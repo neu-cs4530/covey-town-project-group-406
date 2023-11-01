@@ -261,9 +261,11 @@ describe('When a floor emits an auction ended event', () => {
     expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
     expect(bidder.artwork).toEqual([]);
 
-    jest.spyOn(auctionHouse.auctionFloors[0], 'emitAuctionEndEvent').mockImplementation(() => {
-      auctionHouse.resetAuctionFloor(auctionHouse.auctionFloors[0].id);
-    });
+    jest
+      .spyOn(auctionHouse.auctionFloors[0], 'emitAuctionEndEvent')
+      .mockImplementation(async () => {
+        await auctionHouse.resetAuctionFloor(auctionHouse.auctionFloors[0].id);
+      });
 
     await auctionHouse.auctionFloors[0].endAuction();
 
