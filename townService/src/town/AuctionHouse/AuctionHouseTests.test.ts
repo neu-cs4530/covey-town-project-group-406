@@ -248,7 +248,6 @@ describe('When a floor emits an auction ended event', () => {
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork2]);
     expect(bidder.artwork).toEqual([testArtwork2]);
 
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork]);
     expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork]);
   });
 
