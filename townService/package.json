@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/neu-se/covey.town#readme",
   "scripts": {
-    "test": "jest ",
+    "test": "jest --runInBand",
     "start": "npm run build:live",
     "prestart": "tsoa spec-and-routes",
     "build": "tsc -p .",
@@ -66,7 +66,7 @@
     "@types/express": "^4.17.13",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.1",
+    "dotenv": "^16.3.1",
     "express": "^4.18.1",
     "firebase-admin": "^11.11.0",
     "http-status-codes": "^2.2.0",
