@@ -27,9 +27,9 @@ jobs:
           TWILIO_API_AUTH_TOKEN: ${{ secrets.TWILIO_API_AUTH_TOKEN }}
           TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
           TWILIO_API_KEY_SID: ${{ secrets.TWILIO_API_KEY_SID }}
-          FIRESTORE_PROJ_ID: fir-tutorial-e5a27
-          FIRESTORE_PRIVATE_KEY: -----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCkgFF/jia3SUu+\ne543CPV2aAHhzcFhK7Df2cGNCIjmMNqqaUyAZ0TfN8LBV1FPdvtmP9QtpJ9ScYVv\neAgufNFqHB5RSawEuUyB50FiIUYV6DnvMtxOELrbx+2SGYr62hCpBYVzcDnzyjg1\nOgeGIoa27LP70QrjjKlHcG//qjoWrahXkgKBln6BLuYz5Lv8g/GmAwinG30FrM7Y\nRh/DVCwlzekcd5JvPk1ncleMUzHi3Z4I0u5Wo9lauKxPUKwODIgfPGQ4dgEEXkLC\nYQ9TYkY1SSZKXfMP69pz2CRzFntQWkffEzrL6NzAYafsCUGOXS0SUepKSkTjop2x\n7jnRMNv1AgMBAAECggEAEwFZk8bE8FNr3dkDDCa2fUns6xKjhJTQqDwh9tJanAW0\nQxChVwsXU5a/TdPHFXWQprKPKAAnVsC+LYUM+kSkySvwe2xrOax9i1tAHD9DN/q5\niXTd1mMWbkKopELb4g7ZnT2Buow9Fc5yNKwR/Hb2tiGeIGTOwOrFD/eMk67YwTp6\n2KQ5iI97PeD8TfmZBp789Ta3ZPf8OOYdksYyksrYZYVAjybGU/yzetCBp0HUMBLJ\nQacWTZEhbAUlXNrxISakU/KcG3NQ/IM4xhxLGNrm1aXti2pjb8iBVgp16dgu1yvT\nf/UmIZ0ErRm2YgNlpGPfSSMzOIe5JNpY4wXF80eKrQKBgQDZfApqrv7zXrd+A7Yc\nHH4dJJSaAoAn5pK25Zy5jYtZSklv9e88t64gKb3frz+FrwDzo2cHr7ZM6wWMSNWn\nNxMwWHW9bhvykFJCq91JLdfmw0GgSEid4Hj0SaE9xllghTu4JWP3kQ64zTz8hFFK\nx+zLVIiFoaoxtAfXX6eXDpKsxwKBgQDBojUlfq+IbcydKLDZruhCpw/bCb4yGRVj\npDrLTZhjxGRRJo4ZpO7I2isDggg1DBocOHE18ALTrkNnL0G2Bl9X79XDSlq3x+aK\nSCJ460NQbSVtgbJgCFrYPTkCl3rkbQOgMr+czSH9G+qigtSirHdypWpllKgWdRRP\nD2NgG26dYwKBgFQoO5+st9tU+4w3w3B9Vg/Q5+/wp8bI4l0D3PGwZAvZQzGf6UOF\nkEvB20eDeQEyBxxATs4aoGCDUVJHnOVn2nUKxgTXZtkmH67M8oQuySzywaJUVkVB\nZ4ygMVTGPC+tXr6TOWvDJf887CyKxyo40tibjXioZkN1dtNQoHlDml5hAoGBAKiT\nb3GVOXytGtY39r+NZuegSk2Hze4PqG93KziT9XfmIvADgPMShFCYn5oOOtb0Ekc/\nXFB5A/0GWegbXDn8kkUcqB29Pf2CK1N4OYrMR25dl5gesgypOW3I3zlCZ9s2jVGK\n3QbGEDErfLq+7CAzxkopeNe29B+ZDnVGEF47g7HBAoGAO1+ftT77eYleLY+wfugJ\nfOxS0RlqJt1sP1WW1wGcmAQ/Gy5KLt5NZNTqgm88q89aQe0a9iups2DkR1IJeXKa\nueTfBs2TKADW30tiqoz5+qH6VvfpYYgtqYw4pXflMB5uhHW1t42Q5NTJoBql3rIm\nYDaVqckjDV6rjht7njrZwnk=\n-----END PRIVATE KEY-----\n
-          FIRESTORE_CLIENT_EMAIL: firebase-adminsdk-b59s1@fir-tutorial-e5a27.iam.gserviceaccount.com
+          FIRESTORE_PROJ_ID: ${{ secrets.FIRESTORE_PROJ_ID }}
+          FIRESTORE_PRIVATE_KEY: ${{ secrets.FIRESTORE_PRIVATE_KEY }}
+          FIRESTORE_CLIENT_EMAIL: ${{ secrets.FIRESTORE_CLIENT_EMAIL }}
         run: cd townService; npm install && npm run prestart && npm run lint && npm test
 
       - name: Build and test frontend components
