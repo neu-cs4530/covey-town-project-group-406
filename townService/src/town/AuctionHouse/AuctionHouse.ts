@@ -107,6 +107,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     const currentFloor = this._auctionFloors.find(f => f.id === floorID);
     if (currentFloor) {
       if (currentFloor.currentBid.player !== undefined) {
+        await AuctionFloor.DAO.removeArtworkFromAuctionHouse(currentFloor.artBeingAuctioned);
         this.artworkToBeAuctioned = this.artworkToBeAuctioned.filter(
           a => a.id !== currentFloor.artBeingAuctioned.id,
         );
@@ -115,7 +116,6 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
           throw new Error('no artwork left in the auction house!');
         }
         const newArtToBeAuctioned = this._artworkToBeAuctioned[this._indexOfArtToBeAuctioned++];
-        await AuctionFloor.DAO.removeArtworkFromAuctionHouse(currentFloor.artBeingAuctioned);
         currentFloor.artBeingAuctioned = newArtToBeAuctioned;
       }
       currentFloor.status = 'WAITING_TO_START';
