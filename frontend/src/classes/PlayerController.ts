@@ -24,7 +24,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private readonly _networth: number;
 
-  private readonly artwork: Artwork[]
+  private readonly _artwork: Artwork[];
 
   public gameObjects?: PlayerGameObjects;
 
@@ -35,7 +35,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._location = location;
     this._email = '';
     this._networth = 0;
-    this.artwork = [];
+    this._artwork = [];
   }
 
   set location(newLocation: PlayerLocation) {
@@ -57,7 +57,14 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   toPlayerModel(): PlayerModel {
-    return { id: this.id, userName: this.userName, location: this.location, email: this._email, networth: this._networth, artwork: this.artwork };
+    return {
+      id: this.id,
+      userName: this.userName,
+      location: this.location,
+      email: this._email,
+      networth: this._networth,
+      artwork: this._artwork,
+    };
   }
 
   private _updateGameComponentLocation() {
