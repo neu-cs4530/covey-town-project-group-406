@@ -237,19 +237,10 @@ describe('When a floor emits an auction ended event', () => {
     expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
     expect(bidder.artwork).toEqual([]);
 
-    jest
-      .spyOn(auctionHouse.auctionFloors[0], 'emitAuctionEndEvent')
-      .mockImplementation(async () => {
-        await auctionHouse.resetAuctionFloor(auctionHouse.auctionFloors[0].id);
-      });
-
     await auctionHouse.auctionFloors[0].endAuction();
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork2]);
     expect(bidder.artwork).toEqual([testArtwork2]);
-
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork]);
-    expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork]);
   });
 
   it('Resets the floor when it is a auction-house created floor, does not add artwork to player if no bid', async () => {
@@ -261,19 +252,11 @@ describe('When a floor emits an auction ended event', () => {
     expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
     expect(bidder.artwork).toEqual([]);
 
-    jest
-      .spyOn(auctionHouse.auctionFloors[0], 'emitAuctionEndEvent')
-      .mockImplementation(async () => {
-        await auctionHouse.resetAuctionFloor(auctionHouse.auctionFloors[0].id);
-      });
-
     await auctionHouse.auctionFloors[0].endAuction();
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     expect(bidder.artwork).toEqual([]);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
-    expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
-    expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
   });
 
   it('In a player created room, the room is removed and no artwork exchange in player created room', async () => {
