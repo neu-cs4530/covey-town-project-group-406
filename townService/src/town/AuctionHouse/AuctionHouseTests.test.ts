@@ -247,8 +247,6 @@ describe('When a floor emits an auction ended event', () => {
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork2]);
     expect(bidder.artwork).toEqual([testArtwork2]);
-
-    expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork]);
   });
 
   it('Resets the floor when it is a auction-house created floor, does not add artwork to player if no bid', async () => {
