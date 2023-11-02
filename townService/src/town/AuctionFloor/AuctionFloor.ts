@@ -1,4 +1,4 @@
-import { EventEmitter } from 'stream';
+import { EventEmitter } from 'events';
 import Player from '../../lib/Player';
 import { Player as PlayerModel } from '../../types/CoveyTownSocket';
 import { Artwork } from '../../types/Artwork';
