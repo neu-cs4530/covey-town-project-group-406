@@ -211,56 +211,85 @@ describe('When a floor emits an auction ended event', () => {
     seller.artwork = [];
   });
 
+  /* it('bull', async () => {
+    await dao.addPlayer(seller.email);
+    const newAuctionHouse = new AuctionHouseImpl(nanoid(), testAreaBox, mock<TownEmitter>());
+    await newAuctionHouse.setAuctionHouseArtworks([testArtwork, testArtwork2]);
+    newAuctionHouse.createNewAuctionFloorNonPlayer();
+    newAuctionHouse.auctionFloors[0].timeLeft = 1;
+    newAuctionHouse.auctionFloors[0].currentBid = { player: seller, bid: 10 };
+    newAuctionHouse.auctionFloors[0].startAuction();
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise(res => setTimeout(res, 15000));
+    expect(newAuctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2]);
+    await dao.removePlayer(seller.email);
+    await dao.removeAuctionHouse();
+  }, 30000); */
   it('Removes the floor when it is a user-created floor and ', async () => {
     auctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
     auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 10 };
+    auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     expect(seller.artwork).toEqual([testArtwork]);
     expect(bidder.artwork).toEqual([]);
 
-    await auctionHouse.auctionFloors[0].endAuction();
+    auctionHouse.auctionFloors[0].startAuction();
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise(res => setTimeout(res, 5000));
 
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork]);
     expect(seller.artwork).toEqual([]);
     expect(bidder.artwork).toEqual([testArtwork]);
     expect(auctionHouse.auctionFloors).toHaveLength(0);
-  });
+  }, 10000);
   it('Resets the floor when it is a auction-house created floor, adds artwork to player', async () => {
     auctionHouse.createNewAuctionFloorNonPlayer();
     auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 10 };
+    auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
     expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
     expect(bidder.artwork).toEqual([]);
 
-    await auctionHouse.auctionFloors[0].endAuction();
+    auctionHouse.auctionFloors[0].startAuction();
+
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise(res => setTimeout(res, 5000));
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork2]);
     expect(bidder.artwork).toEqual([testArtwork2]);
-  });
+    expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork]);
+  }, 10000);
 
   it('Resets the floor when it is a auction-house created floor, does not add artwork to player if no bid', async () => {
     auctionHouse.createNewAuctionFloorNonPlayer();
     auctionHouse.joinFloorAsBidder(bidder, auctionHouse.auctionFloors[0].id);
+    auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
     expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
     expect(bidder.artwork).toEqual([]);
 
-    await auctionHouse.auctionFloors[0].endAuction();
+    auctionHouse.auctionFloors[0].startAuction();
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise(res => setTimeout(res, 5000));
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     expect(bidder.artwork).toEqual([]);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
-  });
+    expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
+  }, 10000);
 
   it('In a player created room, the room is removed and no artwork exchange in player created room', async () => {
     auctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
+    auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
     expect(seller.artwork).toEqual([testArtwork]);
@@ -268,11 +297,14 @@ describe('When a floor emits an auction ended event', () => {
     expect(bidder.artwork).toEqual([]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
 
-    await auctionHouse.auctionFloors[0].endAuction();
+    auctionHouse.auctionFloors[0].startAuction();
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise(res => setTimeout(res, 5000));
+
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     expect(seller.artwork).toEqual([testArtwork]);
     expect(bidder.artwork).toEqual([]);
     expect(auctionHouse.auctionFloors).toHaveLength(0);
-  });
+  }, 100000);
 });
