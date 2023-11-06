@@ -12,6 +12,7 @@ const testArtwork = {
   artistDisplayName: 'da Vinci',
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
+  isBeingAuctioned: false,
 };
 const testArtwork2 = {
   description: 'Its stary night',
@@ -25,6 +26,7 @@ const testArtwork2 = {
   artistDisplayName: 'Van Gogh',
   medium: 'Canvas',
   countryOfOrigin: 'France',
+  isBeingAuctioned: false,
 };
 
 const testArtwork3 = {
@@ -39,6 +41,7 @@ const testArtwork3 = {
   artistDisplayName: 'Da Vinci',
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
+  isBeingAuctioned: false,
 };
 const dao = new ArtworkDAO();
 let testUser: string;
@@ -287,6 +290,59 @@ describe('testing addArtworkToAuctionHouse', () => {
   });
 });
 
+describe('testing updateAuctionHouseArtworkByID', () => {
+  beforeEach(async () => {
+    await dao.setAuctionHouseArtworks([]);
+    await dao.removeArtworkIDList();
+  });
+  afterEach(async () => {
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
+  it('updates a piece of artwork correctly', async () => {
+    const tempArtwork = {
+      description: 'aaaaa',
+      id: 2,
+      primaryImage: 'aaaaa',
+      current_price: 100000000000,
+      department: 'aaaa',
+      title: 'aaaa Night',
+      culture: 'aa',
+      period: '1800',
+      artistDisplayName: 'Van Gogh',
+      medium: 'Canvas',
+      countryOfOrigin: 'France',
+      isBeingAuctioned: false,
+    };
+    await dao.setAuctionHouseArtworks([testArtwork, testArtwork2, testArtwork3]);
+    await dao.updateAuctionHouseArtworkByID(tempArtwork);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toHaveLength(3);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([
+      testArtwork,
+      tempArtwork,
+      testArtwork3,
+    ]);
+  });
+  it('errors if the artwork with id is not there', async () => {
+    const tempArtwork = {
+      description: 'aaaaa',
+      id: 2,
+      primaryImage: 'aaaaa',
+      current_price: 100000000000,
+      department: 'aaaa',
+      title: 'aaaa Night',
+      culture: 'aa',
+      period: '1800',
+      artistDisplayName: 'Van Gogh',
+      medium: 'Canvas',
+      countryOfOrigin: 'France',
+      isBeingAuctioned: false,
+    };
+    await dao.setAuctionHouseArtworks([testArtwork, testArtwork3]);
+    await expect(dao.updateAuctionHouseArtworkByID(tempArtwork)).rejects.toThrowError();
+  });
+});
+
 describe('testing getAllArtworksAvailableToBuy', () => {
   beforeEach(async () => {
     await dao.setAuctionHouseArtworks([]);
@@ -395,6 +451,7 @@ describe('testing updatePlayerArtworkById', () => {
       artistDisplayName: 'Van Gogh',
       medium: 'Canvas',
       countryOfOrigin: 'France',
+      isBeingAuctioned: false,
     };
     await dao.addArtworksToPlayer(testUser, [testArtwork, testArtwork2, testArtwork3]);
     await dao.updatePlayerArtworkById(testUser, newArtwork2);

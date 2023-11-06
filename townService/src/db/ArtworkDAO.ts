@@ -317,6 +317,28 @@ export default class ArtworkDAO implements IArtworkDAO {
     }
   }
 
+  public async updateAuctionHouseArtworkByID(artwork: Artwork) {
+    try {
+      const allArtworks: Artwork[] = await this.getAllArtworksAvailableToBuy();
+      let count = 0;
+      allArtworks.map((a: Artwork) => {
+        if (a.id === artwork.id) {
+          count += 1;
+          Object.assign(a, artwork);
+        }
+        return a;
+      });
+      if (count === 0) {
+        throw new Error('no artwork with id');
+      }
+      await db.collection('AuctionHouse').doc('artworks').set({ artworks: allArtworks });
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+    }
+  }
+
   public async updatePlayerArtworkById(email: string, artwork: Artwork): Promise<void> {
     try {
       const allArtworks = await this.getAllOfPlayersArtwork(email);

@@ -19,6 +19,7 @@ const testArtwork = {
   artistDisplayName: 'da Vinci',
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
+  isBeingAuctioned: false,
 };
 const testArtwork2 = {
   description: 'Its stary night',
@@ -32,6 +33,7 @@ const testArtwork2 = {
   artistDisplayName: 'Van Gogh',
   medium: 'Canvas',
   countryOfOrigin: 'France',
+  isBeingAuctioned: false,
 };
 
 const seller = new Player(nanoid(), mock<TownEmitter>());
@@ -46,7 +48,6 @@ describe('Testing adding floors to auction house', () => {
   beforeEach(async () => {
     newAuctionHouse = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
   });
-  afterEach(() => {});
   it('Adds a non-player floor to the auction house properly', async () => {
     await newAuctionHouse.setAuctionHouseArtworks([testArtwork2]);
 
@@ -59,6 +60,7 @@ describe('Testing adding floors to auction house', () => {
     expect(newAuctionHouse.auctionFloors[0].status).toEqual('WAITING_TO_START');
 
     await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
   });
   it('Adds a player-created floor to the auction house properly', async () => {
     await dao.addPlayer(seller.email);
@@ -102,6 +104,7 @@ describe('Testing joining floors properly', () => {
     expect(auctionHouse.auctionFloors[0].bidders).toHaveLength(0);
 
     await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
   });
   it('Allows a player to join as a bidder properly', async () => {
     await auctionHouse.setAuctionHouseArtworks([testArtwork]);
@@ -113,6 +116,7 @@ describe('Testing joining floors properly', () => {
     expect(auctionHouse.auctionFloors[0].observers).toHaveLength(0);
 
     await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
   });
   it('Throws an error if the floor does not exist', () => {
     expect(() => auctionHouse.joinFloorAsBidder(bidder, nanoid())).toThrowError(
@@ -131,6 +135,7 @@ describe('Testing delete floor and reset floor functionality', () => {
   });
   afterEach(async () => {
     await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
   });
   it('Deletes a player-owned floor from the auction house', async () => {
     await dao.addPlayer(seller.email);
@@ -205,6 +210,8 @@ describe('When a floor emits an auction ended event', () => {
   });
   afterEach(async () => {
     await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+
     await dao.removePlayer(bidder.email);
     await dao.removePlayer(seller.email);
     bidder.artwork = [];

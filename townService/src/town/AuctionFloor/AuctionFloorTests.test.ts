@@ -19,6 +19,7 @@ const testArtwork = {
   artistDisplayName: 'da Vinci',
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
+  isBeingAuctioned: false,
 };
 const testArtwork2 = {
   description: 'Its stary night',
@@ -32,6 +33,7 @@ const testArtwork2 = {
   artistDisplayName: 'Van Gogh',
   medium: 'Canvas',
   countryOfOrigin: 'France',
+  isBeingAuctioned: false,
 };
 
 let auctionFloorPlayerOwned: AuctionFloor;
@@ -164,6 +166,7 @@ describe('testing removeArtworkFromPlayer and removeArtworkFromAuctionHouse', ()
     await dao.removePlayer(bidder.email);
     await dao.removePlayer(seller.email);
     await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
   });
   it('Removes the artwork properly from the seller if seller is player', async () => {
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
@@ -223,6 +226,7 @@ describe('testing decreaseAuctionTimeLeft', () => {
 
 describe('testing endAuction', () => {
   beforeEach(async () => {
+    await dao.removeArtworkIDList();
     bidder = new Player(nanoid(), mock<TownEmitter>());
     bidder.email = 'bidder@gmail.com';
     await dao.addPlayer(bidder.email);
@@ -265,6 +269,7 @@ describe('testing endAuction', () => {
     await dao.removePlayer(seller.email);
     seller.removeArtwork(testArtwork);
     await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
   });
 
   it('Removes artwork from player when there is a Bid and auction ends', async () => {

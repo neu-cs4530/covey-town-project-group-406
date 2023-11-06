@@ -10,4 +10,5 @@ export type Artwork = {
   artistDisplayName: string;
   medium: string;
   countryOfOrigin: string;
+  isBeingAuctioned: boolean;
 };
