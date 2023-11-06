@@ -9,12 +9,44 @@ export default interface IArtworkDAO {
   addPlayer(email: string): Promise<void>;
 
   /**
+   * Gets an array of all of the artworks that have ever been in circulation in covey.town
+   */
+  getAllArtworkIDs(): Promise<number[]>;
+  /**
+   * logs a player in, ensuring only one player can be logged into an account at any given time
+   * @param email: Player to log in
+   */
+  logPlayerIn(email: string): Promise<void>;
+
+  /**
+   * logs a player out
+   * @param email: Player to log in
+   */
+  logPlayerOut(email: string): Promise<void>;
+
+  /**
+   * checks if there is a player logged in as this user currently
+   */
+  IsPlayerLoggedIn(email: string): Promise<boolean>;
+  /**
    * Adds an artwork to a player in the database
    * @param email: Player's email
    * @param artwork: Artwork to add
    */
   addArtworkToPlayer(email: string, artwork: Artwork): Promise<void>;
 
+  /**
+   * sets a given players money in the database
+   * @param email: the player to update
+   * @param money: the value to set for their money
+   */
+  setPlayerMoney(email: string, money: number): Promise<void>;
+
+  /**
+   * Gets the money for a given player in the database
+   * @param email: the money to get
+   */
+  getPlayerMoney(email: string): Promise<void>;
   /**
    * Adds multiple artworks to a player in the database
    * @param email: Player's email

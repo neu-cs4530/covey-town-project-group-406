@@ -4,6 +4,106 @@ import db from './DBConfig';
 import IArtworkDAO from './IArtworkDAO';
 
 export default class ArtworkDAO implements IArtworkDAO {
+  public async removeArtworkIDList(): Promise<void> {
+    await db.collection('artworkIDs').doc('artworks').delete();
+  }
+
+  public async IsPlayerLoggedIn(email: string): Promise<boolean> {
+    try {
+      const userRef = await db.collection('users').doc(email).get();
+      if (!userRef.exists) {
+        throw new Error('user does not exist');
+      }
+      return userRef.data()?.isLoggedIn;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+      throw new Error('could not log user in');
+    }
+  }
+
+  public async logPlayerOut(email: string): Promise<void> {
+    try {
+      const userRef = await db.collection('users').doc(email).get();
+      if (!userRef.exists) {
+        throw new Error('user does not exist');
+      }
+      await db.collection('users').doc(email).set(
+        {
+          isLoggedIn: false,
+        },
+        {
+          merge: true,
+        },
+      );
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+    }
+  }
+
+  public async logPlayerIn(email: string): Promise<void> {
+    try {
+      const userRef = await db.collection('users').doc(email).get();
+      if (!userRef.exists) {
+        throw new Error('user does not exist');
+      }
+      if (userRef.data()?.isLoggedIn === true) {
+        throw new Error('user is already logged in somewhere else');
+      }
+      await db.collection('users').doc(email).set(
+        {
+          isLoggedIn: true,
+        },
+        {
+          merge: true,
+        },
+      );
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+    }
+  }
+
+  public async setPlayerMoney(email: string, money: number): Promise<void> {
+    try {
+      const userRef = await db.collection('users').doc(email).get();
+      if (!userRef.exists) {
+        throw new Error('user does not exist');
+      }
+      await db.collection('users').doc(email).set(
+        {
+          money,
+        },
+        {
+          merge: true,
+        },
+      );
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+    }
+  }
+
+  public async getPlayerMoney(email: string): Promise<void> {
+    try {
+      const userRef = await db.collection('users').doc(email).get();
+      if (!userRef.exists) {
+        throw new Error('user does not exist');
+      }
+      return userRef.data()?.money;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+      throw new Error('error getting user money');
+    }
+  }
+
   public async addArtworkToPlayer(email: string, artwork: Artwork): Promise<void> {
     try {
       const userRef = await db.collection('users').doc(email).get();
@@ -35,7 +135,11 @@ export default class ArtworkDAO implements IArtworkDAO {
       if (userRef.exists) {
         throw new Error('user with username already exists');
       }
-      await db.collection('users').doc(email).set({ artworks: [] });
+      await db.collection('users').doc(email).set({
+        artworks: [],
+        money: 0,
+        isLoggedIn: false,
+      });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -75,16 +179,50 @@ export default class ArtworkDAO implements IArtworkDAO {
     }
   }
 
+  private async _addArtworkIDToLog(id: number): Promise<void> {
+    await db
+      .collection('artworkIDs')
+      .doc('artworks')
+      .set(
+        {
+          artworkIDs: FieldValue.arrayUnion(id),
+        },
+        { merge: true },
+      );
+  }
+
+  public async getAllArtworkIDs(): Promise<number[]> {
+    const ref = await db.collection('artworkIDs').doc('artworks').get();
+    if (!ref.exists) {
+      throw new Error('artwork ids collection not instantiated properly');
+    }
+    return ref.data()?.artworkIDs;
+  }
+
   public async setAuctionHouseArtworks(artworks: Artwork[]): Promise<void> {
     try {
-      const newIDs = new Set<number>();
+      let collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      if (!collectionResponse.exists) {
+        await db.collection('artworkIDs').doc('artworks').set({ artworkIDs: [] });
+      }
+      collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      const allArtworkIDs: number[] = collectionResponse.data()?.artworkIDs;
+      const ids: Set<number> = new Set();
       for (const a of artworks) {
-        if (newIDs.has(a.id)) {
+        if (allArtworkIDs.indexOf(a.id) !== -1) {
+          throw new Error('duplicate artwork in circulation');
+        }
+        if (ids.has(a.id)) {
           throw new Error('duplciate ID');
         }
-        newIDs.add(a.id);
+        ids.add(a.id);
       }
       await db.collection('AuctionHouse').doc('artworks').set({ artworks });
+      await Promise.all(
+        artworks.map(async artwork => {
+          await this._addArtworkIDToLog(artwork.id);
+        }),
+      );
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -94,13 +232,18 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   public async addArtworkToAuctionHouse(artwork: Artwork): Promise<void> {
     try {
-      const newIDs = new Set<number>();
-      const artworksInAuctionHouse = await this.getAllArtworksAvailableToBuy();
-      for (const a of artworksInAuctionHouse) {
-        newIDs.add(a.id);
-        if (newIDs.has(artwork.id)) {
-          throw new Error('duplicate ID');
-        }
+      const response = await db.collection('AuctionHouse').doc('artworks').get();
+      if (!response.exists) {
+        throw new Error('auction house not instantiated properly');
+      }
+      let collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      if (!collectionResponse.exists) {
+        await db.collection('artworkIDs').doc('artworks').set({ artworkIDs: [] });
+      }
+      collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      const allArtworks: number[] = collectionResponse.data()?.artworkIDs;
+      if (allArtworks.indexOf(artwork.id) !== -1) {
+        throw new Error('duplicate artowrk in circulation');
       }
       await db
         .collection('AuctionHouse')
@@ -111,6 +254,7 @@ export default class ArtworkDAO implements IArtworkDAO {
             merge: true,
           },
         );
+      await this._addArtworkIDToLog(artwork.id);
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -237,7 +381,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       if (allArtworks.length === result.length) {
         throw new Error('no artwork with id');
       }
-      await this.setAuctionHouseArtworks(result);
+      await db.collection('AuctionHouse').doc('artworks').set({ artworks: result });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
