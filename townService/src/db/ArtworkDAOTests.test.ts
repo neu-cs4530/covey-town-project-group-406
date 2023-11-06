@@ -122,11 +122,15 @@ describe('Testing logging in a player', () => {
     await expect(dao.IsPlayerLoggedIn(testUser)).resolves.toEqual(false);
   });
   it('does not let a user log in if no user is in the db', async () => {
-    await expect(async () => dao.logPlayerIn('fakeplayer@gmail.com')).rejects.toThrowError();
+    await expect(async () => dao.logPlayerIn('fakeplayer@gmail.com')).rejects.toThrowError(
+      'user does not exist',
+    );
   });
   it('does not let two users sign in as the same user', async () => {
     await dao.logPlayerIn(testUser);
-    await expect(async () => dao.logPlayerIn(testUser)).rejects.toThrowError();
+    await expect(async () => dao.logPlayerIn(testUser)).rejects.toThrowError(
+      'user is already logged in somewhere else',
+    );
     await dao.logPlayerOut(testUser);
     await dao.logPlayerIn(testUser);
     await expect(dao.IsPlayerLoggedIn(testUser)).resolves.toBe(true);
@@ -148,7 +152,7 @@ describe('Testing addMoneyToPlayer', () => {
   it('throws an error if the user does not exist', async () => {
     await expect(async () =>
       dao.setPlayerMoney('nonexistinguser@gmail.com', 10000),
-    ).rejects.toThrowError();
+    ).rejects.toThrowError('user does not exist');
   });
 });
 
@@ -229,17 +233,29 @@ describe('testing setAuctionHouseArtworks', () => {
     await dao.removeArtworkIDList();
   });
   it('properly sets auction house artworks with new artworks', async () => {
-    await dao.setAuctionHouseArtworks([testArtwork, testArtwork2, testArtwork3]);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([
-      testArtwork,
-      testArtwork2,
-      testArtwork3,
-    ]);
+    await dao.setAuctionHouseArtworks([testArtwork, testArtwork2]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork, testArtwork2]);
+    await expect(dao.getAllArtworkIDs()).resolves.toEqual([1, 2]);
+    await dao.setAuctionHouseArtworks([testArtwork3]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork3]);
+    await expect(dao.getAllArtworkIDs()).resolves.toEqual([1, 2, 3]);
   });
-  it('throws an error if an artwork id is already taken', async () => {
+  it('throws an error if an artwork id is already taken in same list', async () => {
     await expect(async () =>
       dao.setAuctionHouseArtworks([testArtwork, testArtwork, testArtwork3]),
     ).rejects.toThrowError('duplciate ID');
+  });
+  it('throws an error if an artwork id is already taken in at all', async () => {
+    await dao.setAuctionHouseArtworks([testArtwork, testArtwork2]);
+    await dao.setAuctionHouseArtworks([]);
+    await expect(dao.setAuctionHouseArtworks([testArtwork])).rejects.toThrowError(
+      'duplicate artwork in circulation',
+    );
+    await expect(dao.setAuctionHouseArtworks([testArtwork2])).rejects.toThrowError(
+      'duplicate artwork in circulation',
+    );
+    await dao.setAuctionHouseArtworks([testArtwork3]);
+    await expect(dao.getAllArtworkIDs()).resolves.toEqual([1, 2, 3]);
   });
 });
 
@@ -255,11 +271,13 @@ describe('testing addArtworkToAuctionHouse', () => {
   it('adds artwork to empty auction house', async () => {
     await dao.addArtworkToAuctionHouse(testArtwork);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork]);
+    await expect(dao.getAllArtworkIDs()).resolves.toEqual([1]);
   });
   it('adds artwork to non-empty auction house', async () => {
     await dao.setAuctionHouseArtworks([testArtwork2]);
     await dao.addArtworkToAuctionHouse(testArtwork);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
+    await expect(dao.getAllArtworkIDs()).resolves.toEqual([2, 1]);
   });
   it('detects artwork with duplicate id and throws error', async () => {
     await dao.addArtworkToAuctionHouse(testArtwork);
