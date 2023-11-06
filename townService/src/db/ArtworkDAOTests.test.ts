@@ -229,6 +229,7 @@ describe('testing addArtworksToPlayer', () => {
 });
 describe('testing setAuctionHouseArtworks', () => {
   beforeEach(async () => {
+    await dao.removeArtworkIDList();
     await dao.setAuctionHouseArtworks([]);
   });
   afterEach(async () => {
