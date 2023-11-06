@@ -67,6 +67,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   public createNewAuctionFloorNonPlayer(): void {
     const artworkToAuction = AuctionHouse.artworkToBeAuctioned[this._indexOfArtToBeAuctioned++];
     artworkToAuction.isBeingAuctioned = true;
+    // await AuctionFloor.DAO.updateAuctionHouseArtworkByID(artworkToAuction);
     const floor = new AuctionFloor(
       nanoid(),
       artworkToAuction,
@@ -112,6 +113,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
         currentFloor.artBeingAuctioned = newArtToBeAuctioned;
       }
       currentFloor.artBeingAuctioned.isBeingAuctioned = true;
+      // await AuctionFloor.DAO.updateAuctionHouseArtworkByID(currentFloor.artBeingAuctioned);
       currentFloor.status = 'WAITING_TO_START';
       currentFloor.timeLeft = 30;
       currentFloor.currentBid = { player: undefined, bid: 0 };
@@ -132,6 +134,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     }
 
     artwork.isBeingAuctioned = true;
+    // await AuctionFloor.DAO.updatePlayerArtworkById(player.email, artwork);
     const floor = new AuctionFloor(
       nanoid(),
       artwork,
