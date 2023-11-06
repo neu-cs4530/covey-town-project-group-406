@@ -4,6 +4,7 @@ import ArtworkDAO from '../../db/ArtworkDAO';
 import { TownEmitter } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
 import AuctionHouse from './AuctionHouse';
+import { Artwork } from '../../types/Artwork';
 
 const dao = new ArtworkDAO();
 
@@ -21,6 +22,36 @@ const testArtwork = {
   countryOfOrigin: 'Italy',
   isBeingAuctioned: false,
 };
+
+const testArtworkIsNotBeingAuctioned = {
+  description: 'Its the Mona Lisa',
+  id: 1,
+  primaryImage: 'monalisa.png',
+  current_price: 500000,
+  department: 'unknown',
+  title: 'The mona lisa',
+  culture: 'unknown',
+  period: '1500',
+  artistDisplayName: 'da Vinci',
+  medium: 'Canvas',
+  countryOfOrigin: 'Italy',
+  isBeingAuctioned: false,
+};
+
+const testArtworkIsBeingAuctioned = {
+  description: 'Its the Mona Lisa',
+  id: 1,
+  primaryImage: 'monalisa.png',
+  current_price: 500000,
+  department: 'unknown',
+  title: 'The mona lisa',
+  culture: 'unknown',
+  period: '1500',
+  artistDisplayName: 'da Vinci',
+  medium: 'Canvas',
+  countryOfOrigin: 'Italy',
+  isBeingAuctioned: true,
+};
 const testArtwork2 = {
   description: 'Its stary night',
   id: 2,
@@ -36,6 +67,36 @@ const testArtwork2 = {
   isBeingAuctioned: false,
 };
 
+const testArtwork2IsNotBeingAuctioned = {
+  description: 'Its stary night',
+  id: 2,
+  primaryImage: 'starynight.png',
+  current_price: 100000000000,
+  department: 'unknown',
+  title: 'Stary Night',
+  culture: 'unknown',
+  period: '1800',
+  artistDisplayName: 'Van Gogh',
+  medium: 'Canvas',
+  countryOfOrigin: 'France',
+  isBeingAuctioned: false,
+};
+
+const testArtwork2IsBeingAuctioned = {
+  description: 'Its stary night',
+  id: 2,
+  primaryImage: 'starynight.png',
+  current_price: 100000000000,
+  department: 'unknown',
+  title: 'Stary Night',
+  culture: 'unknown',
+  period: '1800',
+  artistDisplayName: 'Van Gogh',
+  medium: 'Canvas',
+  countryOfOrigin: 'France',
+  isBeingAuctioned: true,
+};
+
 const seller = new Player(nanoid(), mock<TownEmitter>());
 seller.email = 'seller@gmail.com';
 const bidder = new Player(nanoid(), mock<TownEmitter>());
@@ -47,6 +108,12 @@ describe('Testing adding floors to auction house', () => {
   let newAuctionHouse: AuctionHouse;
   beforeEach(async () => {
     newAuctionHouse = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    AuctionHouse.artworkToBeAuctioned = [];
+    await dao.removeArtworkIDList();
+  });
+  afterEach(async () => {
+    await dao.removeArtworkIDList();
+    AuctionHouse.artworkToBeAuctioned = [];
   });
   it('Adds a non-player floor to the auction house properly', async () => {
     await newAuctionHouse.setAuctionHouseArtworks([testArtwork2]);
@@ -60,7 +127,6 @@ describe('Testing adding floors to auction house', () => {
     expect(newAuctionHouse.auctionFloors[0].status).toEqual('WAITING_TO_START');
 
     await dao.removeAuctionHouse();
-    await dao.removeArtworkIDList();
   });
   it('Adds a player-created floor to the auction house properly', async () => {
     await dao.addPlayer(seller.email);
@@ -91,8 +157,14 @@ describe('Testing adding floors to auction house', () => {
 });
 
 describe('Testing joining floors properly', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await dao.removeArtworkIDList();
     auctionHouse = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    AuctionHouse.artworkToBeAuctioned = [];
+  });
+  afterEach(async () => {
+    await dao.removeArtworkIDList();
+    AuctionHouse.artworkToBeAuctioned = [];
   });
   it('Allows a player to join as an observer properly', async () => {
     await auctionHouse.setAuctionHouseArtworks([testArtwork2]);
@@ -104,7 +176,6 @@ describe('Testing joining floors properly', () => {
     expect(auctionHouse.auctionFloors[0].bidders).toHaveLength(0);
 
     await dao.removeAuctionHouse();
-    await dao.removeArtworkIDList();
   });
   it('Allows a player to join as a bidder properly', async () => {
     await auctionHouse.setAuctionHouseArtworks([testArtwork]);
@@ -116,7 +187,6 @@ describe('Testing joining floors properly', () => {
     expect(auctionHouse.auctionFloors[0].observers).toHaveLength(0);
 
     await dao.removeAuctionHouse();
-    await dao.removeArtworkIDList();
   });
   it('Throws an error if the floor does not exist', () => {
     expect(() => auctionHouse.joinFloorAsBidder(bidder, nanoid())).toThrowError(
@@ -131,11 +201,14 @@ describe('Testing joining floors properly', () => {
 describe('Testing delete floor and reset floor functionality', () => {
   beforeEach(async () => {
     auctionHouse = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    AuctionHouse.artworkToBeAuctioned = [];
+    await dao.removeArtworkIDList();
     await auctionHouse.setAuctionHouseArtworks([testArtwork, testArtwork2]);
   });
   afterEach(async () => {
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
+    AuctionHouse.artworkToBeAuctioned = [];
   });
   it('Deletes a player-owned floor from the auction house', async () => {
     await dao.addPlayer(seller.email);
@@ -170,7 +243,7 @@ describe('Testing delete floor and reset floor functionality', () => {
     auctionHouse.createNewAuctionFloorNonPlayer();
 
     expect(auctionHouse.auctionFloors).toHaveLength(1);
-    expect(auctionHouse.artworkToBeAuctioned).toHaveLength(2);
+    expect(AuctionHouse.artworkToBeAuctioned).toHaveLength(2);
     expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork);
 
     auctionHouse.auctionFloors[0].currentBid = { player: seller, bid: 10 };
@@ -181,7 +254,7 @@ describe('Testing delete floor and reset floor functionality', () => {
     expect(auctionHouse.auctionFloors[0].status).toBe('WAITING_TO_START');
     expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
     expect(auctionHouse.indexOfArtToBeAuctioned).toBe(1);
-    expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2]);
+    expect(AuctionHouse.artworkToBeAuctioned).toEqual([testArtwork2]);
   });
   it('Throws an error if no floor exists with ID given to delete', async () => {
     await expect(async () => auctionHouse.deleteAuctionFloor(nanoid())).rejects.toThrowError(
@@ -196,51 +269,129 @@ describe('Testing delete floor and reset floor functionality', () => {
 });
 
 describe('When a floor emits an auction ended event', () => {
+  let art: Artwork;
+  let artNo: Artwork;
+  let artYes: Artwork;
+
+  let art2: Artwork;
+  let artNo2: Artwork;
+  let artYes2: Artwork;
   beforeEach(async () => {
+    art = {
+      description: 'Its the Mona Lisa',
+      id: 1,
+      primaryImage: 'monalisa.png',
+      current_price: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artistDisplayName: 'da Vinci',
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: false,
+    };
+    artNo = {
+      description: 'Its the Mona Lisa',
+      id: 1,
+      primaryImage: 'monalisa.png',
+      current_price: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artistDisplayName: 'da Vinci',
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: false,
+    };
+    artYes = {
+      description: 'Its the Mona Lisa',
+      id: 1,
+      primaryImage: 'monalisa.png',
+      current_price: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artistDisplayName: 'da Vinci',
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: true,
+    };
+    art2 = {
+      description: 'Its the Mona Lisa',
+      id: 2,
+      primaryImage: 'monalisa.png',
+      current_price: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artistDisplayName: 'da Vinci',
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: false,
+    };
+    artNo2 = {
+      description: 'Its the Mona Lisa',
+      id: 2,
+      primaryImage: 'monalisa.png',
+      current_price: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artistDisplayName: 'da Vinci',
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: false,
+    };
+    artYes2 = {
+      description: 'Its the Mona Lisa',
+      id: 2,
+      primaryImage: 'monalisa.png',
+      current_price: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artistDisplayName: 'da Vinci',
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: true,
+    };
     bidder.artwork = [];
     seller.artwork = [];
     await dao.addPlayer(seller.email);
-    await dao.addArtworkToPlayer(seller.email, testArtwork);
-    seller.addArtwork(testArtwork);
+    await dao.addArtworkToPlayer(seller.email, art);
+    seller.addArtwork(art);
 
     await dao.addPlayer(bidder.email);
 
     auctionHouse = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await auctionHouse.setAuctionHouseArtworks([testArtwork2, testArtwork]);
+    AuctionHouse.artworkToBeAuctioned = [];
+    await dao.removeArtworkIDList();
+    await auctionHouse.setAuctionHouseArtworks([art, art2]);
   });
   afterEach(async () => {
     await dao.removeAuctionHouse();
-    await dao.removeArtworkIDList();
-
     await dao.removePlayer(bidder.email);
     await dao.removePlayer(seller.email);
+    await dao.removeArtworkIDList();
+    AuctionHouse.artworkToBeAuctioned = [];
     bidder.artwork = [];
     seller.artwork = [];
   });
 
-  /* it('bull', async () => {
-    await dao.addPlayer(seller.email);
-    const newAuctionHouse = new AuctionHouseImpl(nanoid(), testAreaBox, mock<TownEmitter>());
-    await newAuctionHouse.setAuctionHouseArtworks([testArtwork, testArtwork2]);
-    newAuctionHouse.createNewAuctionFloorNonPlayer();
-    newAuctionHouse.auctionFloors[0].timeLeft = 1;
-    newAuctionHouse.auctionFloors[0].currentBid = { player: seller, bid: 10 };
-    newAuctionHouse.auctionFloors[0].startAuction();
-    // eslint-disable-next-line no-promise-executor-return
-    await new Promise(res => setTimeout(res, 15000));
-    expect(newAuctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2]);
-    await dao.removePlayer(seller.email);
-    await dao.removeAuctionHouse();
-  }, 30000); */
   it('Removes the floor when it is a user-created floor and ', async () => {
-    auctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
+    auctionHouse.createNewAuctionFloorPlayer(seller, art);
     auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 10 };
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
+    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artNo]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    expect(seller.artwork).toEqual([testArtwork]);
+    expect(seller.artwork).toEqual([artYes]);
     expect(bidder.artwork).toEqual([]);
 
     auctionHouse.auctionFloors[0].startAuction();
@@ -248,9 +399,9 @@ describe('When a floor emits an auction ended event', () => {
     await new Promise(res => setTimeout(res, 5000));
 
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([]);
-    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork]);
+    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([artNo]);
     expect(seller.artwork).toEqual([]);
-    expect(bidder.artwork).toEqual([testArtwork]);
+    expect(bidder.artwork).toEqual([artNo]);
     expect(auctionHouse.auctionFloors).toHaveLength(0);
   }, 10000);
   it('Resets the floor when it is a auction-house created floor, adds artwork to player', async () => {
@@ -259,8 +410,8 @@ describe('When a floor emits an auction ended event', () => {
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
-    expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo, artNo2]);
+    expect(AuctionHouse.artworkToBeAuctioned).toEqual([artYes, artNo2]);
     expect(bidder.artwork).toEqual([]);
 
     auctionHouse.auctionFloors[0].startAuction();
@@ -268,10 +419,10 @@ describe('When a floor emits an auction ended event', () => {
     // eslint-disable-next-line no-promise-executor-return
     await new Promise(res => setTimeout(res, 5000));
 
-    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork2]);
-    expect(bidder.artwork).toEqual([testArtwork2]);
-    expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork]);
+    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([artNo]);
+    expect(bidder.artwork).toEqual([artNo]);
+    expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(artYes2);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo2]);
   }, 10000);
 
   it('Resets the floor when it is a auction-house created floor, does not add artwork to player if no bid', async () => {
@@ -280,8 +431,8 @@ describe('When a floor emits an auction ended event', () => {
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
-    expect(auctionHouse.artworkToBeAuctioned).toEqual([testArtwork2, testArtwork]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo, artNo2]);
+    expect(AuctionHouse.artworkToBeAuctioned).toEqual([artYes, artNo2]);
     expect(bidder.artwork).toEqual([]);
 
     auctionHouse.auctionFloors[0].startAuction();
@@ -290,16 +441,16 @@ describe('When a floor emits an auction ended event', () => {
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     expect(bidder.artwork).toEqual([]);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork2, testArtwork]);
-    expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo, artNo2]);
+    expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(artYes);
   }, 10000);
 
   it('In a player created room, the room is removed and no artwork exchange in player created room', async () => {
-    auctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
+    auctionHouse.createNewAuctionFloorPlayer(seller, art);
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
-    expect(seller.artwork).toEqual([testArtwork]);
+    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artNo]);
+    expect(seller.artwork).toEqual([artYes]);
 
     expect(bidder.artwork).toEqual([]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
@@ -308,9 +459,9 @@ describe('When a floor emits an auction ended event', () => {
     // eslint-disable-next-line no-promise-executor-return
     await new Promise(res => setTimeout(res, 5000));
 
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
+    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artNo]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    expect(seller.artwork).toEqual([testArtwork]);
+    expect(seller.artwork).toEqual([artNo]);
     expect(bidder.artwork).toEqual([]);
     expect(auctionHouse.auctionFloors).toHaveLength(0);
   }, 100000);

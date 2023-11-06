@@ -17,17 +17,9 @@ import AuctionFloor from '../AuctionFloor/AuctionFloor';
 export default class AuctionHouse extends InteractableArea implements IAuctionHouse {
   private _auctionFloors: AuctionFloor[];
 
-  private _artworkToBeAuctioned: Artwork[];
+  static artworkToBeAuctioned: Artwork[] = [];
 
   private _indexOfArtToBeAuctioned: number;
-
-  set artworkToBeAuctioned(art: Artwork[]) {
-    this._artworkToBeAuctioned = art;
-  }
-
-  get artworkToBeAuctioned(): Artwork[] {
-    return this._artworkToBeAuctioned;
-  }
 
   get indexOfArtToBeAuctioned(): number {
     return this._indexOfArtToBeAuctioned;
@@ -44,7 +36,6 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   constructor(id: string, coordinates: BoundingBox, townEmitter: TownEmitter) {
     super(id, coordinates, townEmitter);
     this._auctionFloors = [];
-    this._artworkToBeAuctioned = [];
     this._indexOfArtToBeAuctioned = 0;
   }
 
@@ -69,12 +60,13 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   }
 
   public async setAuctionHouseArtworks(artworks: Artwork[]) {
-    this.artworkToBeAuctioned = artworks;
+    AuctionHouse.artworkToBeAuctioned = artworks;
     await AuctionFloor.DAO.setAuctionHouseArtworks(artworks);
   }
 
   public createNewAuctionFloorNonPlayer(): void {
-    const artworkToAuction = this._artworkToBeAuctioned[this._indexOfArtToBeAuctioned++];
+    const artworkToAuction = AuctionHouse.artworkToBeAuctioned[this._indexOfArtToBeAuctioned++];
+    artworkToAuction.isBeingAuctioned = true;
     const floor = new AuctionFloor(
       nanoid(),
       artworkToAuction,
@@ -108,16 +100,18 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     if (currentFloor) {
       if (currentFloor.currentBid.player !== undefined) {
         await AuctionFloor.DAO.removeArtworkFromAuctionHouse(currentFloor.artBeingAuctioned);
-        this.artworkToBeAuctioned = this.artworkToBeAuctioned.filter(
+        AuctionHouse.artworkToBeAuctioned = AuctionHouse.artworkToBeAuctioned.filter(
           a => a.id !== currentFloor.artBeingAuctioned.id,
         );
         this._indexOfArtToBeAuctioned -= 1;
-        if (this.indexOfArtToBeAuctioned >= this.artworkToBeAuctioned.length) {
+        if (this.indexOfArtToBeAuctioned >= AuctionHouse.artworkToBeAuctioned.length) {
           throw new Error('no artwork left in the auction house!');
         }
-        const newArtToBeAuctioned = this._artworkToBeAuctioned[this._indexOfArtToBeAuctioned++];
+        const newArtToBeAuctioned =
+          AuctionHouse.artworkToBeAuctioned[this._indexOfArtToBeAuctioned++];
         currentFloor.artBeingAuctioned = newArtToBeAuctioned;
       }
+      currentFloor.artBeingAuctioned.isBeingAuctioned = true;
       currentFloor.status = 'WAITING_TO_START';
       currentFloor.timeLeft = 30;
       currentFloor.currentBid = { player: undefined, bid: 0 };
@@ -137,6 +131,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
       throw new Error('player does not have artwork with id');
     }
 
+    artwork.isBeingAuctioned = true;
     const floor = new AuctionFloor(
       nanoid(),
       artwork,

@@ -160,12 +160,14 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
 
   public async endAuction(): Promise<void> {
     this.status = 'ENDED';
+    this.artBeingAuctioned.isBeingAuctioned = false;
     if (this._currentBid.player !== undefined) {
       if (this._auctioneer) {
         await this.removeArtworkFromPlayer();
       }
       await this.giveArtworkToPlayer();
     }
+
     this.emitAuctionEndEvent();
   }
 
