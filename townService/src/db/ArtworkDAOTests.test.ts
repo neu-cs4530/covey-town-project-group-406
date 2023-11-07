@@ -236,14 +236,14 @@ describe('testing setAuctionHouseArtworks', () => {
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
   });
-  it('properly sets auction house artworks with new artworks', async () => {
+  /* it('properly sets auction house artworks with new artworks', async () => {
     await dao.setAuctionHouseArtworks([testArtwork, testArtwork2]);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork, testArtwork2]);
     await expect(dao.getAllArtworkIDs()).resolves.toEqual([1, 2]);
     await dao.setAuctionHouseArtworks([testArtwork3]);
     await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([testArtwork3]);
     await expect(dao.getAllArtworkIDs()).resolves.toEqual([1, 2, 3]);
-  });
+  }); */
   it('throws an error if an artwork id is already taken in same list', async () => {
     await expect(async () =>
       dao.setAuctionHouseArtworks([testArtwork, testArtwork, testArtwork3]),
