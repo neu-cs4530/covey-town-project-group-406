@@ -411,11 +411,13 @@ describe('TownController', () => {
         id: nanoid(),
         location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
         userName: nanoid(),
-        email: 'fake@gmail.com',
-        wallet: {
-          networth: 0,
-          artwork: [],
-          money: 0,
+        artAuctionAccount: {
+          email: 'fake@gmail.com',
+          wallet: {
+            networth: 0,
+            artwork: [],
+            money: 0,
+          },
         },
       };
       //Add that player to the test town

@@ -4,8 +4,10 @@ import db from './DBConfig';
 import IArtworkDAO from './IArtworkDAO';
 
 export default class ArtworkDAO implements IArtworkDAO {
+  ARTWORK_IDS_COLLECTION = 'artworkIDs';
+
   public async removeArtworkIDList(): Promise<void> {
-    await db.collection('artworkIDs').doc('artworks').delete();
+    await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').delete();
   }
 
   public async IsPlayerLoggedIn(email: string): Promise<boolean> {
@@ -181,7 +183,7 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   private async _addArtworkIDToLog(id: number): Promise<void> {
     await db
-      .collection('artworkIDs')
+      .collection(this.ARTWORK_IDS_COLLECTION)
       .doc('artworks')
       .update({
         artworkIDs: FieldValue.arrayUnion(id),
@@ -189,7 +191,7 @@ export default class ArtworkDAO implements IArtworkDAO {
   }
 
   public async getAllArtworkIDs(): Promise<number[]> {
-    const ref = await db.collection('artworkIDs').doc('artworks').get();
+    const ref = await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').get();
     if (!ref.exists) {
       throw new Error('artwork ids collection not instantiated properly');
     }
@@ -198,11 +200,14 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   public async setAuctionHouseArtworks(artworks: Artwork[]): Promise<void> {
     try {
-      let collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      let collectionResponse = await db
+        .collection(this.ARTWORK_IDS_COLLECTION)
+        .doc('artworks')
+        .get();
       if (!collectionResponse.exists) {
-        await db.collection('artworkIDs').doc('artworks').set({ artworkIDs: [] });
+        await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').set({ artworkIDs: [] });
       }
-      collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      collectionResponse = await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').get();
       const allArtworkIDs: number[] = collectionResponse.data()?.artworkIDs;
       const ids: Set<number> = new Set();
       for (const a of artworks) {
@@ -233,11 +238,14 @@ export default class ArtworkDAO implements IArtworkDAO {
       if (!response.exists) {
         throw new Error('auction house not instantiated properly');
       }
-      let collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      let collectionResponse = await db
+        .collection(this.ARTWORK_IDS_COLLECTION)
+        .doc('artworks')
+        .get();
       if (!collectionResponse.exists) {
-        await db.collection('artworkIDs').doc('artworks').set({ artworkIDs: [] });
+        await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').set({ artworkIDs: [] });
       }
-      collectionResponse = await db.collection('artworkIDs').doc('artworks').get();
+      collectionResponse = await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').get();
       const allArtworks: number[] = collectionResponse.data()?.artworkIDs;
       if (allArtworks.indexOf(artwork.id) !== -1) {
         throw new Error('duplicate artowrk in circulation');
