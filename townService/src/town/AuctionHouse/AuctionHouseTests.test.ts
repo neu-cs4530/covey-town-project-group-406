@@ -23,35 +23,6 @@ const testArtwork = {
   isBeingAuctioned: false,
 };
 
-const testArtworkIsNotBeingAuctioned = {
-  description: 'Its the Mona Lisa',
-  id: 1,
-  primaryImage: 'monalisa.png',
-  current_price: 500000,
-  department: 'unknown',
-  title: 'The mona lisa',
-  culture: 'unknown',
-  period: '1500',
-  artistDisplayName: 'da Vinci',
-  medium: 'Canvas',
-  countryOfOrigin: 'Italy',
-  isBeingAuctioned: false,
-};
-
-const testArtworkIsBeingAuctioned = {
-  description: 'Its the Mona Lisa',
-  id: 1,
-  primaryImage: 'monalisa.png',
-  current_price: 500000,
-  department: 'unknown',
-  title: 'The mona lisa',
-  culture: 'unknown',
-  period: '1500',
-  artistDisplayName: 'da Vinci',
-  medium: 'Canvas',
-  countryOfOrigin: 'Italy',
-  isBeingAuctioned: true,
-};
 const testArtwork2 = {
   description: 'Its stary night',
   id: 2,
@@ -65,36 +36,6 @@ const testArtwork2 = {
   medium: 'Canvas',
   countryOfOrigin: 'France',
   isBeingAuctioned: false,
-};
-
-const testArtwork2IsNotBeingAuctioned = {
-  description: 'Its stary night',
-  id: 2,
-  primaryImage: 'starynight.png',
-  current_price: 100000000000,
-  department: 'unknown',
-  title: 'Stary Night',
-  culture: 'unknown',
-  period: '1800',
-  artistDisplayName: 'Van Gogh',
-  medium: 'Canvas',
-  countryOfOrigin: 'France',
-  isBeingAuctioned: false,
-};
-
-const testArtwork2IsBeingAuctioned = {
-  description: 'Its stary night',
-  id: 2,
-  primaryImage: 'starynight.png',
-  current_price: 100000000000,
-  department: 'unknown',
-  title: 'Stary Night',
-  culture: 'unknown',
-  period: '1800',
-  artistDisplayName: 'Van Gogh',
-  medium: 'Canvas',
-  countryOfOrigin: 'France',
-  isBeingAuctioned: true,
 };
 
 const seller = new Player(nanoid(), mock<TownEmitter>());
