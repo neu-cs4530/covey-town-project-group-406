@@ -1,8 +1,8 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
 import { nanoid } from 'nanoid';
 import Player from '../../lib/Player';
-import { Artwork } from '../../types/Artwork';
 import {
+  Artwork,
   TownEmitter,
   InteractableType,
   InteractableCommand,
@@ -85,7 +85,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
 
   public async deleteAuctionFloor(floorID: string): Promise<void> {
     const f = this.auctionFloors.find(floor => floor.id === floorID);
-    if (f && !f.currentBid.player && f?.artBeingAuctioned && f.auctioneer) {
+    if (f && !f.currentBid.player && f.artBeingAuctioned && f.auctioneer) {
       await AuctionFloor.DAO.updatePlayerArtworkById(f.auctioneer.email, f.artBeingAuctioned);
     }
     const res = this._auctionFloors.filter(floor => floor.id !== floorID);

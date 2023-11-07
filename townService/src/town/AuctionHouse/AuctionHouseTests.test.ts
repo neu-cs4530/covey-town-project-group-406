@@ -1,10 +1,9 @@
 import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
 import ArtworkDAO from '../../db/ArtworkDAO';
-import { TownEmitter } from '../../types/CoveyTownSocket';
+import { TownEmitter, Artwork } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
 import AuctionHouse from './AuctionHouse';
-import { Artwork } from '../../types/Artwork';
 
 const dao = new ArtworkDAO();
 
@@ -12,7 +11,7 @@ const testArtwork = {
   description: 'Its the Mona Lisa',
   id: 1,
   primaryImage: 'monalisa.png',
-  current_price: 500000,
+  purchasePrice: 500000,
   department: 'unknown',
   title: 'The mona lisa',
   culture: 'unknown',
@@ -21,13 +20,14 @@ const testArtwork = {
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
   isBeingAuctioned: false,
+  purchaseHistory: [],
 };
 
 const testArtwork2 = {
   description: 'Its stary night',
   id: 2,
   primaryImage: 'starynight.png',
-  current_price: 100000000000,
+  purchasePrice: 100000000000,
   department: 'unknown',
   title: 'Stary Night',
   culture: 'unknown',
@@ -36,6 +36,7 @@ const testArtwork2 = {
   medium: 'Canvas',
   countryOfOrigin: 'France',
   isBeingAuctioned: false,
+  purchaseHistory: [],
 };
 
 const seller = new Player(nanoid(), mock<TownEmitter>());
@@ -226,7 +227,7 @@ describe('When a floor emits an auction ended event', () => {
       description: 'Its the Mona Lisa',
       id: 1,
       primaryImage: 'monalisa.png',
-      current_price: 500000,
+      purchasePrice: 500000,
       department: 'unknown',
       title: 'The mona lisa',
       culture: 'unknown',
@@ -235,12 +236,13 @@ describe('When a floor emits an auction ended event', () => {
       medium: 'Canvas',
       countryOfOrigin: 'Italy',
       isBeingAuctioned: false,
+      purchaseHistory: [],
     };
     artNo = {
       description: 'Its the Mona Lisa',
       id: 1,
       primaryImage: 'monalisa.png',
-      current_price: 500000,
+      purchasePrice: 500000,
       department: 'unknown',
       title: 'The mona lisa',
       culture: 'unknown',
@@ -249,12 +251,13 @@ describe('When a floor emits an auction ended event', () => {
       medium: 'Canvas',
       countryOfOrigin: 'Italy',
       isBeingAuctioned: false,
+      purchaseHistory: [],
     };
     artYes = {
       description: 'Its the Mona Lisa',
       id: 1,
       primaryImage: 'monalisa.png',
-      current_price: 500000,
+      purchasePrice: 500000,
       department: 'unknown',
       title: 'The mona lisa',
       culture: 'unknown',
@@ -263,12 +266,13 @@ describe('When a floor emits an auction ended event', () => {
       medium: 'Canvas',
       countryOfOrigin: 'Italy',
       isBeingAuctioned: true,
+      purchaseHistory: [],
     };
     art2 = {
       description: 'Its the Mona Lisa',
       id: 2,
       primaryImage: 'monalisa.png',
-      current_price: 500000,
+      purchasePrice: 500000,
       department: 'unknown',
       title: 'The mona lisa',
       culture: 'unknown',
@@ -277,12 +281,13 @@ describe('When a floor emits an auction ended event', () => {
       medium: 'Canvas',
       countryOfOrigin: 'Italy',
       isBeingAuctioned: false,
+      purchaseHistory: [],
     };
     artNo2 = {
       description: 'Its the Mona Lisa',
       id: 2,
       primaryImage: 'monalisa.png',
-      current_price: 500000,
+      purchasePrice: 500000,
       department: 'unknown',
       title: 'The mona lisa',
       culture: 'unknown',
@@ -291,12 +296,13 @@ describe('When a floor emits an auction ended event', () => {
       medium: 'Canvas',
       countryOfOrigin: 'Italy',
       isBeingAuctioned: false,
+      purchaseHistory: [],
     };
     artYes2 = {
       description: 'Its the Mona Lisa',
       id: 2,
       primaryImage: 'monalisa.png',
-      current_price: 500000,
+      purchasePrice: 500000,
       department: 'unknown',
       title: 'The mona lisa',
       culture: 'unknown',
@@ -305,6 +311,7 @@ describe('When a floor emits an auction ended event', () => {
       medium: 'Canvas',
       countryOfOrigin: 'Italy',
       isBeingAuctioned: true,
+      purchaseHistory: [],
     };
     bidder.artwork = [];
     seller.artwork = [];

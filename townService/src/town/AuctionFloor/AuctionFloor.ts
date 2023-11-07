@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import Player from '../../lib/Player';
-import { Player as PlayerModel } from '../../types/CoveyTownSocket';
-import { Artwork } from '../../types/Artwork';
+import { Player as PlayerModel, Artwork } from '../../types/CoveyTownSocket';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import IAuctionFloor, { Status, Bid, AuctionFloorModel } from './IAuctionFloor';
 
@@ -162,9 +161,20 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     this.status = 'ENDED';
     this.artBeingAuctioned.isBeingAuctioned = false;
     if (this._currentBid.player !== undefined) {
+      this.artBeingAuctioned.purchasePrice = this.currentBid.bid;
       if (this._auctioneer) {
+        this._auctioneer.wallet.money += this._artBeingAuctioned.purchasePrice;
+        await AuctionFloor.DAO.setPlayerMoney(
+          this._auctioneer.email,
+          this._auctioneer.wallet.money,
+        );
         await this.removeArtworkFromPlayer();
       }
+      this._currentBid.player.wallet.money -= this.artBeingAuctioned.purchasePrice;
+      await AuctionFloor.DAO.setPlayerMoney(
+        this._currentBid.player.email,
+        this._currentBid.player.wallet.money,
+      );
       await this.giveArtworkToPlayer();
     }
 

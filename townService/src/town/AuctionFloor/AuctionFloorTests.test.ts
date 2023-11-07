@@ -11,7 +11,7 @@ const testArtwork = {
   description: 'Its the Mona Lisa',
   id: 1,
   primaryImage: 'monalisa.png',
-  current_price: 500000,
+  purchasePrice: 500000,
   department: 'unknown',
   title: 'The mona lisa',
   culture: 'unknown',
@@ -20,12 +20,13 @@ const testArtwork = {
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
   isBeingAuctioned: false,
+  purchaseHistory: [],
 };
 const testArtwork2 = {
   description: 'Its stary night',
   id: 2,
   primaryImage: 'starynight.png',
-  current_price: 100000000000,
+  purchasePrice: 100000000000,
   department: 'unknown',
   title: 'Stary Night',
   culture: 'unknown',
@@ -34,6 +35,7 @@ const testArtwork2 = {
   medium: 'Canvas',
   countryOfOrigin: 'France',
   isBeingAuctioned: false,
+  purchaseHistory: [],
 };
 
 let auctionFloorPlayerOwned: AuctionFloor;

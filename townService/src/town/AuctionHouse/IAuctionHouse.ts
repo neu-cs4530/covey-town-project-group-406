@@ -1,8 +1,11 @@
 import { AuctionFloorModel } from '../AuctionFloor/IAuctionFloor';
-import { Interactable, InteractableType } from '../../types/CoveyTownSocket';
+import { Interactable, InteractableType, Artwork } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
-import { Artwork } from '../../types/Artwork';
 
+/**
+ * Interface representing an entire auction house which stores many auction floors
+ * This is the main interactable component we are implementing for covey.town
+ */
 export default interface IAuctionHouse {
   /**
    * This method sets the artworks in the auction house that are available to go on auction

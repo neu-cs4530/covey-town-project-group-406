@@ -1,6 +1,11 @@
 import { nanoid } from 'nanoid';
-import { Player as PlayerModel, PlayerLocation, TownEmitter } from '../types/CoveyTownSocket';
-import { Artwork } from '../types/Artwork';
+import {
+  Player as PlayerModel,
+  PlayerLocation,
+  TownEmitter,
+  Artwork,
+  Wallet,
+} from '../types/CoveyTownSocket';
 
 /**
  * Each user who is connected to a town is represented by a Player object
@@ -26,9 +31,7 @@ export default class Player {
 
   private _email: string;
 
-  private _netWorth: number;
-
-  private _artwork: Artwork[];
+  private _wallet: Wallet;
 
   constructor(userName: string, townEmitter: TownEmitter) {
     this.location = {
@@ -42,8 +45,19 @@ export default class Player {
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
     this._email = '';
-    this._netWorth = 0;
-    this._artwork = [];
+    this._wallet = {
+      money: 1_000_000,
+      artwork: [],
+      networth: 1_000_000,
+    };
+  }
+
+  get wallet(): Wallet {
+    return this._wallet;
+  }
+
+  set wallet(w: Wallet) {
+    this._wallet = w;
   }
 
   get userName(): string {
@@ -59,27 +73,27 @@ export default class Player {
   }
 
   set networth(nw: number) {
-    this.networth = nw;
+    this._wallet.networth = nw;
   }
 
   get networth(): number {
-    return this._netWorth;
+    return this._wallet.networth;
   }
 
   public addArtwork(art: Artwork) {
-    this._artwork.push(art);
+    this._wallet.artwork.push(art);
   }
 
   public removeArtwork(art: Artwork) {
-    this._artwork = this._artwork.filter(a => a.id !== art.id);
+    this._wallet.artwork = this._wallet.artwork.filter(a => a.id !== art.id);
   }
 
   set artwork(arts: Artwork[]) {
-    this._artwork = arts;
+    this._wallet.artwork = arts;
   }
 
   get artwork(): Artwork[] {
-    return this._artwork;
+    return this._wallet.artwork;
   }
 
   get id(): string {
@@ -104,8 +118,11 @@ export default class Player {
       location: this.location,
       userName: this._userName,
       email: this._email,
-      networth: this._netWorth,
-      artwork: this._artwork,
+      wallet: {
+        networth: this._wallet.networth,
+        artwork: this._wallet.artwork,
+        money: this._wallet.money,
+      },
     };
   }
 }

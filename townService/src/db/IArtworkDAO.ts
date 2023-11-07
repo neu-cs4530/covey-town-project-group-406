@@ -1,5 +1,8 @@
-import { Artwork } from '../types/Artwork';
+import { Artwork } from '../types/CoveyTownSocket';
 
+/*
+  Interface for the Data access object that interacts with the database to get player and artwork info
+*/
 export default interface IArtworkDAO {
   /**
    * Adds a player to the database with no artworks
