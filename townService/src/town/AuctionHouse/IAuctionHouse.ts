@@ -11,7 +11,7 @@ export default interface IAuctionHouse {
    * This method sets the artworks in the auction house that are available to go on auction
    * @param artworks the artworks to set
    */
-  setAuctionHouseArtworks(artworks: Artwork[]): void;
+  addArtworksToAuctionHouse(artworks: Artwork[]): void;
   /**
    * Creates a new auction floor and adds it to the
    * Array of auction floors. This method should fetch
@@ -19,20 +19,7 @@ export default interface IAuctionHouse {
    * for the artwork to auction
    */
   createNewAuctionFloorNonPlayer(): void;
-  /**
-   * Removes an auction floor from the list of auction floors
-   * Should only be used on user created auction floors
-   * @param floorID: Floor ID to remove
-   */
-  deleteAuctionFloor(floorID: string): void;
-  /**
-   * Used to fetch a new piece of artwork for a
-   * Auction houses's auction floor, and just reset
-   * the values so that there is no bid,
-   * the status is wating to start, etc
-   * @param floorID: Floor ID to remove
-   */
-  resetAuctionFloor(floorID: string): void;
+
   /**
    * Creates a new auction floor owned by a player
    * @param player: Player who's auction floor it is

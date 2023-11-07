@@ -7,11 +7,14 @@ import {
   Wallet,
   ArtAuctionAccount,
 } from '../types/CoveyTownSocket';
+import ArtworkDAO from '../db/ArtworkDAO';
 
 /**
  * Each user who is connected to a town is represented by a Player object
  */
 export default class Player {
+  static dao = new ArtworkDAO();
+
   /** The current location of this user in the world map * */
   public location: PlayerLocation;
 
@@ -64,9 +67,10 @@ export default class Player {
     throw new Error('art auction account not defined for user');
   }
 
-  set wallet(w: Wallet) {
+  public async setWallet(w: Wallet) {
     if (this._artAuctionAccount) {
       this._artAuctionAccount.wallet = w;
+      await Player.dao.updatePlayer(this._artAuctionAccount.email, true, w.money);
     }
   }
 
@@ -100,23 +104,19 @@ export default class Player {
     throw new Error('auction account not defined for user');
   }
 
-  public addArtwork(art: Artwork) {
+  public async addArtwork(art: Artwork) {
     if (this._artAuctionAccount) {
       this._artAuctionAccount.wallet.artwork.push(art);
+      await Player.dao.addArtworksToPlayer(this._artAuctionAccount.email, [art]);
     }
   }
 
-  public removeArtwork(art: Artwork) {
+  public async removeArtwork(art: Artwork) {
     if (this._artAuctionAccount) {
       this._artAuctionAccount.wallet.artwork = this._artAuctionAccount.wallet.artwork.filter(
         a => a.id !== art.id,
       );
-    }
-  }
-
-  set artwork(arts: Artwork[]) {
-    if (this._artAuctionAccount) {
-      this._artAuctionAccount.wallet.artwork = arts;
+      await Player.dao.removeArtworkFromPlayerById(this._artAuctionAccount.email, art.id);
     }
   }
 

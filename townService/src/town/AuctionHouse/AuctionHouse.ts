@@ -52,9 +52,10 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     throw new Error('no floor with ID found');
   }
 
-  public async setAuctionHouseArtworks(artworks: Artwork[]) {
-    AuctionHouse.artworkToBeAuctioned = artworks;
+  public async addArtworksToAuctionHouse(artworks: Artwork[]) {
     await AuctionFloor.DAO.addArtworksToAuctionHouse(artworks);
+    const artworksInAuctionHouse = await AuctionFloor.DAO.getAllAuctionHouseArtworks();
+    AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
   }
 
   public async createNewAuctionFloorNonPlayer(): Promise<void> {
@@ -74,7 +75,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
         undefined,
       );
       floor.on('auctionEnded', f => {
-        this.resetAuctionFloor(f.id);
+        this._resetAuctionFloor(f.id);
       });
       floor.on('timeDecreased', t => {
         this._emitAreaChanged();
@@ -83,7 +84,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     }
   }
 
-  public async deleteAuctionFloor(floorID: string): Promise<void> {
+  private async _deleteAuctionFloor(floorID: string): Promise<void> {
     const f = this.auctionFloors.find(floor => floor.id === floorID);
     if (f && !f.currentBid.player && f.artBeingAuctioned && f.auctioneer) {
       await AuctionFloor.DAO.updatePlayerArtworkById(f.auctioneer.email, f.artBeingAuctioned);
@@ -97,7 +98,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   }
 
   // make sure to remove artwork here
-  public async resetAuctionFloor(floorID: string): Promise<void> {
+  private async _resetAuctionFloor(floorID: string): Promise<void> {
     const currentFloor = this._auctionFloors.find(f => f.id === floorID);
     if (currentFloor) {
       if (currentFloor.currentBid.player !== undefined) {
@@ -147,7 +148,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
       player,
     );
     floor.on('auctionEnded', f => {
-      this.deleteAuctionFloor(f.id);
+      this._deleteAuctionFloor(f.id);
     });
     floor.on('timeDecreased', t => {
       this._emitAreaChanged();
