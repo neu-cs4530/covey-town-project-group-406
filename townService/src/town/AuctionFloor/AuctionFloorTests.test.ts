@@ -128,5 +128,6 @@ describe('when an auction starts', () => {
     await new Promise(res => setTimeout(res, 5000));
     expect(decreaseAuctionTimeLeftSpy).toHaveBeenCalledTimes(3);
     expect(endAuctionSpy).toHaveBeenCalledTimes(1);
+    expect(floor.timeLeft).toBe(0);
   }, 10000000);
 });
