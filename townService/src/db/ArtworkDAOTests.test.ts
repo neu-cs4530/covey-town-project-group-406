@@ -294,6 +294,7 @@ describe('testing addArtworkToAuctionHouse', () => {
   });
   it('detects artwork with duplicate id and throws error', async () => {
     await dao.addArtworkToAuctionHouse(testArtwork);
+    await dao.addArtworkToAuctionHouse(testArtwork2);
     await expect(dao.addArtworkToAuctionHouse(testArtwork)).rejects.toThrowError(
       'duplicate artowrk in circulation',
     );

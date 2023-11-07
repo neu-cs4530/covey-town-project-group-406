@@ -196,7 +196,6 @@ export default class ArtworkDAO implements IArtworkDAO {
     return ref.data()?.artworkIDs;
   }
 
-  // this should remove the artworks that are in auction house from the in circulation list
   public async setAuctionHouseArtworks(artworks: Artwork[]): Promise<void> {
     try {
       let collectionResponse = await db.collection('artworkIDs').doc('artworks').get();

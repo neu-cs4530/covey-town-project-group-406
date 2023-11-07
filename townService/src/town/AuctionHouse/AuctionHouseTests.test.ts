@@ -64,10 +64,10 @@ describe('Testing adding floors to auction house', () => {
     expect(newAuctionHouse.auctionFloors).toHaveLength(1);
     expect(newAuctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
     expect(newAuctionHouse.auctionFloors[0].auctioneer).toBeUndefined();
-    expect(newAuctionHouse.indexOfArtToBeAuctioned).toBe(1);
     expect(newAuctionHouse.auctionFloors[0].status).toEqual('WAITING_TO_START');
 
     await dao.removeAuctionHouse();
+    testArtwork2.isBeingAuctioned = false;
   });
   it('Adds a player-created floor to the auction house properly', async () => {
     await dao.addPlayer(seller.email);
@@ -79,10 +79,10 @@ describe('Testing adding floors to auction house', () => {
     expect(newAuctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork);
     expect(newAuctionHouse.auctionFloors[0].auctioneer).toEqual(seller);
     expect(seller.artwork).toEqual([testArtwork]);
-    expect(newAuctionHouse.indexOfArtToBeAuctioned).toBe(0);
     expect(newAuctionHouse.auctionFloors[0].status).toEqual('WAITING_TO_START');
 
     await dao.removePlayer(seller.email);
+    testArtwork.isBeingAuctioned = false;
   });
 
   it('Throws an error if the player does not have the artwork in their inventory and tries to create a floor with it', async () => {
@@ -94,6 +94,7 @@ describe('Testing adding floors to auction house', () => {
     ).rejects.toThrowError('player does not have artwork with id');
 
     await dao.removePlayer(seller.email);
+    testArtwork.isBeingAuctioned = false;
   });
 });
 
@@ -117,6 +118,7 @@ describe('Testing joining floors properly', () => {
     expect(auctionHouse.auctionFloors[0].bidders).toHaveLength(0);
 
     await dao.removeAuctionHouse();
+    testArtwork2.isBeingAuctioned = false;
   });
   it('Allows a player to join as a bidder properly', async () => {
     await auctionHouse.setAuctionHouseArtworks([testArtwork]);
@@ -128,6 +130,7 @@ describe('Testing joining floors properly', () => {
     expect(auctionHouse.auctionFloors[0].observers).toHaveLength(0);
 
     await dao.removeAuctionHouse();
+    testArtwork.isBeingAuctioned = false;
   });
   it('Throws an error if the floor does not exist', () => {
     expect(() => auctionHouse.joinFloorAsBidder(bidder, nanoid())).toThrowError(
@@ -165,12 +168,12 @@ describe('Testing delete floor and reset floor functionality', () => {
 
     await dao.removePlayer(seller.email);
     seller.removeArtwork(testArtwork);
+    testArtwork.isBeingAuctioned = false;
   });
   it('Resets an auction-house owned floor when there is no winner', async () => {
     await auctionHouse.createNewAuctionFloorNonPlayer();
 
     expect(auctionHouse.auctionFloors).toHaveLength(1);
-    expect(auctionHouse.indexOfArtToBeAuctioned).toBe(1);
     expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork);
 
     await auctionHouse.resetAuctionFloor(auctionHouse.auctionFloors[0].id);
@@ -178,7 +181,7 @@ describe('Testing delete floor and reset floor functionality', () => {
     expect(auctionHouse.auctionFloors).toHaveLength(1);
     expect(auctionHouse.auctionFloors[0].currentBid.bid).toBe(0);
     expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork);
-    expect(auctionHouse.indexOfArtToBeAuctioned).toBe(1);
+    testArtwork.isBeingAuctioned = false;
   });
   it('Resets an auction-house owned floor when there is a winner', async () => {
     await auctionHouse.createNewAuctionFloorNonPlayer();
@@ -194,8 +197,9 @@ describe('Testing delete floor and reset floor functionality', () => {
     expect(auctionHouse.auctionFloors[0].currentBid.bid).toBe(0);
     expect(auctionHouse.auctionFloors[0].status).toBe('WAITING_TO_START');
     expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
-    expect(auctionHouse.indexOfArtToBeAuctioned).toBe(1);
     expect(AuctionHouse.artworkToBeAuctioned).toEqual([testArtwork2]);
+    testArtwork.isBeingAuctioned = false;
+    testArtwork2.isBeingAuctioned = false;
   });
   it('Throws an error if no floor exists with ID given to delete', async () => {
     await expect(async () => auctionHouse.deleteAuctionFloor(nanoid())).rejects.toThrowError(
