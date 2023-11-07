@@ -1,7 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
-import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
-import { Artwork } from '../types/Artwork';
+import { Player as PlayerModel, PlayerLocation, Wallet } from '../types/CoveyTownSocket';
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
@@ -22,9 +21,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private readonly _email: string;
 
-  private readonly _networth: number;
-
-  private readonly _artwork: Artwork[];
+  private readonly _wallet: Wallet;
 
   public gameObjects?: PlayerGameObjects;
 
@@ -34,8 +31,11 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._userName = userName;
     this._location = location;
     this._email = '';
-    this._networth = 0;
-    this._artwork = [];
+    this._wallet = {
+      networth: 1_000_000,
+      artwork: [],
+      money: 1_000_000,
+    };
   }
 
   set location(newLocation: PlayerLocation) {
@@ -62,8 +62,11 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       userName: this.userName,
       location: this.location,
       email: this._email,
-      networth: this._networth,
-      artwork: this._artwork,
+      wallet: {
+        money: this._wallet.money,
+        networth: this._wallet.networth,
+        artwork: this._wallet.artwork,
+      },
     };
   }
 

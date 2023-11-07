@@ -412,8 +412,11 @@ describe('TownController', () => {
         location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
         userName: nanoid(),
         email: 'fake@gmail.com',
-        networth: 0,
-        artwork: [],
+        wallet: {
+          networth: 0,
+          artwork: [],
+          money: 0,
+        },
       };
       //Add that player to the test town
       testPlayerPlayersChangedFn = emitEventAndExpectListenerFiring(
