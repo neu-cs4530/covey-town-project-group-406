@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
 import Player from '../../lib/Player';
-import { TownEmitter } from '../../types/CoveyTownSocket';
+import { Artwork, TownEmitter } from '../../types/CoveyTownSocket';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import AuctionFloor from './AuctionFloor';
 
 const dao = new ArtworkDAO();
 
-const testArtwork = {
+const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',
   id: 1,
   primaryImage: 'monalisa.png',
@@ -16,13 +16,13 @@ const testArtwork = {
   title: 'The mona lisa',
   culture: 'unknown',
   period: '1500',
-  artistDisplayName: 'da Vinci',
+  artist: { name: 'da Vinci' },
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
   isBeingAuctioned: false,
   purchaseHistory: [],
 };
-const testArtwork2 = {
+const testArtwork2: Artwork = {
   description: 'Its stary night',
   id: 2,
   primaryImage: 'starynight.png',
@@ -31,7 +31,7 @@ const testArtwork2 = {
   title: 'Stary Night',
   culture: 'unknown',
   period: '1800',
-  artistDisplayName: 'Van Gogh',
+  artist: { name: 'Van Gogh' },
   medium: 'Canvas',
   countryOfOrigin: 'France',
   isBeingAuctioned: false,

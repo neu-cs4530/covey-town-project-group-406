@@ -197,7 +197,7 @@ export type Artwork = {
   title: string;
   culture?: string;
   period?: string;
-  artistDisplayName: string;
+  artist: ArtistInfo;
   medium: string;
   countryOfOrigin?: string;
   isBeingAuctioned: boolean;
@@ -207,6 +207,16 @@ export type Artwork = {
 export type Purchase = {
   player: Player,
   sellPrice: number
+}
+
+export type ArtistInfo = {
+  name: string,
+  biography?: string,
+  nationality?: string,
+  begin?: string,
+  end?: string,
+  gender?: string,
+  wikiUrl?: string
 }
 
 export type InteractableCommand =
