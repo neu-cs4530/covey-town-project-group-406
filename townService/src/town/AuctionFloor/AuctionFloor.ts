@@ -166,13 +166,13 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
         );
         await this._removeArtworkFromPlayer();
       }
+      await this._giveArtworkToPlayer();
       this._currentBid.player.wallet.money -= this.artBeingAuctioned.purchasePrice;
       await AuctionFloor.DAO.updatePlayer(
         this._currentBid.player.email,
         true,
         this._currentBid.player.wallet.money,
       );
-      await this._giveArtworkToPlayer();
     }
 
     this._emitAuctionEndEvent();
