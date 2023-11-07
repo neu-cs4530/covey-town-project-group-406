@@ -49,6 +49,7 @@ export default class Player {
     this._artAuctionAccount = undefined;
   }
 
+  // this needs to use the DAO to get the information
   public initializeArtAuctionAccount(email: string) {
     this._artAuctionAccount = {
       email,

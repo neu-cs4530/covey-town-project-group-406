@@ -362,4 +362,61 @@ describe('when an auction floor ends', () => {
       await dao.removeArtworkIDList();
     }, 100000);
   });
+
+  describe('in a player owned auction floor', () => {
+    it('keeps artwork in player inventory if no bid, shows that it is not being auctioned', async () => {
+      const player = new Player(nanoid(), mock<TownEmitter>());
+      player.initializeArtAuctionAccount('player@gmail.com');
+      await dao.addPlayer(player.email);
+      await player.addArtwork(testArtwork);
+
+      const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+      await house.createNewAuctionFloorPlayer(player, testArtwork);
+      house.auctionFloors[0].timeLeft = 1;
+
+      house.auctionFloors[0].startAuction();
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise(res => setTimeout(res, 5000));
+
+      expect(player.artwork).toEqual([testArtworkIsNotBeingAuctioned]);
+      const playerResponse = await dao.getPlayer(player.email);
+      const { artworks } = playerResponse;
+      expect(artworks).toEqual([testArtworkIsNotBeingAuctioned]);
+      await dao.removePlayer(player.email);
+    }, 100000);
+
+    it('transfers artwork properly and deducts money when there is a bid', async () => {
+      const player = new Player(nanoid(), mock<TownEmitter>());
+      player.initializeArtAuctionAccount('player@gmail.com');
+      await dao.addPlayer(player.email);
+      await player.addArtwork(testArtwork);
+
+      const player2 = new Player(nanoid(), mock<TownEmitter>());
+      player2.initializeArtAuctionAccount('player2@gmail.com');
+      await dao.addPlayer(player2.email);
+
+      const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+      await house.createNewAuctionFloorPlayer(player, testArtwork);
+      house.auctionFloors[0].timeLeft = 1;
+      house.auctionFloors[0].currentBid = { player: player2, bid: 500000 };
+      house.auctionFloors[0].startAuction();
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise(res => setTimeout(res, 5000));
+
+      expect(player.artwork).toEqual([]);
+      expect(player2.artwork).toEqual([testArtworkIsNotBeingAuctioned]);
+      expect(player.wallet.money).toEqual(1500000);
+      expect(player2.wallet.money).toEqual(500000);
+      const playerResponse = await dao.getPlayer(player.email);
+      const playerResponse2 = await dao.getPlayer(player2.email);
+      const { artworks } = playerResponse;
+      const artworks2 = playerResponse2.artworks;
+      expect(artworks).toEqual([]);
+      expect(artworks2).toEqual([testArtworkIsNotBeingAuctioned]);
+      expect(playerResponse.money).toEqual(1500000);
+      expect(playerResponse2.money).toEqual(500000);
+      await dao.removePlayer(player.email);
+      await dao.removePlayer(player2.email);
+    }, 100000);
+  });
 });

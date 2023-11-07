@@ -50,9 +50,12 @@ export default class ArtworkDAO implements IArtworkDAO {
       if (!response.exists) {
         throw new Error('user does not exist');
       }
-      await db.collection(this.USER_COLLECTION).doc(email).set({
-        artworks: newArtwork,
-      });
+      await db.collection(this.USER_COLLECTION).doc(email).set(
+        {
+          artworks: newArtwork,
+        },
+        { merge: true },
+      );
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -228,7 +231,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       }
       await db.collection(this.USER_COLLECTION).doc(email).set({
         artworks: [],
-        money: 1_000_000,
+        money: 1000000,
         isLoggedIn: false,
       });
     } catch (err) {
