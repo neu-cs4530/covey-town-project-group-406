@@ -215,3 +215,75 @@ describe('when joining an auction floor', () => {
     await dao.removeArtworkIDList();
   });
 });
+
+describe('when an auction floor ends', () => {
+  let testArtwork: Artwork;
+  let testArtwork2: Artwork;
+  let testArtworkIsBeingAuctioned: Artwork;
+  beforeEach(() => {
+    testArtwork = {
+      description: 'Its the Mona Lisa',
+      id: 1,
+      primaryImage: 'monalisa.png',
+      purchasePrice: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artist: { name: 'da Vinci' },
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: false,
+      purchaseHistory: [],
+    };
+    testArtworkIsBeingAuctioned = {
+      description: 'Its the Mona Lisa',
+      id: 1,
+      primaryImage: 'monalisa.png',
+      purchasePrice: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artist: { name: 'da Vinci' },
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: true,
+      purchaseHistory: [],
+    };
+    testArtwork2 = {
+      description: 'Its stary night',
+      id: 2,
+      primaryImage: 'starynight.png',
+      purchasePrice: 100000000000,
+      department: 'unknown',
+      title: 'Stary Night',
+      culture: 'unknown',
+      period: '1800',
+      artist: { name: 'Van Gogh' },
+      medium: 'Canvas',
+      countryOfOrigin: 'France',
+      isBeingAuctioned: false,
+      purchaseHistory: [],
+    };
+  });
+  describe('in a non-player auction floor', () => {
+    it('does not give artwork to anyone, and reset floor with same artwork when no bid', async () => {
+      const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+      await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+      await house.createNewAuctionFloorNonPlayer();
+      house.auctionFloors[0].timeLeft = 1;
+      house.auctionFloors[0].startAuction();
+
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise(res => setTimeout(res, 2000));
+
+      expect(house.auctionFloors).toHaveLength(1);
+      expect(house.auctionFloors[0].artBeingAuctioned).toEqual(testArtworkIsBeingAuctioned);
+      expect(house.auctionFloors[0].status).toEqual('WAITING_TO_START');
+      expect(house.auctionFloors[0].timeLeft).toBe(30);
+      await dao.removeAuctionHouse();
+      await dao.removeArtworkIDList();
+    }, 100000);
+  });
+});

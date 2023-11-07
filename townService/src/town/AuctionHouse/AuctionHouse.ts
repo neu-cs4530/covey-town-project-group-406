@@ -120,6 +120,8 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
       currentFloor.status = 'WAITING_TO_START';
       currentFloor.timeLeft = 30;
       currentFloor.currentBid = { player: undefined, bid: 0 };
+      currentFloor.observers = [];
+      currentFloor.bidders = [];
     } else {
       throw new Error('no floor with id found');
     }
