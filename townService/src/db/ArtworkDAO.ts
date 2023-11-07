@@ -265,15 +265,14 @@ export default class ArtworkDAO implements IArtworkDAO {
 
       const allArtworkIDs: number[] = collectionResponse.data()?.artworkIDs;
       const ids: Set<number> = new Set();
-      for (const a of artworks) {
-        if (allArtworkIDs.indexOf(a.id) !== -1) {
-          throw new Error('duplicate artwork in circulation');
-        }
-        if (ids.has(a.id)) {
-          throw new Error('duplciate ID');
-        }
-        ids.add(a.id);
+
+      if (this._areAnyOfArtworksAreInCirculation(allArtworkIDs, artworks)) {
+        throw new Error('duplicate artwork in circulation');
       }
+      if (!this._areArtworksUnique([], artworks)) {
+        throw new Error('duplciate ID');
+      }
+
       await db.collection(this.AUCTION_HOUSE_COLLECTION).doc('artworks').set({ artworks });
       await Promise.all(
         artworks.map(async artwork => {
