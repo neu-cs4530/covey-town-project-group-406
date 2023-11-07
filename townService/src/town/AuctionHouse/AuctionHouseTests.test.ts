@@ -338,7 +338,7 @@ describe('When a floor emits an auction ended event', () => {
 
   it('Removes the floor when it is a user-created floor and ', async () => {
     await auctionHouse.createNewAuctionFloorPlayer(seller, art);
-    auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 10 };
+    auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 500000 };
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artYes]);
@@ -358,7 +358,7 @@ describe('When a floor emits an auction ended event', () => {
   }, 10000);
   it('Resets the floor when it is a auction-house created floor, adds artwork to player', async () => {
     await auctionHouse.createNewAuctionFloorNonPlayer();
-    auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 10 };
+    auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 500000 };
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);

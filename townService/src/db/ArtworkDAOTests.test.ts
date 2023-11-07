@@ -1,10 +1,11 @@
+import { Artwork } from '../types/CoveyTownSocket';
 import ArtworkDAO from './ArtworkDAO';
 
-const testArtwork = {
+const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',
   id: 1,
   primaryImage: 'monalisa.png',
-  current_price: 500000,
+  purchasePrice: 500000,
   department: 'unknown',
   title: 'The mona lisa',
   culture: 'unknown',
@@ -13,12 +14,13 @@ const testArtwork = {
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
   isBeingAuctioned: false,
+  purchaseHistory: [],
 };
-const testArtwork2 = {
+const testArtwork2: Artwork = {
   description: 'Its stary night',
   id: 2,
   primaryImage: 'starynight.png',
-  current_price: 100000000000,
+  purchasePrice: 100000000000,
   department: 'unknown',
   title: 'Stary Night',
   culture: 'unknown',
@@ -27,13 +29,14 @@ const testArtwork2 = {
   medium: 'Canvas',
   countryOfOrigin: 'France',
   isBeingAuctioned: false,
+  purchaseHistory: [],
 };
 
-const testArtwork3 = {
+const testArtwork3: Artwork = {
   description: 'Its the Last Supper',
   id: 3,
   primaryImage: 'lastsupper.png',
-  current_price: 2,
+  purchasePrice: 2,
   department: 'unknown',
   title: 'The Last Supper',
   culture: 'unkown',
@@ -42,6 +45,7 @@ const testArtwork3 = {
   medium: 'Canvas',
   countryOfOrigin: 'Italy',
   isBeingAuctioned: false,
+  purchaseHistory: [],
 };
 const dao = new ArtworkDAO();
 let testUser: string;
@@ -311,11 +315,11 @@ describe('testing updateAuctionHouseArtworkByID', () => {
     await dao.removeArtworkIDList();
   });
   it('updates a piece of artwork correctly', async () => {
-    const tempArtwork = {
+    const tempArtwork: Artwork = {
       description: 'aaaaa',
       id: 2,
       primaryImage: 'aaaaa',
-      current_price: 100000000000,
+      purchasePrice: 100000000000,
       department: 'aaaa',
       title: 'aaaa Night',
       culture: 'aa',
@@ -324,6 +328,7 @@ describe('testing updateAuctionHouseArtworkByID', () => {
       medium: 'Canvas',
       countryOfOrigin: 'France',
       isBeingAuctioned: false,
+      purchaseHistory: [],
     };
     await dao.setAuctionHouseArtworks([testArtwork, testArtwork2, testArtwork3]);
     await dao.updateAuctionHouseArtworkByID(tempArtwork);
@@ -335,11 +340,11 @@ describe('testing updateAuctionHouseArtworkByID', () => {
     ]);
   });
   it('errors if the artwork with id is not there', async () => {
-    const tempArtwork = {
+    const tempArtwork: Artwork = {
       description: 'aaaaa',
       id: 2,
       primaryImage: 'aaaaa',
-      current_price: 100000000000,
+      purchasePrice: 100000000000,
       department: 'aaaa',
       title: 'aaaa Night',
       culture: 'aa',
@@ -348,6 +353,7 @@ describe('testing updateAuctionHouseArtworkByID', () => {
       medium: 'Canvas',
       countryOfOrigin: 'France',
       isBeingAuctioned: false,
+      purchaseHistory: [],
     };
     await dao.setAuctionHouseArtworks([testArtwork, testArtwork3]);
     await expect(dao.updateAuctionHouseArtworkByID(tempArtwork)).rejects.toThrowError();
@@ -450,11 +456,11 @@ describe('testing updatePlayerArtworkById', () => {
   });
 
   it('correctly updates an artwork', async () => {
-    const newArtwork2 = {
+    const newArtwork2: Artwork = {
       description: 'new',
       id: 2,
       primaryImage: 'new',
-      current_price: 0,
+      purchasePrice: 0,
       department: 'new',
       title: 'Stary Night',
       culture: 'new',
@@ -463,6 +469,7 @@ describe('testing updatePlayerArtworkById', () => {
       medium: 'Canvas',
       countryOfOrigin: 'France',
       isBeingAuctioned: false,
+      purchaseHistory: [],
     };
     await dao.addArtworksToPlayer(testUser, [testArtwork, testArtwork2, testArtwork3]);
     await dao.updatePlayerArtworkById(testUser, newArtwork2);
