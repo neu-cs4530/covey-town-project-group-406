@@ -1,11 +1,10 @@
-import { Artwork, Player as PlayerModel } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
-
+import { Player as PlayerModel, Artwork } from '../../types/CoveyTownSocket';
 /*
   Represents an auction floor component where users can go and bid on artwork
   Can be created by a player or the auction house itself
 */
-export default interface AuctionFloor {
+export default interface IAuctionFloor {
   /**
    * Gives the artwork that is on auction in this
    * floor to the player who's current bid is active

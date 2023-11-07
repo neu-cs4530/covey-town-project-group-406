@@ -45,6 +45,7 @@ let bidder: Player;
 describe('testing emitAuctionEndEvent', () => {
   beforeAll(() => {
     seller = new Player(nanoid(), mock<TownEmitter>());
+    seller.initializeArtAuctionAccount('seller@gmail.com');
     auctionFloorPlayerOwned = new AuctionFloor(
       nanoid(),
       testArtwork,
@@ -90,11 +91,11 @@ describe('testing emitAuctionEndEvent', () => {
 describe('testing giveArtworkToPlayer', () => {
   beforeAll(async () => {
     bidder = new Player(nanoid(), mock<TownEmitter>());
-    bidder.email = 'bidder@gmail.com';
+    bidder.initializeArtAuctionAccount('bidder@gmail.com');
     await dao.addPlayer(bidder.email);
 
     seller = new Player(nanoid(), mock<TownEmitter>());
-    seller.email = 'seller@gmail.com';
+    seller.initializeArtAuctionAccount('seller@gmail.com');
     await dao.addPlayer(seller.email);
 
     auctionFloorPlayerOwned = new AuctionFloor(
@@ -111,29 +112,33 @@ describe('testing giveArtworkToPlayer', () => {
     );
   });
   afterAll(async () => {
-    await dao.removePlayer(bidder.email);
-    await dao.removePlayer(seller.email);
+    if (bidder.email && seller.email) {
+      await dao.removePlayer(bidder.email);
+      await dao.removePlayer(seller.email);
+    }
   });
   it('Gives the artwork to the player who made the bid', async () => {
-    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    expect(bidder.artwork).toEqual([]);
+    if (bidder.email) {
+      await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
+      expect(bidder.artwork).toEqual([]);
 
-    auctionFloorPlayerOwned.currentBid = { player: bidder, bid: 0 };
-    await auctionFloorPlayerOwned.giveArtworkToPlayer();
+      auctionFloorPlayerOwned.currentBid = { player: bidder, bid: 0 };
+      await auctionFloorPlayerOwned.giveArtworkToPlayer();
 
-    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork]);
-    expect(bidder.artwork).toEqual([testArtwork]);
+      await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork]);
+      expect(bidder.artwork).toEqual([testArtwork]);
+    }
   });
 });
 
 describe('testing removeArtworkFromPlayer and removeArtworkFromAuctionHouse', () => {
   beforeAll(async () => {
     bidder = new Player(nanoid(), mock<TownEmitter>());
-    bidder.email = 'bidder@gmail.com';
+    bidder.initializeArtAuctionAccount('bidder@gmail.com');
     await dao.addPlayer(bidder.email);
 
     seller = new Player(nanoid(), mock<TownEmitter>());
-    seller.email = 'seller@gmail.com';
+    seller.initializeArtAuctionAccount('seller@gmail.com');
     await dao.addPlayer(seller.email);
     await dao.addArtworkToPlayer(seller.email, testArtwork);
     seller.addArtwork(testArtwork);
@@ -165,19 +170,23 @@ describe('testing removeArtworkFromPlayer and removeArtworkFromAuctionHouse', ()
     await dao.setAuctionHouseArtworks([testArtwork2]);
   });
   afterAll(async () => {
-    await dao.removePlayer(bidder.email);
-    await dao.removePlayer(seller.email);
+    if (bidder.email && seller.email) {
+      await dao.removePlayer(bidder.email);
+      await dao.removePlayer(seller.email);
+    }
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
   });
   it('Removes the artwork properly from the seller if seller is player', async () => {
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
-    expect(seller.artwork).toEqual([testArtwork]);
+    if (seller.email) {
+      await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
+      expect(seller.artwork).toEqual([testArtwork]);
 
-    await auctionFloorPlayerOwned.removeArtworkFromPlayer();
+      await auctionFloorPlayerOwned.removeArtworkFromPlayer();
 
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([]);
-    expect(seller.artwork).toEqual([]);
+      await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([]);
+      expect(seller.artwork).toEqual([]);
+    }
   });
 });
 
@@ -230,11 +239,11 @@ describe('testing endAuction', () => {
   beforeEach(async () => {
     await dao.removeArtworkIDList();
     bidder = new Player(nanoid(), mock<TownEmitter>());
-    bidder.email = 'bidder@gmail.com';
+    bidder.initializeArtAuctionAccount('bidder@gmail.com');
     await dao.addPlayer(bidder.email);
 
     seller = new Player(nanoid(), mock<TownEmitter>());
-    seller.email = 'seller@gmail.com';
+    seller.initializeArtAuctionAccount('seller@gmail.com');
     await dao.addPlayer(seller.email);
     seller.addArtwork(testArtwork);
 
@@ -267,30 +276,36 @@ describe('testing endAuction', () => {
     await dao.addArtworkToAuctionHouse(testArtwork2);
   });
   afterEach(async () => {
-    await dao.removePlayer(bidder.email);
-    await dao.removePlayer(seller.email);
-    seller.removeArtwork(testArtwork);
-    await dao.removeAuctionHouse();
-    await dao.removeArtworkIDList();
+    if (bidder.email && seller.email) {
+      await dao.removePlayer(bidder.email);
+      await dao.removePlayer(seller.email);
+      seller.removeArtwork(testArtwork);
+      await dao.removeAuctionHouse();
+      await dao.removeArtworkIDList();
+    }
   });
 
   it('Removes artwork from player when there is a Bid and auction ends', async () => {
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
-    expect(seller.artwork).toEqual([testArtwork]);
+    if (bidder.email && seller.email) {
+      await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([testArtwork]);
+      expect(seller.artwork).toEqual([testArtwork]);
 
-    await auctionFloorPlayerOwned.endAuction();
+      await auctionFloorPlayerOwned.endAuction();
 
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([]);
-    expect(seller.artwork).toEqual([]);
+      await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([]);
+      expect(seller.artwork).toEqual([]);
+    }
   });
   it('Gives artwork to player who made the bid and auction ends', async () => {
-    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    auctionFloorPlayerOwned.currentBid = { player: bidder, bid: 10 };
+    if (bidder.email && seller.email) {
+      await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
+      auctionFloorPlayerOwned.currentBid = { player: bidder, bid: 10 };
 
-    await auctionFloorPlayerOwned.endAuction();
+      await auctionFloorPlayerOwned.endAuction();
 
-    await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork]);
-    expect(bidder.artwork).toEqual([testArtwork]);
+      await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([testArtwork]);
+      expect(bidder.artwork).toEqual([testArtwork]);
+    }
   });
   it('Emits the auction ended event', async () => {
     auctionFloorPlayerOwned.on('auctionEnded', (f: AuctionFloor) => {

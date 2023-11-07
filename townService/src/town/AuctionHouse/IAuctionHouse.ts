@@ -1,6 +1,6 @@
-import { AuctionFloorModel } from '../AuctionFloor/IAuctionFloor';
-import { Interactable, InteractableType, Artwork } from '../../types/CoveyTownSocket';
+import { InteractableType, Artwork, Interactable } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
+import { AuctionFloorModel } from '../AuctionFloor/IAuctionFloor';
 
 /**
  * Interface representing an entire auction house which stores many auction floors

@@ -40,9 +40,9 @@ const testArtwork2: Artwork = {
 };
 
 const seller = new Player(nanoid(), mock<TownEmitter>());
-seller.email = 'seller@gmail.com';
+seller.initializeArtAuctionAccount('seller@gmail.com');
 const bidder = new Player(nanoid(), mock<TownEmitter>());
-bidder.email = 'bidder@gmail.com';
+bidder.initializeArtAuctionAccount('bidder@gmail.com');
 const testAreaBox = { x: 100, y: 100, width: 100, height: 100 };
 let auctionHouse: AuctionHouse;
 

@@ -5,6 +5,7 @@ import {
   TownEmitter,
   Artwork,
   Wallet,
+  ArtAuctionAccount,
 } from '../types/CoveyTownSocket';
 
 /**
@@ -29,9 +30,7 @@ export default class Player {
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
-  private _email: string;
-
-  private _wallet: Wallet;
+  private _artAuctionAccount: ArtAuctionAccount | undefined;
 
   constructor(userName: string, townEmitter: TownEmitter) {
     this.location = {
@@ -44,20 +43,31 @@ export default class Player {
     this._id = nanoid();
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
-    this._email = '';
-    this._wallet = {
-      money: 1_000_000,
-      artwork: [],
-      networth: 1_000_000,
+    this._artAuctionAccount = undefined;
+  }
+
+  public initializeArtAuctionAccount(email: string) {
+    this._artAuctionAccount = {
+      email,
+      wallet: {
+        money: 1_000_000,
+        artwork: [],
+        networth: 1_000_000,
+      },
     };
   }
 
   get wallet(): Wallet {
-    return this._wallet;
+    if (this._artAuctionAccount) {
+      return this._artAuctionAccount?.wallet;
+    }
+    throw new Error('art auction account not defined for user');
   }
 
   set wallet(w: Wallet) {
-    this._wallet = w;
+    if (this._artAuctionAccount) {
+      this._artAuctionAccount.wallet = w;
+    }
   }
 
   get userName(): string {
@@ -65,35 +75,56 @@ export default class Player {
   }
 
   set email(email: string) {
-    this._email = email;
+    if (this._artAuctionAccount) {
+      this._artAuctionAccount.email = email;
+    }
   }
 
   get email(): string {
-    return this._email;
+    if (this._artAuctionAccount) {
+      return this._artAuctionAccount?.email;
+    }
+    throw new Error('auction account not defined for user');
   }
 
   set networth(nw: number) {
-    this._wallet.networth = nw;
+    if (this._artAuctionAccount) {
+      this._artAuctionAccount.wallet.networth = nw;
+    }
   }
 
   get networth(): number {
-    return this._wallet.networth;
+    if (this._artAuctionAccount) {
+      return this._artAuctionAccount?.wallet.networth;
+    }
+    throw new Error('auction account not defined for user');
   }
 
   public addArtwork(art: Artwork) {
-    this._wallet.artwork.push(art);
+    if (this._artAuctionAccount) {
+      this._artAuctionAccount.wallet.artwork.push(art);
+    }
   }
 
   public removeArtwork(art: Artwork) {
-    this._wallet.artwork = this._wallet.artwork.filter(a => a.id !== art.id);
+    if (this._artAuctionAccount) {
+      this._artAuctionAccount.wallet.artwork = this._artAuctionAccount.wallet.artwork.filter(
+        a => a.id !== art.id,
+      );
+    }
   }
 
   set artwork(arts: Artwork[]) {
-    this._wallet.artwork = arts;
+    if (this._artAuctionAccount) {
+      this._artAuctionAccount.wallet.artwork = arts;
+    }
   }
 
   get artwork(): Artwork[] {
-    return this._wallet.artwork;
+    if (this._artAuctionAccount) {
+      return this._artAuctionAccount?.wallet.artwork;
+    }
+    throw new Error('auction account not defined for user');
   }
 
   get id(): string {
@@ -117,12 +148,16 @@ export default class Player {
       id: this._id,
       location: this.location,
       userName: this._userName,
-      email: this._email,
-      wallet: {
-        networth: this._wallet.networth,
-        artwork: this._wallet.artwork,
-        money: this._wallet.money,
-      },
+      artAuctionAccount: this._artAuctionAccount
+        ? {
+            email: this._artAuctionAccount.email,
+            wallet: {
+              networth: this._artAuctionAccount.wallet.networth,
+              artwork: this._artAuctionAccount.wallet.artwork,
+              money: this._artAuctionAccount.wallet.money,
+            },
+          }
+        : undefined,
     };
   }
 }

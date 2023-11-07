@@ -37,18 +37,27 @@ export type Direction = "front" | "back" | "left" | "right";
 
 export type PlayerID = string;
 
+
+
+
+
+
 export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
-  email: string;
-  wallet: Wallet;
+  artAuctionAccount: ArtAuctionAccount | undefined
+}
+
+export type ArtAuctionAccount = {
+  email: string,
+  wallet: Wallet,
 }
 
 export type Wallet = {
   money: number,
   artwork: Artwork[],
-  networth: number
+  networth: number,
 }
 
 export type XY = { x: number; y: number };
