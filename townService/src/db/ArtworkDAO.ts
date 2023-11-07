@@ -183,12 +183,9 @@ export default class ArtworkDAO implements IArtworkDAO {
     await db
       .collection('artworkIDs')
       .doc('artworks')
-      .set(
-        {
-          artworkIDs: FieldValue.arrayUnion(id),
-        },
-        { merge: true },
-      );
+      .update({
+        artworkIDs: FieldValue.arrayUnion(id),
+      });
   }
 
   public async getAllArtworkIDs(): Promise<number[]> {
