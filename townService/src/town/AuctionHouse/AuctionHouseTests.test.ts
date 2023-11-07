@@ -118,7 +118,7 @@ describe('Testing adding floors to auction house', () => {
   it('Adds a non-player floor to the auction house properly', async () => {
     await newAuctionHouse.setAuctionHouseArtworks([testArtwork2]);
 
-    newAuctionHouse.createNewAuctionFloorNonPlayer();
+    await newAuctionHouse.createNewAuctionFloorNonPlayer();
 
     expect(newAuctionHouse.auctionFloors).toHaveLength(1);
     expect(newAuctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2);
@@ -133,7 +133,7 @@ describe('Testing adding floors to auction house', () => {
     await dao.addArtworkToPlayer(seller.email, testArtwork);
     seller.addArtwork(testArtwork);
 
-    newAuctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
+    await newAuctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
 
     expect(newAuctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork);
     expect(newAuctionHouse.auctionFloors[0].auctioneer).toEqual(seller);
@@ -148,9 +148,9 @@ describe('Testing adding floors to auction house', () => {
     await dao.addPlayer(seller.email);
     seller.removeArtwork(testArtwork);
 
-    expect(() => newAuctionHouse.createNewAuctionFloorPlayer(seller, testArtwork)).toThrowError(
-      'player does not have artwork with id',
-    );
+    await expect(() =>
+      newAuctionHouse.createNewAuctionFloorPlayer(seller, testArtwork),
+    ).rejects.toThrowError('player does not have artwork with id');
 
     await dao.removePlayer(seller.email);
   });
@@ -169,7 +169,7 @@ describe('Testing joining floors properly', () => {
   it('Allows a player to join as an observer properly', async () => {
     await auctionHouse.setAuctionHouseArtworks([testArtwork2]);
 
-    auctionHouse.createNewAuctionFloorNonPlayer();
+    await auctionHouse.createNewAuctionFloorNonPlayer();
     auctionHouse.joinFloorAsObserver(bidder, auctionHouse.auctionFloors[0].id);
 
     expect(auctionHouse.auctionFloors[0].observers[0]).toEqual(bidder);
@@ -180,7 +180,7 @@ describe('Testing joining floors properly', () => {
   it('Allows a player to join as a bidder properly', async () => {
     await auctionHouse.setAuctionHouseArtworks([testArtwork]);
 
-    auctionHouse.createNewAuctionFloorNonPlayer();
+    await auctionHouse.createNewAuctionFloorNonPlayer();
     auctionHouse.joinFloorAsBidder(bidder, auctionHouse.auctionFloors[0].id);
 
     expect(auctionHouse.auctionFloors[0].bidders[0]).toEqual(bidder);
@@ -214,11 +214,11 @@ describe('Testing delete floor and reset floor functionality', () => {
     await dao.addPlayer(seller.email);
     await dao.addArtworkToPlayer(seller.email, testArtwork);
     seller.addArtwork(testArtwork);
-    auctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
+    await auctionHouse.createNewAuctionFloorPlayer(seller, testArtwork);
 
     expect(auctionHouse.auctionFloors).toHaveLength(1);
 
-    auctionHouse.deleteAuctionFloor(auctionHouse.auctionFloors[0].id);
+    await auctionHouse.deleteAuctionFloor(auctionHouse.auctionFloors[0].id);
 
     expect(auctionHouse.auctionFloors).toHaveLength(0);
 
@@ -226,7 +226,7 @@ describe('Testing delete floor and reset floor functionality', () => {
     seller.removeArtwork(testArtwork);
   });
   it('Resets an auction-house owned floor when there is no winner', async () => {
-    auctionHouse.createNewAuctionFloorNonPlayer();
+    await auctionHouse.createNewAuctionFloorNonPlayer();
 
     expect(auctionHouse.auctionFloors).toHaveLength(1);
     expect(auctionHouse.indexOfArtToBeAuctioned).toBe(1);
@@ -240,7 +240,7 @@ describe('Testing delete floor and reset floor functionality', () => {
     expect(auctionHouse.indexOfArtToBeAuctioned).toBe(1);
   });
   it('Resets an auction-house owned floor when there is a winner', async () => {
-    auctionHouse.createNewAuctionFloorNonPlayer();
+    await auctionHouse.createNewAuctionFloorNonPlayer();
 
     expect(auctionHouse.auctionFloors).toHaveLength(1);
     expect(AuctionHouse.artworkToBeAuctioned).toHaveLength(2);
@@ -385,11 +385,11 @@ describe('When a floor emits an auction ended event', () => {
   });
 
   it('Removes the floor when it is a user-created floor and ', async () => {
-    auctionHouse.createNewAuctionFloorPlayer(seller, art);
+    await auctionHouse.createNewAuctionFloorPlayer(seller, art);
     auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 10 };
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artNo]);
+    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artYes]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     expect(seller.artwork).toEqual([artYes]);
     expect(bidder.artwork).toEqual([]);
@@ -405,12 +405,12 @@ describe('When a floor emits an auction ended event', () => {
     expect(auctionHouse.auctionFloors).toHaveLength(0);
   }, 10000);
   it('Resets the floor when it is a auction-house created floor, adds artwork to player', async () => {
-    auctionHouse.createNewAuctionFloorNonPlayer();
+    await auctionHouse.createNewAuctionFloorNonPlayer();
     auctionHouse.auctionFloors[0].currentBid = { player: bidder, bid: 10 };
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo, artNo2]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artYes, artNo2]);
     expect(AuctionHouse.artworkToBeAuctioned).toEqual([artYes, artNo2]);
     expect(bidder.artwork).toEqual([]);
 
@@ -422,16 +422,16 @@ describe('When a floor emits an auction ended event', () => {
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([artNo]);
     expect(bidder.artwork).toEqual([artNo]);
     expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(artYes2);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo2]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artYes2]);
   }, 10000);
 
   it('Resets the floor when it is a auction-house created floor, does not add artwork to player if no bid', async () => {
-    auctionHouse.createNewAuctionFloorNonPlayer();
+    await auctionHouse.createNewAuctionFloorNonPlayer();
     auctionHouse.joinFloorAsBidder(bidder, auctionHouse.auctionFloors[0].id);
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo, artNo2]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artYes, artNo2]);
     expect(AuctionHouse.artworkToBeAuctioned).toEqual([artYes, artNo2]);
     expect(bidder.artwork).toEqual([]);
 
@@ -441,15 +441,15 @@ describe('When a floor emits an auction ended event', () => {
 
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
     expect(bidder.artwork).toEqual([]);
-    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artNo, artNo2]);
+    await expect(dao.getAllArtworksAvailableToBuy()).resolves.toEqual([artYes, artNo2]);
     expect(auctionHouse.auctionFloors[0].artBeingAuctioned).toEqual(artYes);
   }, 10000);
 
   it('In a player created room, the room is removed and no artwork exchange in player created room', async () => {
-    auctionHouse.createNewAuctionFloorPlayer(seller, art);
+    await auctionHouse.createNewAuctionFloorPlayer(seller, art);
     auctionHouse.auctionFloors[0].timeLeft = 1;
 
-    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artNo]);
+    await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artYes]);
     expect(seller.artwork).toEqual([artYes]);
 
     expect(bidder.artwork).toEqual([]);
@@ -457,7 +457,7 @@ describe('When a floor emits an auction ended event', () => {
 
     auctionHouse.auctionFloors[0].startAuction();
     // eslint-disable-next-line no-promise-executor-return
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 8000));
 
     await expect(dao.getAllOfPlayersArtwork(seller.email)).resolves.toEqual([artNo]);
     await expect(dao.getAllOfPlayersArtwork(bidder.email)).resolves.toEqual([]);
