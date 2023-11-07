@@ -347,12 +347,12 @@ describe('when an auction floor ends', () => {
       house.auctionFloors[0].startAuction();
 
       // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 2000));
+      await new Promise(res => setTimeout(res, 8000));
 
-      // expect(player.artwork).toEqual([testArtwork]);
       const playerResponse = await dao.getPlayer(player.email);
       const { artworks } = playerResponse;
       expect(artworks).toEqual([testArtworkIsNotBeingAuctioned]);
+      expect(player.artwork).toEqual([testArtwork]);
 
       expect(house.auctionFloors).toHaveLength(1);
       expect(house.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2IsBeingAuctioned);

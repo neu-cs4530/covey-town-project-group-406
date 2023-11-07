@@ -122,7 +122,7 @@ export default class Player {
 
   get artwork(): Artwork[] {
     if (this._artAuctionAccount) {
-      return this._artAuctionAccount?.wallet.artwork;
+      return this._artAuctionAccount.wallet.artwork;
     }
     throw new Error('auction account not defined for user');
   }
