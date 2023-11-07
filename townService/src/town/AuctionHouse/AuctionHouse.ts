@@ -54,7 +54,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
 
   public async setAuctionHouseArtworks(artworks: Artwork[]) {
     AuctionHouse.artworkToBeAuctioned = artworks;
-    await AuctionFloor.DAO.setAuctionHouseArtworks(artworks);
+    await AuctionFloor.DAO.addArtworksToAuctionHouse(artworks);
   }
 
   public async createNewAuctionFloorNonPlayer(): Promise<void> {
@@ -101,7 +101,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     const currentFloor = this._auctionFloors.find(f => f.id === floorID);
     if (currentFloor) {
       if (currentFloor.currentBid.player !== undefined) {
-        await AuctionFloor.DAO.removeArtworkFromAuctionHouse(currentFloor.artBeingAuctioned);
+        await AuctionFloor.DAO.removeArtworkFromAuctionHouseById(currentFloor.artBeingAuctioned.id);
         AuctionHouse.artworkToBeAuctioned = AuctionHouse.artworkToBeAuctioned.filter(
           a => a.id !== currentFloor.artBeingAuctioned.id,
         );
