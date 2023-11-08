@@ -62,7 +62,6 @@ describe('when creating a new auction floor', () => {
   let testArtwork: Artwork;
   let testArtworkIsBeingAuctioned: Artwork;
   let testArtwork2: Artwork;
-  let testArtwork2IsBeingAuctioned: Artwork;
   beforeEach(() => {
     testArtwork = {
       description: 'Its the Mona Lisa',
@@ -107,21 +106,6 @@ describe('when creating a new auction floor', () => {
       medium: 'Canvas',
       countryOfOrigin: 'France',
       isBeingAuctioned: false,
-      purchaseHistory: [],
-    };
-    testArtwork2IsBeingAuctioned = {
-      description: 'Its stary night',
-      id: 2,
-      primaryImage: 'starynight.png',
-      purchasePrice: 100000000000,
-      department: 'unknown',
-      title: 'Stary Night',
-      culture: 'unknown',
-      period: '1800',
-      artist: { name: 'Van Gogh' },
-      medium: 'Canvas',
-      countryOfOrigin: 'France',
-      isBeingAuctioned: true,
       purchaseHistory: [],
     };
   });
