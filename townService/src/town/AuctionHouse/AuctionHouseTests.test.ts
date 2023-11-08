@@ -141,11 +141,13 @@ describe('when creating a new auction floor', () => {
   it('creates two non-player floors back to back correctly', async () => {
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
     await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+    const floorTwoArtwork = { ...AuctionHouse.artworkToBeAuctioned[1] };
+    floorTwoArtwork.isBeingAuctioned = true;
     await house.createNewAuctionFloorNonPlayer();
     await house.createNewAuctionFloorNonPlayer();
     expect(house.auctionFloors).toHaveLength(2);
 
-    expect(house.auctionFloors[1].artBeingAuctioned).toEqual(testArtwork2IsBeingAuctioned);
+    expect(house.auctionFloors[1].artBeingAuctioned).toEqual(floorTwoArtwork);
     expect(house.auctionFloors[1].artBeingAuctioned.isBeingAuctioned).toBe(true);
     const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
     expect(auctionHouseArtworks).toHaveLength(2);
