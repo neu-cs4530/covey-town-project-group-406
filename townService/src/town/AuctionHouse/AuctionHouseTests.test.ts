@@ -321,7 +321,8 @@ describe('when an auction floor ends', () => {
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
       await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
       await house.createNewAuctionFloorNonPlayer();
-      const chosenOne = { ...house.auctionFloors[0].artBeingAuctioned };
+      const artworkBeingAuctioned = { ...AuctionHouse.artworkToBeAuctioned[0] };
+
       house.auctionFloors[0].timeLeft = 1;
       house.auctionFloors[0].startAuction();
 
@@ -329,7 +330,7 @@ describe('when an auction floor ends', () => {
       await new Promise(res => setTimeout(res, 8000));
 
       expect(house.auctionFloors).toHaveLength(1);
-      expect(house.auctionFloors[0].artBeingAuctioned).toEqual(chosenOne);
+      expect(house.auctionFloors[0].artBeingAuctioned).toEqual(artworkBeingAuctioned);
       expect(house.auctionFloors[0].status).toEqual('WAITING_TO_START');
       expect(house.auctionFloors[0].timeLeft).toBe(30);
       await dao.removeAuctionHouse();
@@ -439,7 +440,13 @@ describe('when an auction floor ends', () => {
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
       await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
       await house.createNewAuctionFloorNonPlayer();
-      const chosenOne = { ...house.auctionFloors[0].artBeingAuctioned };
+
+      const artworkOnAuctionFloor = { ...AuctionHouse.artworkToBeAuctioned[0] };
+      artworkOnAuctionFloor.purchasePrice = 500000;
+      artworkOnAuctionFloor.isBeingAuctioned = false;
+      const artworkInQueue = { ...AuctionHouse.artworkToBeAuctioned[1] };
+      artworkInQueue.isBeingAuctioned = true;
+
       house.auctionFloors[0].timeLeft = 1;
       house.auctionFloors[0].currentBid = { player, bid: 500000 };
       house.auctionFloors[0].startAuction();
@@ -447,15 +454,13 @@ describe('when an auction floor ends', () => {
       // eslint-disable-next-line no-promise-executor-return
       await new Promise(res => setTimeout(res, 5000));
 
-      chosenOne.isBeingAuctioned = false;
-      chosenOne.purchasePrice = 500000;
-      expect(player.artwork).toEqual([chosenOne]);
+      expect(player.artwork).toEqual([artworkOnAuctionFloor]);
       const playerResponse = await dao.getPlayer(player.email);
       const { artworks } = playerResponse;
-      expect(artworks).toEqual([chosenOne]);
+      expect(artworks).toEqual([artworkOnAuctionFloor]);
 
       expect(house.auctionFloors).toHaveLength(1);
-      expect(house.auctionFloors[0].artBeingAuctioned).toEqual(testArtwork2IsBeingAuctioned);
+      expect(house.auctionFloors[0].artBeingAuctioned).toEqual(artworkInQueue);
 
       await dao.removePlayer(player.email);
       await dao.removeAuctionHouse();
