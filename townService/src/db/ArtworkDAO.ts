@@ -1,6 +1,5 @@
 import { FieldValue } from 'firebase-admin/firestore';
-import e from 'express';
-import { Artwork, Player as PlayerModel } from '../types/CoveyTownSocket';
+import { Artwork } from '../types/CoveyTownSocket';
 import db from './DBConfig';
 import IArtworkDAO from './IArtworkDAO';
 

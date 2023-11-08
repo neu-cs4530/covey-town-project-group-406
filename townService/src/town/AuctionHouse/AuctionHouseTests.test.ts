@@ -220,10 +220,6 @@ describe('when an auction floor ends', () => {
   let testArtwork: Artwork;
   let testArtworkIsNotBeingAuctioned: Artwork;
   let testArtwork2: Artwork;
-  let testArtworkIsBeingAuctioned: Artwork;
-  let testArtwork2IsBeingAuctioned: Artwork;
-  let testArtwork2IsNotBeingAuctioned: Artwork;
-
   describe('in a non-player auction floor', () => {
     beforeEach(() => {
       testArtwork = {
@@ -239,21 +235,6 @@ describe('when an auction floor ends', () => {
         medium: 'Canvas',
         countryOfOrigin: 'Italy',
         isBeingAuctioned: false,
-        purchaseHistory: [],
-      };
-      testArtworkIsBeingAuctioned = {
-        description: 'Its the Mona Lisa',
-        id: 1,
-        primaryImage: 'monalisa.png',
-        purchasePrice: 500000,
-        department: 'unknown',
-        title: 'The mona lisa',
-        culture: 'unknown',
-        period: '1500',
-        artist: { name: 'da Vinci' },
-        medium: 'Canvas',
-        countryOfOrigin: 'Italy',
-        isBeingAuctioned: true,
         purchaseHistory: [],
       };
       testArtworkIsNotBeingAuctioned = {
@@ -284,36 +265,6 @@ describe('when an auction floor ends', () => {
         medium: 'Canvas',
         countryOfOrigin: 'France',
         isBeingAuctioned: false,
-        purchaseHistory: [],
-      };
-      testArtwork2IsBeingAuctioned = {
-        description: 'Its stary night',
-        id: 2,
-        primaryImage: 'starynight.png',
-        purchasePrice: 100000000000,
-        department: 'unknown',
-        title: 'Stary Night',
-        culture: 'unknown',
-        period: '1800',
-        artist: { name: 'Van Gogh' },
-        medium: 'Canvas',
-        countryOfOrigin: 'France',
-        isBeingAuctioned: true,
-        purchaseHistory: [],
-      };
-      testArtwork2IsNotBeingAuctioned = {
-        description: 'Its stary night',
-        id: 2,
-        primaryImage: 'starynight.png',
-        purchasePrice: 100000000000,
-        department: 'unknown',
-        title: 'Stary Night',
-        culture: 'unknown',
-        period: '1800',
-        artist: { name: 'Van Gogh' },
-        medium: 'Canvas',
-        countryOfOrigin: 'France',
-        isBeingAuctioned: true,
         purchaseHistory: [],
       };
     });
@@ -355,21 +306,6 @@ describe('when an auction floor ends', () => {
         isBeingAuctioned: false,
         purchaseHistory: [],
       };
-      testArtworkIsBeingAuctioned = {
-        description: 'Its the Mona Lisa',
-        id: 1,
-        primaryImage: 'monalisa.png',
-        purchasePrice: 500000,
-        department: 'unknown',
-        title: 'The mona lisa',
-        culture: 'unknown',
-        period: '1500',
-        artist: { name: 'da Vinci' },
-        medium: 'Canvas',
-        countryOfOrigin: 'Italy',
-        isBeingAuctioned: true,
-        purchaseHistory: [],
-      };
       testArtworkIsNotBeingAuctioned = {
         description: 'Its the Mona Lisa',
         id: 1,
@@ -398,36 +334,6 @@ describe('when an auction floor ends', () => {
         medium: 'Canvas',
         countryOfOrigin: 'France',
         isBeingAuctioned: false,
-        purchaseHistory: [],
-      };
-      testArtwork2IsBeingAuctioned = {
-        description: 'Its stary night',
-        id: 2,
-        primaryImage: 'starynight.png',
-        purchasePrice: 100000000000,
-        department: 'unknown',
-        title: 'Stary Night',
-        culture: 'unknown',
-        period: '1800',
-        artist: { name: 'Van Gogh' },
-        medium: 'Canvas',
-        countryOfOrigin: 'France',
-        isBeingAuctioned: true,
-        purchaseHistory: [],
-      };
-      testArtwork2IsNotBeingAuctioned = {
-        description: 'Its stary night',
-        id: 2,
-        primaryImage: 'starynight.png',
-        purchasePrice: 100000000000,
-        department: 'unknown',
-        title: 'Stary Night',
-        culture: 'unknown',
-        period: '1800',
-        artist: { name: 'Van Gogh' },
-        medium: 'Canvas',
-        countryOfOrigin: 'France',
-        isBeingAuctioned: true,
         purchaseHistory: [],
       };
     });

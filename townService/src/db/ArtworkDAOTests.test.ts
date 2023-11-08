@@ -51,7 +51,6 @@ const testArtwork3: Artwork = {
   purchaseHistory: [],
 };
 const dao = new ArtworkDAO();
-let testUser: string;
 
 describe('when adding artwork to an auction house', () => {
   afterEach(async () => {
