@@ -417,7 +417,7 @@ describe('when an auction floor ends', () => {
       house.auctionFloors[1].startAuction();
 
       // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 10000));
+      await new Promise(res => setTimeout(res, 3000));
 
       expect(player.wallet.money).toBe(999900);
       expect(player2.wallet.money).toBe(999900);
