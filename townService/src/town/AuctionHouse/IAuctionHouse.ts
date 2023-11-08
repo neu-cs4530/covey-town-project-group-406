@@ -18,14 +18,14 @@ export default interface IAuctionHouse {
    * the first item from the auctionhouses's database
    * for the artwork to auction
    */
-  createNewAuctionFloorNonPlayer(): void;
+  createNewAuctionFloorNonPlayer(minBid: number): void;
 
   /**
    * Creates a new auction floor owned by a player
    * @param player: Player who's auction floor it is
    * @param artwork: The artwork to auction off
    */
-  createNewAuctionFloorPlayer(player: Player, artwork: Artwork): void;
+  createNewAuctionFloorPlayer(player: Player, artwork: Artwork, mindBid: number): void;
   /**
    * Joins an auction floor as an observer
    * @param player: The player to join
@@ -38,6 +38,7 @@ export default interface IAuctionHouse {
    * @param floorID: The floor to join
    */
   joinFloorAsBidder(player: Player, floorID: string): void;
+
   /**
    * Gets the type of this class (for instantiation w/ tile map)
    */

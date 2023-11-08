@@ -48,6 +48,7 @@ describe('when creating an auction floor', () => {
       { player: undefined, bid: 0 },
       [player],
       [player2],
+      1,
       undefined,
     );
     expect(floor.artBeingAuctioned).toEqual(testArtwork);
@@ -64,6 +65,7 @@ describe('when creating an auction floor', () => {
       { player: undefined, bid: 0 },
       [],
       [player2],
+      1,
       player,
     );
     expect(floor.artBeingAuctioned).toEqual(testArtwork);
@@ -115,6 +117,7 @@ describe('when an auction starts', () => {
       { player: undefined, bid: 0 },
       [],
       [player2],
+      1,
       player,
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

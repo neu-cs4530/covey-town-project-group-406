@@ -33,6 +33,16 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   // Players who are able to bid
   private _bidders: Player[];
 
+  private _minBid: number;
+
+  set minBid(b: number) {
+    this._minBid = b;
+  }
+
+  get minBid(): number {
+    return this._minBid;
+  }
+
   set bidders(b: Player[]) {
     this._bidders = b;
   }
@@ -104,6 +114,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     currentBid: Bid,
     observers: Player[],
     bidders: Player[],
+    minBid: number,
     auctioneer?: Player,
   ) {
     super();
@@ -115,6 +126,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     this._auctioneer = auctioneer;
     this._observers = observers;
     this._bidders = bidders;
+    this._minBid = minBid;
   }
 
   private _emitAuctionEndEvent(): void {

@@ -58,7 +58,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
   }
 
-  public async createNewAuctionFloorNonPlayer(): Promise<void> {
+  public async createNewAuctionFloorNonPlayer(minBid: number): Promise<void> {
     const artworkToAuction = AuctionHouse.artworkToBeAuctioned.find(
       artwork => artwork.isBeingAuctioned === false,
     );
@@ -72,6 +72,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
         { player: undefined, bid: 0 },
         [],
         [],
+        minBid,
         undefined,
       );
       floor.on('auctionEnded', f => {
@@ -127,7 +128,11 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     }
   }
 
-  public async createNewAuctionFloorPlayer(player: Player, artwork: Artwork): Promise<void> {
+  public async createNewAuctionFloorPlayer(
+    player: Player,
+    artwork: Artwork,
+    minBid: number,
+  ): Promise<void> {
     let playerHasArtwork = false;
     for (const a of player.artwork) {
       if (artwork.id === a.id) {
@@ -147,6 +152,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
       { player: undefined, bid: 0 },
       [player],
       [],
+      minBid,
       player,
     );
     floor.on('auctionEnded', f => {
