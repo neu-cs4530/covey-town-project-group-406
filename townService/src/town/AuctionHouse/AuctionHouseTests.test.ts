@@ -615,20 +615,40 @@ describe('when an auction floor ends', () => {
 
       house.makeBid(player4, house.auctionFloors[1].id, 500);
 
-      const floorOneArtwork = { ...AuctionHouse.artworkToBeAuctioned[0] };
-      const floorTwoArtwork = { ...AuctionHouse.artworkToBeAuctioned[1] };
+      const floorOneArtwork = { ...testArtwork };
+      const floorTwoArtwork = { ...testArtwork2 };
       floorOneArtwork.isBeingAuctioned = false;
+      floorOneArtwork.purchasePrice = 300;
       floorTwoArtwork.isBeingAuctioned = false;
+      floorTwoArtwork.purchasePrice = 500;
 
       house.auctionFloors[0].startAuction();
       house.auctionFloors[1].startAuction();
       // eslint-disable-next-line no-promise-executor-return
       await new Promise(res => setTimeout(res, 3000));
 
-      /* await dao.removePlayer(player.email);
+      // check networth, money, and artworks locally and in db
+
+      expect(player.artwork).toHaveLength(0);
+      expect(player.networth).toBe(1000300);
+      expect(player.wallet.money).toBe(1000300);
+
+      expect(player2.artwork).toHaveLength(0);
+      expect(player2.networth).toBe(1000500);
+      expect(player2.wallet.money).toBe(1000500);
+
+      expect(player3.artwork[0]).toEqual(floorOneArtwork);
+      expect(player3.wallet.money).toEqual(999700);
+      expect(player3.networth).toEqual(1000000);
+
+      expect(player4.artwork[0]).toEqual(floorTwoArtwork);
+      expect(player4.wallet.money).toEqual(999500);
+      expect(player4.networth).toEqual(1000000);
+
+      await dao.removePlayer(player.email);
       await dao.removePlayer(player2.email);
       await dao.removePlayer(player3.email);
-      await dao.removePlayer(player4.email); */
+      await dao.removePlayer(player4.email);
     }, 100000);
   });
 });
