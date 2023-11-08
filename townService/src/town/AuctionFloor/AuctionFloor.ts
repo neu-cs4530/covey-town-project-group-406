@@ -146,14 +146,14 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     };
   }
 
-  private async _giveArtworkToPlayer(): Promise<void> {
+  private async _giveArtworkToBuyer(): Promise<void> {
     const winner = this._currentBid.player;
     if (winner !== undefined) {
       await winner.addArtwork(this._artBeingAuctioned);
     }
   }
 
-  private async _removeArtworkFromPlayer(): Promise<void> {
+  private async _removeArtworkFromAuctioneer(): Promise<void> {
     if (this._auctioneer) {
       await this._auctioneer.removeArtwork(this._artBeingAuctioned);
     }
@@ -164,27 +164,39 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     this.emit('timeDecreased', this._timeLeft);
   }
 
-  private async _endAuction(): Promise<void> {
-    this.status = 'ENDED';
-    this.artBeingAuctioned.isBeingAuctioned = false;
+  private async _addMoneyToAuctioneer() {
+    if (this._auctioneer) {
+      this._auctioneer.wallet.money += this._artBeingAuctioned.purchasePrice;
+      await AuctionFloor.DAO.updatePlayer(
+        this._auctioneer.email,
+        true,
+        this._auctioneer.wallet.money,
+      );
+    }
+  }
+
+  private async _removeMoneyFromBuyer() {
     if (this._currentBid.player !== undefined) {
-      this.artBeingAuctioned.purchasePrice = this.currentBid.bid;
-      if (this._auctioneer) {
-        this._auctioneer.wallet.money += this._artBeingAuctioned.purchasePrice;
-        await AuctionFloor.DAO.updatePlayer(
-          this._auctioneer.email,
-          true,
-          this._auctioneer.wallet.money,
-        );
-        await this._removeArtworkFromPlayer();
-      }
-      await this._giveArtworkToPlayer();
       this._currentBid.player.wallet.money -= this.artBeingAuctioned.purchasePrice;
       await AuctionFloor.DAO.updatePlayer(
         this._currentBid.player.email,
         true,
         this._currentBid.player.wallet.money,
       );
+    }
+  }
+
+  private async _endAuction(): Promise<void> {
+    this.status = 'ENDED';
+    this.artBeingAuctioned.isBeingAuctioned = false;
+    if (this._currentBid.player !== undefined) {
+      this.artBeingAuctioned.purchasePrice = this.currentBid.bid;
+      if (this._auctioneer) {
+        await this._addMoneyToAuctioneer();
+        await this._removeArtworkFromAuctioneer();
+      }
+      await this._giveArtworkToBuyer();
+      await this._removeMoneyFromBuyer();
     }
 
     this._emitAuctionEndEvent();
