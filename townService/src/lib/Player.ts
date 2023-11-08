@@ -49,7 +49,6 @@ export default class Player {
     this._artAuctionAccount = undefined;
   }
 
-  // this needs to use the DAO to get the information
   public initializeArtAuctionAccount(email: string) {
     this._artAuctionAccount = {
       email,
@@ -59,6 +58,16 @@ export default class Player {
         networth: 1_000_000,
       },
     };
+  }
+
+  public calculateNetWorth() {
+    if (this._artAuctionAccount) {
+      let base = this._artAuctionAccount.wallet.money;
+      for (const art of this._artAuctionAccount.wallet.artwork) {
+        base += art.purchasePrice;
+      }
+      this._artAuctionAccount.wallet.networth = base;
+    }
   }
 
   get wallet(): Wallet {

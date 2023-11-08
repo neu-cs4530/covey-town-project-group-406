@@ -167,6 +167,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   private async _addMoneyToAuctioneer() {
     if (this._auctioneer) {
       this._auctioneer.wallet.money += this._artBeingAuctioned.purchasePrice;
+      this._auctioneer.calculateNetWorth();
       await AuctionFloor.DAO.updatePlayer(
         this._auctioneer.email,
         true,
@@ -178,6 +179,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   private async _removeMoneyFromBuyer() {
     if (this._currentBid.player !== undefined) {
       this._currentBid.player.wallet.money -= this.artBeingAuctioned.purchasePrice;
+      this._currentBid.player.calculateNetWorth();
       await AuctionFloor.DAO.updatePlayer(
         this._currentBid.player.email,
         true,
