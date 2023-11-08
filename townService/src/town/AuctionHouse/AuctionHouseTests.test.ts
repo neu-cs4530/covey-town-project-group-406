@@ -408,7 +408,7 @@ describe('when an auction floor ends', () => {
       house.joinFloorAsBidder(player2, house.auctionFloors[1].id);
 
       house.auctionFloors[0].timeLeft = 1;
-      house.auctionFloors[1].timeLeft = 2;
+      house.auctionFloors[1].timeLeft = 1;
 
       house.makeBid(player, house.auctionFloors[0].id, 100);
       house.makeBid(player2, house.auctionFloors[1].id, 100);
@@ -425,6 +425,20 @@ describe('when an auction floor ends', () => {
       expect(player.networth).toBe(1000000);
       expect(player.artwork[0]).toEqual(firstFloorArtwork);
       expect(player2.artwork[0]).toEqual(secondFloorArtwork);
+
+      const dbPlayer = await dao.getPlayer(player.email);
+      const dbPlayer2 = await dao.getPlayer(player2.email);
+      const artPlayerOne = dbPlayer.artworks;
+      const artPlayerTwo = dbPlayer2.artworks;
+      expect(artPlayerOne).toContainEqual(firstFloorArtwork);
+      expect(artPlayerTwo).toContainEqual(secondFloorArtwork);
+      const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
+      expect(auctionHouseArtworks).toHaveLength(2);
+      expect(AuctionHouse.artworkToBeAuctioned).toHaveLength(2);
+      await dao.removeAuctionHouse();
+      await dao.removeArtworkIDList();
+      await dao.removePlayer(player.email);
+      await dao.removePlayer(player2.email);
 
       // check the money of the player (in db too)
       // check the networth of the player

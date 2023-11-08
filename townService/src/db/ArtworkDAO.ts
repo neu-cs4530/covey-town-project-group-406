@@ -381,11 +381,16 @@ export default class ArtworkDAO implements IArtworkDAO {
   public async removeArtworkFromPlayerById(email: string, artworkID: number): Promise<void> {
     try {
       const allArtwork = await this._getAllOfPlayersArtwork(email);
-      const newArtwork = allArtwork.filter((a: Artwork) => a.id !== artworkID);
-      if (allArtwork.length === newArtwork.length) {
+      const artworkToRemove = allArtwork.find((a: Artwork) => a.id === artworkID);
+      if (!artworkToRemove) {
         throw new Error('no artwork with id');
       }
-      await this._setAllOfPlayersArtwork(email, newArtwork);
+      await db
+        .collection(this.USER_COLLECTION)
+        .doc(email)
+        .update({
+          artworks: FieldValue.arrayRemove(artworkToRemove),
+        });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -405,12 +410,16 @@ export default class ArtworkDAO implements IArtworkDAO {
       }
 
       const allArtworks: Artwork[] = response.data()?.artworks;
-      const result = allArtworks.filter((a: Artwork) => a.id !== id);
-      if (allArtworks.length === result.length) {
+      const artworkToRemove = allArtworks.find((a: Artwork) => a.id === id);
+      if (!artworkToRemove) {
         throw new Error('no artwork with id');
       }
-
-      await db.collection(this.AUCTION_HOUSE_COLLECTION).doc('artworks').set({ artworks: result });
+      await db
+        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .doc('artworks')
+        .update({
+          artworks: FieldValue.arrayRemove(artworkToRemove),
+        });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
