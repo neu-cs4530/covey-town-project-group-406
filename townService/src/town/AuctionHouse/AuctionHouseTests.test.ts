@@ -645,6 +645,23 @@ describe('when an auction floor ends', () => {
       expect(player4.wallet.money).toEqual(999500);
       expect(player4.networth).toEqual(1000000);
 
+      const daoPlayer = await dao.getPlayer(player.email);
+      const daoPlayer2 = await dao.getPlayer(player2.email);
+      const daoPlayer3 = await dao.getPlayer(player3.email);
+      const daoPlayer4 = await dao.getPlayer(player4.email);
+
+      expect(daoPlayer.artworks).toHaveLength(0);
+      expect(daoPlayer.money).toBe(1000300);
+
+      expect(daoPlayer2.artworks).toHaveLength(0);
+      expect(daoPlayer2.money).toBe(1000500);
+
+      expect(daoPlayer3.artworks).toContainEqual(floorOneArtwork);
+      expect(daoPlayer3.money).toBe(999700);
+
+      expect(daoPlayer4.artworks).toContainEqual(floorTwoArtwork);
+      expect(daoPlayer4.money).toBe(999500);
+
       await dao.removePlayer(player.email);
       await dao.removePlayer(player2.email);
       await dao.removePlayer(player3.email);
