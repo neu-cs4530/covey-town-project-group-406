@@ -49,6 +49,10 @@ export default class Player {
     this._artAuctionAccount = undefined;
   }
 
+  /**
+   * Initializes a users artAuctionAccount when they create an account via firebase
+   * @param email the email that the user has signed up with
+   */
   public initializeArtAuctionAccount(email: string) {
     this._artAuctionAccount = {
       email,
@@ -60,6 +64,9 @@ export default class Player {
     };
   }
 
+  /**
+   * Calculates the net worth of the user based on purchase price of artwork and their money
+   */
   public calculateNetWorth() {
     if (this._artAuctionAccount) {
       let base = this._artAuctionAccount.wallet.money;
@@ -70,6 +77,9 @@ export default class Player {
     }
   }
 
+  /**
+   * returns the wallet of this user if they have an art auction account and are signed in to it
+   */
   get wallet(): Wallet {
     if (this._artAuctionAccount) {
       return this._artAuctionAccount?.wallet;
@@ -77,6 +87,10 @@ export default class Player {
     throw new Error('art auction account not defined for user');
   }
 
+  /**
+   * sets the wallet of the user
+   * @param w wallet to set
+   */
   public async setWallet(w: Wallet) {
     if (this._artAuctionAccount) {
       this._artAuctionAccount.wallet = w;
