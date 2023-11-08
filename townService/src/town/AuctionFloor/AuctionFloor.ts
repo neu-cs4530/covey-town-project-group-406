@@ -149,7 +149,9 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   private async _giveArtworkToBuyer(): Promise<void> {
     const winner = this._currentBid.player;
     if (winner !== undefined) {
-      await winner.addArtwork(this._artBeingAuctioned);
+      const artwork = { ...this._artBeingAuctioned };
+      artwork.isBeingAuctioned = false;
+      await winner.addArtwork(artwork);
     }
   }
 
@@ -190,7 +192,6 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
 
   private async _endAuction(): Promise<void> {
     this.status = 'ENDED';
-    this._artBeingAuctioned.isBeingAuctioned = false;
     if (this._currentBid.player !== undefined) {
       this.artBeingAuctioned.purchasePrice = this.currentBid.bid;
       if (this._auctioneer) {
