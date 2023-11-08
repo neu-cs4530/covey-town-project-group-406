@@ -40,6 +40,14 @@ export default interface IAuctionHouse {
   joinFloorAsBidder(player: Player, floorID: string): void;
 
   /**
+   * Makes a bid on a floor for a given player
+   * @param player: the player
+   * @param floorID: the floor
+   * @param bid: the number to bid
+   */
+  makeBid(player: Player, floorID: string, bid: number): void;
+
+  /**
    * Gets the type of this class (for instantiation w/ tile map)
    */
   getType(): InteractableType; // required for the toModel() method which returns an InteractableType;

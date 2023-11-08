@@ -58,6 +58,21 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
   }
 
+  public makeBid(player: Player, floorID: string, bid: number): void {
+    const floor = this.auctionFloors.find(f => f.id === floorID);
+    if (floor) {
+      if (
+        (floor.currentBid.player === undefined && bid > floor.minBid) ||
+        (floor.currentBid.player !== undefined && bid > floor.currentBid.bid)
+      ) {
+        floor.currentBid.player = player;
+        floor.currentBid.bid = bid;
+      }
+    } else {
+      throw new Error('floor not found');
+    }
+  }
+
   public async createNewAuctionFloorNonPlayer(minBid: number): Promise<void> {
     const artworkToAuction = AuctionHouse.artworkToBeAuctioned.find(
       artwork => artwork.isBeingAuctioned === false,

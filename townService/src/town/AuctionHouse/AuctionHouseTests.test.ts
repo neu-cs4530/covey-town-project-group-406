@@ -58,6 +58,77 @@ describe('when adding artworks to the auction house', () => {
   });
 });
 
+describe('when making a bid', () => {
+  let testArtwork: Artwork;
+  beforeEach(() => {
+    testArtwork = {
+      description: 'Its the Mona Lisa',
+      id: 1,
+      primaryImage: 'monalisa.png',
+      purchasePrice: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artist: { name: 'da Vinci' },
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: false,
+      purchaseHistory: [],
+    };
+  });
+  it('makes the bid correctly', async () => {
+    const player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+    await dao.addPlayer(player.email);
+
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.createNewAuctionFloorNonPlayer(1);
+    house.makeBid(player, house.auctionFloors[0].id, 10);
+    expect(house.auctionFloors[0].currentBid.player).toEqual(player);
+    expect(house.auctionFloors[0].currentBid.bid).toBe(10);
+    await dao.removePlayer(player.email);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
+  it('does not make a bid if the players bid is under the min bid', async () => {
+    const player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+    await dao.addPlayer(player.email);
+
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.createNewAuctionFloorNonPlayer(100);
+    house.makeBid(player, house.auctionFloors[0].id, 10);
+    expect(house.auctionFloors[0].currentBid.player).toEqual(undefined);
+    expect(house.auctionFloors[0].currentBid.bid).toBe(0);
+    await dao.removePlayer(player.email);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
+  it('does not make a bid if the players bid is under the current bid', async () => {
+    const player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+    await dao.addPlayer(player.email);
+
+    const player2 = new Player(nanoid(), mock<TownEmitter>());
+    player2.initializeArtAuctionAccount('player2@gmail.com');
+    await dao.addPlayer(player2.email);
+
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.createNewAuctionFloorNonPlayer(0);
+    house.auctionFloors[0].currentBid = { player: player2, bid: 1000 };
+    house.makeBid(player, house.auctionFloors[0].id, 10);
+    expect(house.auctionFloors[0].currentBid.player).toEqual(player2);
+    expect(house.auctionFloors[0].currentBid.bid).toBe(1000);
+    await dao.removePlayer(player.email);
+    await dao.removePlayer(player2.email);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
+});
 describe('when creating a new auction floor', () => {
   let testArtwork: Artwork;
   let testArtworkIsBeingAuctioned: Artwork;
