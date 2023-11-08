@@ -26,7 +26,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       const artwork: Artwork = response.data()?.artworks.find((a: Artwork) => a.id === artworkID);
 
       if (artwork === undefined || artwork === null) {
-        throw new Error('artwork with id does not exist');
+        throw new Error('no artwork with id');
       }
 
       return artwork;
@@ -35,30 +35,6 @@ export default class ArtworkDAO implements IArtworkDAO {
         throw new Error(err.message);
       }
       throw new Error('Error getting artwork from player with ID');
-    }
-  }
-
-  /**
-   * settings all of a players artwork
-   * @param email the players artwork to set
-   * @param newArtwork the new artwork to set
-   */
-  private async _setAllOfPlayersArtwork(email: string, newArtwork: Artwork[]): Promise<void> {
-    try {
-      const response = await this._getUserFromDatabase(email);
-      if (!response.exists) {
-        throw new Error('user does not exist');
-      }
-      await db.collection(this.USER_COLLECTION).doc(email).set(
-        {
-          artworks: newArtwork,
-        },
-        { merge: true },
-      );
-    } catch (err) {
-      if (err instanceof Error) {
-        throw new Error(err.message);
-      }
     }
   }
 
@@ -103,7 +79,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       await db
         .collection(this.USER_COLLECTION)
         .doc(email)
-        .update({ artworks: FieldValue.arrayUnion(artwork) });
+        .set({ artworks: FieldValue.arrayUnion(artwork) }, { merge: true });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -320,25 +296,24 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   public async updateAuctionHouseArtworkByID(artwork: Artwork) {
     try {
-      let allArtworks: Artwork[] = await this.getAllAuctionHouseArtworks();
-
-      let count = 0;
-      allArtworks = allArtworks.map((a: Artwork) => {
-        if (a.id === artwork.id) {
-          count += 1;
-          return artwork;
-        }
-        return a;
-      });
-
-      if (count === 0) {
+      const allArtworks: Artwork[] = await this.getAllAuctionHouseArtworks();
+      const artworkToRemove = allArtworks.find((a: Artwork) => a.id === artwork.id);
+      if (!artworkToRemove) {
         throw new Error('no artwork with id');
       }
+      await db
+        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .doc('artworks')
+        .update({
+          artworks: FieldValue.arrayRemove(artworkToRemove),
+        });
 
       await db
         .collection(this.AUCTION_HOUSE_COLLECTION)
         .doc('artworks')
-        .set({ artworks: allArtworks });
+        .update({
+          artworks: FieldValue.arrayUnion(artwork),
+        });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -353,19 +328,20 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   public async updatePlayerArtworkById(email: string, artwork: Artwork): Promise<void> {
     try {
-      let allArtworks = await this._getAllOfPlayersArtwork(email);
-      let count = 0;
-      allArtworks = allArtworks.map((a: Artwork) => {
-        if (a.id === artwork.id) {
-          count += 1;
-          return artwork;
-        }
-        return a;
-      });
-      if (count === 0) {
-        throw new Error('no artwork with id');
-      }
-      await this._setAllOfPlayersArtwork(email, allArtworks);
+      const artworkToRemove = await this._getPlayerArtworkById(email, artwork.id);
+      await db
+        .collection(this.USER_COLLECTION)
+        .doc(email)
+        .update({
+          artworks: FieldValue.arrayRemove(artworkToRemove),
+        });
+
+      await db
+        .collection(this.USER_COLLECTION)
+        .doc(email)
+        .update({
+          artworks: FieldValue.arrayUnion(artwork),
+        });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);

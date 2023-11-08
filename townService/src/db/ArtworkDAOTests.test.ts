@@ -193,7 +193,7 @@ describe('when updating a players artwork', () => {
     player.initializeArtAuctionAccount('player@gmail.com');
   });
   it('updates the artwork properly', async () => {
-    const artworkWithUpdatedFields = {
+    const artworkWithUpdatedFields: Artwork = {
       description: 'test',
       id: 1,
       primaryImage: 'test',
