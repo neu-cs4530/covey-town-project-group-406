@@ -4,6 +4,7 @@ import {
   TicTacToeGameState,
   ViewingArea,
   GameArea,
+  ArtAuctionHouseArea,
 } from './CoveyTownSocket';
 
 /**
@@ -11,6 +12,10 @@ import {
  */
 export function isConversationArea(interactable: Interactable): interactable is ConversationArea {
   return interactable.type === 'ConversationArea';
+}
+
+export function isArtAuctionHouseArea(interactable: Interactable): interactable is ArtAuctionHouseArea {
+  return interactable.type === 'ArtAuctionHouseArea';
 }
 
 /**

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
+import ArtAuctionHouseArea from '../components/Town/interactables/ArtAuctionHouseArea';
 import ConversationArea from '../components/Town/interactables/ConversationArea';
 import GameArea from '../components/Town/interactables/GameArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
@@ -26,7 +27,8 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isTicTacToeArea, isViewingArea } from '../types/TypeUtils';
+import { isArtAuctionHouseArea, isConversationArea, isTicTacToeArea, isViewingArea } from '../types/TypeUtils';
+import ArtAuctionHouseAreaController from './interactable/ArtAuctionHouseAreaController';
 import ConversationAreaController from './interactable/ConversationAreaController';
 import GameAreaController, { GameEventTypes } from './interactable/GameAreaController';
 import InteractableAreaController, {
@@ -605,6 +607,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this._interactableControllers.push(
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
+          } else if (isArtAuctionHouseArea(eachInteractable)) {
+            this._interactableControllers.push(new ArtAuctionHouseAreaController(
+              eachInteractable.id, eachInteractable.artwork
+            ));
           }
         });
         this._userID = initialData.userID;
@@ -645,6 +651,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       return existingController;
     } else {
       throw new Error(`No such viewing area controller ${existingController}`);
+    }
+  }
+
+  public getArtAuctionHouseAreaController(
+    artAuctionHouseArea: ArtAuctionHouseArea,
+  ): ArtAuctionHouseAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === artAuctionHouseArea.name,
+    );
+    if (existingController instanceof ArtAuctionHouseAreaController) {
+      return existingController;
+    } else {
+      throw new Error(`No such art auction house area controller ${existingController}`);
     }
   }
 

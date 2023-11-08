@@ -7,6 +7,7 @@ import Player from '../lib/Player';
 import TwilioVideo from '../lib/TwilioVideo';
 import { isViewingArea } from '../TestUtils';
 import {
+  ArtAuctionHouseArea as ArtAuctionHouseAreaModel,
   ChatMessage,
   ConversationArea as ConversationAreaModel,
   CoveyTownSocket,
@@ -23,6 +24,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import ArtAuctionHouseArea from './ArtAuctionHouseArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -332,6 +334,35 @@ export default class Town {
   }
 
   /**
+   * Creates a new art auction house area in this town if there is not currently an active
+   * art auction house area with the same ID. The art auction house area ID must match the name of a
+   * art auction house area that exists in this town's map
+   *
+   * If successful creating the art auction house area, this method:
+   *    Adds any players who are in the region defined by the art auction house area to it
+   *    Notifies all players in the town that the art auction house area has been updated by
+   *      emitting an interactableUpdate event
+   *
+   * @param artAuctionHouseArea Information describing the viewing area to create.
+   *
+   * @returns True if the viewing area was created or false if there is no known
+   * viewing area with the specified ID or if there is already an active viewing area
+   * with the specified ID or if there is no video URL specified
+   */
+  public addArtAuctionHouseArea(artAuctionHouseArea: ArtAuctionHouseAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === artAuctionHouseArea.id,
+    ) as ArtAuctionHouseArea;
+    if (!area || !artAuctionHouseArea.artwork || area.artwork) {
+      return false;
+    }
+    area.artwork = artAuctionHouseArea.artwork;
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
+  /**
    * Fetch a player's session based on the provided session token. Returns undefined if the
    * session token is not valid.
    *
@@ -400,6 +431,12 @@ export default class Town {
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
 
+    const artAuctionHouseAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'ArtAuctionHouseArea')
+      .map(eachConvAreaObj =>
+        ArtAuctionHouseArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
+      );
+
     const gameAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'GameArea')
       .map(eachGameAreaObj => GameAreaFactory(eachGameAreaObj, this._broadcastEmitter));
@@ -407,7 +444,8 @@ export default class Town {
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)
-      .concat(gameAreas);
+      .concat(gameAreas)
+      .concat(artAuctionHouseAreas);
     this._validateInteractables();
   }
 

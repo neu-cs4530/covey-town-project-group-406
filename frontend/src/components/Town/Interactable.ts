@@ -4,6 +4,7 @@ import TownGameScene from './TownGameScene';
 //TODO is there not some way to figure this out from generic types/supertypes?
 export type KnownInteractableTypes =
   | 'conversationArea'
+  | 'artAuctionHouseArea'
   | 'viewingArea'
   | 'transporter'
   | 'gameArea';
