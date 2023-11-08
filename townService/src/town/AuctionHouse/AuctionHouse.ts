@@ -8,9 +8,10 @@ import {
   InteractableCommand,
   InteractableCommandReturnType,
   BoundingBox,
+  AuctionFloorModel,
+  AuctionHouseModel,
 } from '../../types/CoveyTownSocket';
-import { AuctionFloorModel } from '../AuctionFloor/IAuctionFloor';
-import IAuctionHouse, { AuctionHouseModel } from './IAuctionHouse';
+import IAuctionHouse from './IAuctionHouse';
 import InteractableArea from '../InteractableArea';
 import AuctionFloor from '../AuctionFloor/AuctionFloor';
 

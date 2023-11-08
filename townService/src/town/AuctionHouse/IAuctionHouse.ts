@@ -1,6 +1,5 @@
-import { InteractableType, Artwork, Interactable } from '../../types/CoveyTownSocket';
+import { InteractableType, Artwork, AuctionHouseModel } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
-import { AuctionFloorModel } from '../AuctionFloor/IAuctionFloor';
 
 /**
  * Interface representing an entire auction house which stores many auction floors
@@ -55,8 +54,4 @@ export default interface IAuctionHouse {
    * Model to send to the frontend
    */
   toModel(): AuctionHouseModel;
-}
-
-export interface AuctionHouseModel extends Interactable {
-  floors: AuctionFloorModel[];
 }

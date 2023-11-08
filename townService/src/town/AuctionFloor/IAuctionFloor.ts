@@ -1,5 +1,5 @@
 import Player from '../../lib/Player';
-import { Player as PlayerModel, Artwork } from '../../types/CoveyTownSocket';
+import { AuctionFloorModel } from '../../types/CoveyTownSocket';
 /*
   Represents an auction floor component where users can go and bid on artwork
   Can be created by a player or the auction house itself
@@ -20,14 +20,3 @@ export default interface IAuctionFloor {
 
 export type Status = 'IN_PROGRESS' | 'WAITING_TO_START' | 'ENDED';
 export type Bid = { player: Player | undefined; bid: number };
-
-export type AuctionFloorModel = {
-  _id: string;
-  _status: Status;
-  _artBeingAuctioned: Artwork;
-  _timeLeft: number;
-  _currentBid: { player: PlayerModel | undefined; bid: number };
-  _auctioneer: PlayerModel | undefined;
-  _observers: PlayerModel[];
-  _bidders: PlayerModel[];
-};

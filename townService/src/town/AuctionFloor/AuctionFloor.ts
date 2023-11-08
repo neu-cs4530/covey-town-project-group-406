@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import Player from '../../lib/Player';
-import { Player as PlayerModel, Artwork } from '../../types/CoveyTownSocket';
+import { Player as PlayerModel, Artwork, AuctionFloorModel } from '../../types/CoveyTownSocket';
 import ArtworkDAO from '../../db/ArtworkDAO';
-import IAuctionFloor, { Status, Bid, AuctionFloorModel } from './IAuctionFloor';
+import IAuctionFloor, { Status, Bid } from './IAuctionFloor';
 
 export default class AuctionFloor extends EventEmitter implements IAuctionFloor {
   // DAO instance

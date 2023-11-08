@@ -49,6 +49,21 @@ export interface Player {
   artAuctionAccount: ArtAuctionAccount | undefined
 }
 
+export interface AuctionHouseModel extends Interactable {
+  floors: AuctionFloorModel[];
+}
+
+export type AuctionFloorModel = {
+  _id: string;
+  _status: Status;
+  _artBeingAuctioned: Artwork;
+  _timeLeft: number;
+  _currentBid: { player: PlayerModel | undefined; bid: number };
+  _auctioneer: PlayerModel | undefined;
+  _observers: PlayerModel[];
+  _bidders: PlayerModel[];
+};
+
 export type ArtAuctionAccount = {
   email: string,
   wallet: Wallet,
