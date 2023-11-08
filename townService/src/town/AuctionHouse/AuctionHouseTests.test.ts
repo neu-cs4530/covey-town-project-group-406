@@ -584,5 +584,51 @@ describe('when an auction floor ends', () => {
       await dao.removePlayer(player.email);
       await dao.removePlayer(player2.email);
     }, 100000);
+    it('transfers artwork properly and deducts money when there are multiple floors running', async () => {
+      const player = new Player(nanoid(), mock<TownEmitter>());
+      player.initializeArtAuctionAccount('player@gmail.com');
+      await dao.addPlayer(player.email);
+      await player.addArtwork(testArtwork);
+
+      const player2 = new Player(nanoid(), mock<TownEmitter>());
+      player2.initializeArtAuctionAccount('player2@gmail.com');
+      await dao.addPlayer(player2.email);
+      await player2.addArtwork(testArtwork2);
+
+      const player3 = new Player(nanoid(), mock<TownEmitter>());
+      player3.initializeArtAuctionAccount('player3@gmail.com');
+      await dao.addPlayer(player3.email);
+
+      const player4 = new Player(nanoid(), mock<TownEmitter>());
+      player4.initializeArtAuctionAccount('player4@gmail.com');
+      await dao.addPlayer(player4.email);
+
+      const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+      await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
+      await house.createNewAuctionFloorPlayer(player2, testArtwork2, 1);
+      house.auctionFloors[0].timeLeft = 1;
+      house.auctionFloors[1].timeLeft = 1;
+
+      house.makeBid(player3, house.auctionFloors[0].id, 100);
+      house.makeBid(player4, house.auctionFloors[0].id, 200);
+      house.makeBid(player3, house.auctionFloors[0].id, 300);
+
+      house.makeBid(player4, house.auctionFloors[1].id, 500);
+
+      const floorOneArtwork = { ...AuctionHouse.artworkToBeAuctioned[0] };
+      const floorTwoArtwork = { ...AuctionHouse.artworkToBeAuctioned[1] };
+      floorOneArtwork.isBeingAuctioned = false;
+      floorTwoArtwork.isBeingAuctioned = false;
+
+      house.auctionFloors[0].startAuction();
+      house.auctionFloors[1].startAuction();
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise(res => setTimeout(res, 3000));
+
+      /* await dao.removePlayer(player.email);
+      await dao.removePlayer(player2.email);
+      await dao.removePlayer(player3.email);
+      await dao.removePlayer(player4.email); */
+    }, 100000);
   });
 });
