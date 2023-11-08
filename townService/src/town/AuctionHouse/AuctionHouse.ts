@@ -133,9 +133,8 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   }
 
   private async _prepareAuctionFloorForNextAuction(floor: AuctionFloor) {
-    floor.artBeingAuctioned.isBeingAuctioned = true;
-    await AuctionFloor.DAO.updateAuctionHouseArtworkByID(floor.artBeingAuctioned);
     floor.status = 'WAITING_TO_START';
+    floor.artBeingAuctioned.isBeingAuctioned = true;
     floor.timeLeft = 30;
     floor.currentBid = { player: undefined, bid: 0 };
     floor.observers = [];
@@ -148,6 +147,9 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
       if (currentFloor.currentBid.player !== undefined) {
         await this._removeSoldArtworkFromAuctionHouse(currentFloor.artBeingAuctioned);
         this._findAndSetNextArtworkForAuctionFloor(currentFloor);
+      } else {
+        currentFloor.artBeingAuctioned.isBeingAuctioned = true;
+        await AuctionFloor.DAO.updateAuctionHouseArtworkByID(currentFloor.artBeingAuctioned);
       }
       await this._prepareAuctionFloorForNextAuction(currentFloor);
     } else {

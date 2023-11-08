@@ -277,6 +277,8 @@ describe('when an auction floor ends', () => {
   let testArtwork: Artwork;
   let testArtworkIsNotBeingAuctioned: Artwork;
   let testArtwork2: Artwork;
+  let testArtwork3: Artwork;
+  let testArtwork4: Artwork;
   describe('in a non-player auction floor', () => {
     beforeEach(() => {
       testArtwork = {
@@ -324,6 +326,36 @@ describe('when an auction floor ends', () => {
         isBeingAuctioned: false,
         purchaseHistory: [],
       };
+      testArtwork3 = {
+        description: 'third',
+        id: 3,
+        primaryImage: 'third.png',
+        purchasePrice: 100000000000,
+        department: 'third',
+        title: 'third third',
+        culture: 'third',
+        period: 'third',
+        artist: { name: 'third third' },
+        medium: 'third',
+        countryOfOrigin: 'third',
+        isBeingAuctioned: false,
+        purchaseHistory: [],
+      };
+      testArtwork4 = {
+        description: 'fourth',
+        id: 4,
+        primaryImage: 'fourth.png',
+        purchasePrice: 100000000000,
+        department: 'fourth',
+        title: 'fourth fourth',
+        culture: 'fourth',
+        period: 'fourth',
+        artist: { name: 'fourth fourth' },
+        medium: 'fourth',
+        countryOfOrigin: 'fourth',
+        isBeingAuctioned: false,
+        purchaseHistory: [],
+      };
     });
     it('does not give artwork to anyone, and reset floor with same artwork when no bid', async () => {
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
@@ -341,6 +373,95 @@ describe('when an auction floor ends', () => {
       expect(house.auctionFloors[0].artBeingAuctioned).toEqual(artworkBeingAuctioned);
       expect(house.auctionFloors[0].status).toEqual('WAITING_TO_START');
       expect(house.auctionFloors[0].timeLeft).toBe(30);
+      await dao.removeAuctionHouse();
+      await dao.removeArtworkIDList();
+    }, 100000);
+
+    it('gives artwork properly when multiple floors are operating', async () => {
+      const player = new Player(nanoid(), mock<TownEmitter>());
+      player.initializeArtAuctionAccount('player@gmail.com');
+      await dao.addPlayer(player.email);
+
+      const player2 = new Player(nanoid(), mock<TownEmitter>());
+      player2.initializeArtAuctionAccount('player2@gmail.com');
+      await dao.addPlayer(player2.email);
+
+      AuctionHouse.artworkToBeAuctioned = [];
+      const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+      await house.addArtworksToAuctionHouse([
+        testArtwork,
+        testArtwork2,
+        testArtwork3,
+        testArtwork4,
+      ]);
+      await house.createNewAuctionFloorNonPlayer(1);
+      await house.createNewAuctionFloorNonPlayer(1);
+
+      const firstFloorArtwork = { ...house.auctionFloors[0].artBeingAuctioned };
+      const secondFloorArtwork = { ...house.auctionFloors[1].artBeingAuctioned };
+      firstFloorArtwork.purchasePrice = 100;
+      secondFloorArtwork.purchasePrice = 100;
+      firstFloorArtwork.isBeingAuctioned = false;
+      secondFloorArtwork.isBeingAuctioned = false;
+
+      house.joinFloorAsBidder(player, house.auctionFloors[0].id);
+      house.joinFloorAsBidder(player2, house.auctionFloors[1].id);
+
+      house.auctionFloors[0].timeLeft = 1;
+      house.auctionFloors[1].timeLeft = 2;
+
+      house.makeBid(player, house.auctionFloors[0].id, 100);
+      house.makeBid(player2, house.auctionFloors[1].id, 100);
+
+      house.auctionFloors[0].startAuction();
+      house.auctionFloors[1].startAuction();
+
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise(res => setTimeout(res, 10000));
+
+      expect(player.wallet.money).toBe(999900);
+      expect(player2.wallet.money).toBe(999900);
+      expect(player.networth).toBe(1000000);
+      expect(player.networth).toBe(1000000);
+      expect(player.artwork[0]).toEqual(firstFloorArtwork);
+      expect(player2.artwork[0]).toEqual(secondFloorArtwork);
+
+      // check the money of the player (in db too)
+      // check the networth of the player
+      // check the artworks of the player (in db too)
+    }, 100000);
+    it('does give artwork to player when their bid is the highest at the timer end', async () => {
+      const player = new Player(nanoid(), mock<TownEmitter>());
+      player.initializeArtAuctionAccount('player@gmail.com');
+      await dao.addPlayer(player.email);
+
+      AuctionHouse.artworkToBeAuctioned = [];
+      const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+      await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+      await house.createNewAuctionFloorNonPlayer(1);
+
+      const artworkOnAuctionFloor = { ...AuctionHouse.artworkToBeAuctioned[0] };
+      artworkOnAuctionFloor.purchasePrice = 500000;
+      artworkOnAuctionFloor.isBeingAuctioned = false;
+      const artworkInQueue = { ...AuctionHouse.artworkToBeAuctioned[1] };
+      artworkInQueue.isBeingAuctioned = true;
+
+      house.auctionFloors[0].timeLeft = 1;
+      house.auctionFloors[0].currentBid = { player, bid: 500000 };
+      house.auctionFloors[0].startAuction();
+
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise(res => setTimeout(res, 5000));
+
+      expect(player.artwork).toEqual([artworkOnAuctionFloor]);
+      const playerResponse = await dao.getPlayer(player.email);
+      const { artworks } = playerResponse;
+      expect(artworks).toEqual([artworkOnAuctionFloor]);
+
+      expect(house.auctionFloors).toHaveLength(1);
+      expect(house.auctionFloors[0].artBeingAuctioned).toEqual(artworkInQueue);
+
+      await dao.removePlayer(player.email);
       await dao.removeAuctionHouse();
       await dao.removeArtworkIDList();
     }, 100000);
@@ -394,41 +515,7 @@ describe('when an auction floor ends', () => {
         purchaseHistory: [],
       };
     });
-    it('does give artwork to player when their bid is the highest at the timer end', async () => {
-      const player = new Player(nanoid(), mock<TownEmitter>());
-      player.initializeArtAuctionAccount('player@gmail.com');
-      await dao.addPlayer(player.email);
 
-      AuctionHouse.artworkToBeAuctioned = [];
-      const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-      await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
-      await house.createNewAuctionFloorNonPlayer(1);
-
-      const artworkOnAuctionFloor = { ...AuctionHouse.artworkToBeAuctioned[0] };
-      artworkOnAuctionFloor.purchasePrice = 500000;
-      artworkOnAuctionFloor.isBeingAuctioned = false;
-      const artworkInQueue = { ...AuctionHouse.artworkToBeAuctioned[1] };
-      artworkInQueue.isBeingAuctioned = true;
-
-      house.auctionFloors[0].timeLeft = 1;
-      house.auctionFloors[0].currentBid = { player, bid: 500000 };
-      house.auctionFloors[0].startAuction();
-
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 5000));
-
-      expect(player.artwork).toEqual([artworkOnAuctionFloor]);
-      const playerResponse = await dao.getPlayer(player.email);
-      const { artworks } = playerResponse;
-      expect(artworks).toEqual([artworkOnAuctionFloor]);
-
-      expect(house.auctionFloors).toHaveLength(1);
-      expect(house.auctionFloors[0].artBeingAuctioned).toEqual(artworkInQueue);
-
-      await dao.removePlayer(player.email);
-      await dao.removeAuctionHouse();
-      await dao.removeArtworkIDList();
-    }, 100000);
     it('keeps artwork in player inventory if no bid, shows that it is not being auctioned', async () => {
       const player = new Player(nanoid(), mock<TownEmitter>());
       player.initializeArtAuctionAccount('player@gmail.com');
