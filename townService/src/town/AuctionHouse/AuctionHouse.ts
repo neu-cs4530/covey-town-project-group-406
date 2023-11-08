@@ -113,34 +113,46 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     this._emitAreaChanged();
   }
 
-  // make sure to remove artwork here
+  private async _removeSoldArtworkFromAuctionHouse(art: Artwork) {
+    await AuctionFloor.DAO.removeArtworkFromAuctionHouseById(art.id);
+    AuctionHouse.artworkToBeAuctioned = AuctionHouse.artworkToBeAuctioned.filter(
+      a => a.id !== art.id,
+    );
+  }
+
+  private _findAndSetNextArtworkForAuctionFloor(floor: AuctionFloor) {
+    const newArtToBeAuctioned = AuctionHouse.artworkToBeAuctioned.find(
+      artwork => artwork.isBeingAuctioned === false,
+    );
+    if (newArtToBeAuctioned) {
+      floor.artBeingAuctioned = newArtToBeAuctioned;
+    } else {
+      throw new Error('no artwork left');
+    }
+  }
+
+  private async _prepareAuctionFloorForNextAuction(floor: AuctionFloor) {
+    floor.artBeingAuctioned.isBeingAuctioned = true;
+    await AuctionFloor.DAO.updateAuctionHouseArtworkByID(floor.artBeingAuctioned);
+    floor.status = 'WAITING_TO_START';
+    floor.timeLeft = 30;
+    floor.currentBid = { player: undefined, bid: 0 };
+    floor.observers = [];
+    floor.bidders = [];
+  }
+
   private async _resetAuctionFloor(floorID: string): Promise<void> {
     const currentFloor = this._auctionFloors.find(f => f.id === floorID);
     if (currentFloor) {
       if (currentFloor.currentBid.player !== undefined) {
-        await AuctionFloor.DAO.removeArtworkFromAuctionHouseById(currentFloor.artBeingAuctioned.id);
-        AuctionHouse.artworkToBeAuctioned = AuctionHouse.artworkToBeAuctioned.filter(
-          a => a.id !== currentFloor.artBeingAuctioned.id,
-        );
-        const newArtToBeAuctioned = AuctionHouse.artworkToBeAuctioned.find(
-          artwork => artwork.isBeingAuctioned === false,
-        );
-        if (newArtToBeAuctioned) {
-          currentFloor.artBeingAuctioned = newArtToBeAuctioned;
-        } else {
-          throw new Error('no artwork left');
-        }
+        await this._removeSoldArtworkFromAuctionHouse(currentFloor.artBeingAuctioned);
+        this._findAndSetNextArtworkForAuctionFloor(currentFloor);
       }
-      currentFloor.artBeingAuctioned.isBeingAuctioned = true;
-      await AuctionFloor.DAO.updateAuctionHouseArtworkByID(currentFloor.artBeingAuctioned);
-      currentFloor.status = 'WAITING_TO_START';
-      currentFloor.timeLeft = 30;
-      currentFloor.currentBid = { player: undefined, bid: 0 };
-      currentFloor.observers = [];
-      currentFloor.bidders = [];
+      await this._prepareAuctionFloorForNextAuction(currentFloor);
     } else {
       throw new Error('no floor with id found');
     }
+    this._emitAreaChanged();
   }
 
   public async createNewAuctionFloorPlayer(
