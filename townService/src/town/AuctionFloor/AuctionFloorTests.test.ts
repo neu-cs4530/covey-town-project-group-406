@@ -117,7 +117,9 @@ describe('when an auction starts', () => {
       [player2],
       player,
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const decreaseAuctionTimeLeftSpy = jest.spyOn(floor as any, '_decreaseAuctionTimeLeft');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const endAuctionSpy = jest.spyOn(floor as any, '_endAuction');
 
     floor.startAuction();
