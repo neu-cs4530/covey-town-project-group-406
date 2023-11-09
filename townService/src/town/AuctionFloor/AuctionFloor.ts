@@ -149,16 +149,23 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
 
   private async _giveArtworkToBuyer(): Promise<void> {
     const winner = this._currentBid.player;
-    if (winner !== undefined) {
+    if (winner !== undefined && this.currentBid.player?.email) {
       const artwork = { ...this._artBeingAuctioned };
       artwork.isBeingAuctioned = false;
       await winner.addArtwork(artwork);
+      await AuctionFloor.DAO.addArtworksToPlayer(this.currentBid.player?.email, [
+        this.artBeingAuctioned,
+      ]);
     }
   }
 
   private async _removeArtworkFromAuctioneer(): Promise<void> {
     if (this._auctioneer) {
       await this._auctioneer.removeArtwork(this._artBeingAuctioned);
+      await AuctionFloor.DAO.removeArtworkFromPlayerById(
+        this._auctioneer.email,
+        this.artBeingAuctioned.id,
+      );
     }
   }
 
