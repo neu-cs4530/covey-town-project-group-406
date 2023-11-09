@@ -441,6 +441,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         console.trace(err);
       }
     });
+
+    this._socket.on('auctionHouseLoginResponse', response => {
+      if (!response.success) {
+        // do something here? maybe emit?
+      } else {
+        // find the player, update their information
+      }
+    });
   }
 
   /**

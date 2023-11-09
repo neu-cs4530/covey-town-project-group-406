@@ -297,7 +297,7 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
-  auctionHouseLoginResponse: (response: Player) => void;
+  auctionHouseLoginResponse: (response: {success: boolean, player: Player | undefined}) => void;
 }
 
 export interface ClientToServerEvents {
