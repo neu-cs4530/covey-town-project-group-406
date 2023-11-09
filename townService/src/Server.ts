@@ -13,6 +13,10 @@ import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
 
 // Create the server instances
+console.log('stall -2');
+
+console.log('stall -1');
+
 const app = Express();
 app.use(CORS());
 const server = http.createServer(app);
