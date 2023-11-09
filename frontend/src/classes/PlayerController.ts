@@ -41,6 +41,10 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return this._location;
   }
 
+  set artAuctionAccount(a: ArtAuctionAccount) {
+    this.artAuctionAccount = a;
+  }
+
   get userName(): string {
     return this._userName;
   }

@@ -451,8 +451,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     this._socket.on('auctionHouseLoginResponse', response => {
       this.emit('loginStatus', response.success);
-      if (response.success && response.player) {
-        this.ourPlayer.setArtAuctionAccount(response.player.artAuctionAccount);
+      if (response.success && response.player && response.player.artAuctionAccount) {
+        this.ourPlayer.artAuctionAccount = response.player.artAuctionAccount;
       }
     });
   }
@@ -528,8 +528,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
   }
 
-  public sendLoginCommand<CommandType extends AuctionHouseLoginCommand>(command: CommandType) {
-    this._socket.emit('auctionHouseLoginCommand', command.player);
+  public sendLoginCommand() {
+    this._socket.emit('auctionHouseLoginCommand', this.ourPlayer.toPlayerModel());
   }
 
   /**
