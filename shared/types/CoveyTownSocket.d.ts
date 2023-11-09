@@ -65,6 +65,7 @@ export type ArtAuctionAccount = {
   wallet: Wallet,
 }
 
+
 export type Wallet = {
   money: number,
   artwork: Artwork[],
