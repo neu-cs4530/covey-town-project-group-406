@@ -164,7 +164,8 @@ export default class Town {
 
     socket.on('auctionHouseLoginCommand', player => {
       try {
-        // try to sign in with dao in reality
+        // whatever email the player tries to login with, check the dao and see if that
+        // player is already logged in
         socket.emit('auctionHouseLoginResponse', { success: true, player });
       } catch (err) {
         socket.emit('auctionHouseLoginResponse', { success: false, player: undefined });
