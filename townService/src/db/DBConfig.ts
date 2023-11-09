@@ -15,5 +15,4 @@ initializeApp({
 });
 
 const db = getFirestore();
-
 export default db;
