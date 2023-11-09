@@ -162,6 +162,15 @@ export default class Town {
       }
     });
 
+    socket.on('auctionHouseLoginCommand', player => {
+      try {
+        // try to sign in with dao in reality
+        socket.emit('auctionHouseLoginResponse', { success: true, player });
+      } catch (err) {
+        socket.emit('auctionHouseLoginResponse', { success: false, player: undefined });
+      }
+    });
+
     // Set up a listener to process commands to interactables.
     // Dispatches commands to the appropriate interactable and sends the response back to the client
     socket.on('interactableCommand', (command: InteractableCommand & InteractableCommandBase) => {
