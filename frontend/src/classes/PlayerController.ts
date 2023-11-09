@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
-import { Player as PlayerModel, PlayerLocation, ArtAuctionAccount } from '../types/CoveyTownSocket';
+import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
@@ -19,8 +19,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private readonly _userName: string;
 
-  private readonly _artAuctionAccount: ArtAuctionAccount | undefined;
-
   public gameObjects?: PlayerGameObjects;
 
   constructor(id: string, userName: string, location: PlayerLocation) {
@@ -28,7 +26,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._id = id;
     this._userName = userName;
     this._location = location;
-    this._artAuctionAccount = undefined;
   }
 
   set location(newLocation: PlayerLocation) {
@@ -50,12 +47,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   toPlayerModel(): PlayerModel {
-    return {
-      id: this.id,
-      userName: this.userName,
-      location: this.location,
-      artAuctionAccount: this._artAuctionAccount,
-    };
+    return { id: this.id, userName: this.userName, location: this.location };
   }
 
   private _updateGameComponentLocation() {
