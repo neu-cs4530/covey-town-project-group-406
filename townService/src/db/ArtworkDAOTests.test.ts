@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import { Artwork, TownEmitter } from '../types/CoveyTownSocket';
 import ArtworkDAO from './ArtworkDAO';
 import Player from '../lib/Player';
+import AuctionFloor from '../town/AuctionFloor/AuctionFloor';
 
 const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',
@@ -51,6 +52,12 @@ const testArtwork3: Artwork = {
   purchaseHistory: [],
 };
 const dao = new ArtworkDAO();
+const VAL1 = nanoid();
+const VAL2 = nanoid();
+const VAL3 = nanoid();
+dao.userCollection = VAL1;
+dao.artworkIDsCollection = VAL2;
+dao.auctionHouseCollection = VAL3;
 
 describe('when adding artwork to an auction house', () => {
   afterEach(async () => {
