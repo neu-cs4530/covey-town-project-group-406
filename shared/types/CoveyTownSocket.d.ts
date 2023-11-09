@@ -41,7 +41,7 @@ export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
-  artAuctionAccount: ArtAuctionAccount | undefined
+  artAuctionAccount: ArtAuctionAccount | undefined;
 }
 
 export interface AuctionHouseModel extends Interactable {
@@ -54,23 +54,22 @@ export type AuctionFloorModel = {
   minBid: number;
   artBeingAuctioned: Artwork;
   timeLeft: number;
-  currentBid: { player: PlayerModel | undefined; bid: number };
+  currentBid: { player: PlayerModel; bid: number } | undefined;
   auctioneer: PlayerModel | undefined;
   observers: PlayerModel[];
   bidders: PlayerModel[];
 };
 
 export type ArtAuctionAccount = {
-  email: string,
-  wallet: Wallet,
-}
-
+  email: string;
+  wallet: Wallet;
+};
 
 export type Wallet = {
-  money: number,
-  artwork: Artwork[],
-  networth: number,
-}
+  money: number;
+  artwork: Artwork[];
+  networth: number;
+};
 
 export type XY = { x: number; y: number };
 
@@ -222,23 +221,23 @@ export type Artwork = {
   medium: string;
   countryOfOrigin?: string;
   isBeingAuctioned: boolean;
-  purchaseHistory: Purchase[]
+  purchaseHistory: Purchase[];
 };
 
 export type Purchase = {
-  player: Player,
-  sellPrice: number
-}
+  player: Player;
+  sellPrice: number;
+};
 
 export type ArtistInfo = {
-  name: string,
-  biography?: string,
-  nationality?: string,
-  begin?: string,
-  end?: string,
-  gender?: string,
-  wikiUrl?: string
-}
+  name: string;
+  biography?: string;
+  nationality?: string;
+  begin?: string;
+  end?: string;
+  gender?: string;
+  wikiUrl?: string;
+};
 
 export type InteractableCommand =
   | ViewingAreaUpdateCommand

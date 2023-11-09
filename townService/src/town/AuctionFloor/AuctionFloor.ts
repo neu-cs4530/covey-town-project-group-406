@@ -140,7 +140,9 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
       minBid: this._minBid,
       artBeingAuctioned: this._artBeingAuctioned,
       timeLeft: this._timeLeft,
-      currentBid: { player: this._currentBid.player?.toPlayerModel(), bid: this._currentBid.bid },
+      currentBid: this._currentBid.player
+        ? { player: this._currentBid.player, bid: this._currentBid.bid }
+        : undefined,
       auctioneer: this._auctioneer?.toPlayerModel(),
       observers: this._observers.map(o => o.toPlayerModel()) as PlayerModel[],
       bidders: this._bidders.map(b => b.toPlayerModel()) as PlayerModel[],
