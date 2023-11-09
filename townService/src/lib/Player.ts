@@ -7,13 +7,13 @@ import {
   Wallet,
   ArtAuctionAccount,
 } from '../types/CoveyTownSocket';
-import ArtworkDAO from '../db/ArtworkDAO';
+// import ArtworkDAO from '../db/ArtworkDAO';
 
 /**
  * Each user who is connected to a town is represented by a Player object
  */
 export default class Player {
-  public dao: ArtworkDAO;
+  // public dao: ArtworkDAO;
 
   /** The current location of this user in the world map * */
   public location: PlayerLocation;
@@ -47,7 +47,7 @@ export default class Player {
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
     this._artAuctionAccount = undefined;
-    this.dao = new ArtworkDAO();
+    // this.dao = new ArtworkDAO();
   }
 
   /**
@@ -95,7 +95,7 @@ export default class Player {
   public async setWallet(w: Wallet) {
     if (this._artAuctionAccount) {
       this._artAuctionAccount.wallet = w;
-      await this.dao.updatePlayer(this._artAuctionAccount.email, true, w.money);
+      // await this.dao.updatePlayer(this._artAuctionAccount.email, true, w.money);
     }
   }
 
@@ -132,7 +132,7 @@ export default class Player {
   public async addArtwork(art: Artwork) {
     if (this._artAuctionAccount) {
       this._artAuctionAccount.wallet.artwork.push(art);
-      await this.dao.addArtworksToPlayer(this._artAuctionAccount.email, [art]);
+      // await this.dao.addArtworksToPlayer(this._artAuctionAccount.email, [art]);
     }
   }
 
@@ -141,7 +141,7 @@ export default class Player {
       this._artAuctionAccount.wallet.artwork = this._artAuctionAccount.wallet.artwork.filter(
         a => a.id !== art.id,
       );
-      await this.dao.removeArtworkFromPlayerById(this._artAuctionAccount.email, art.id);
+      // await this.dao.removeArtworkFromPlayerById(this._artAuctionAccount.email, art.id);
     }
   }
 

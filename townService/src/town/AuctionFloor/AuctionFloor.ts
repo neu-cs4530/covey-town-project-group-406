@@ -1,12 +1,12 @@
 import { EventEmitter } from 'events';
 import Player from '../../lib/Player';
 import { Player as PlayerModel, Artwork, AuctionFloorModel } from '../../types/CoveyTownSocket';
-import ArtworkDAO from '../../db/ArtworkDAO';
+// import ArtworkDAO from '../../db/ArtworkDAO';
 import IAuctionFloor, { Status, Bid } from './IAuctionFloor';
 
 export default class AuctionFloor extends EventEmitter implements IAuctionFloor {
   // DAO instance
-  static DAO = new ArtworkDAO();
+  // static DAO = new ArtworkDAO();
 
   // The ID of this auction floor (unique using nanoid())
   private _id: string;
@@ -171,11 +171,11 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     if (this._auctioneer) {
       this._auctioneer.wallet.money += this.currentBid.bid;
       this._auctioneer.calculateNetWorth();
-      await AuctionFloor.DAO.updatePlayer(
+      /* await AuctionFloor.DAO.updatePlayer(
         this._auctioneer.email,
         true,
         this._auctioneer.wallet.money,
-      );
+      ); */
     }
   }
 
@@ -183,11 +183,11 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     if (this._currentBid.player !== undefined) {
       this._currentBid.player.wallet.money -= this.currentBid.bid;
       this._currentBid.player.calculateNetWorth();
-      await AuctionFloor.DAO.updatePlayer(
+      /* await AuctionFloor.DAO.updatePlayer(
         this._currentBid.player.email,
         true,
         this._currentBid.player.wallet.money,
-      );
+      ); */
     }
   }
 
