@@ -60,7 +60,6 @@ export type AuctionFloorModel = {
   bidders: PlayerModel[];
 };
 
-
 export type ArtAuctionAccount = {
   email: string,
   wallet: Wallet,
