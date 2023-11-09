@@ -160,6 +160,14 @@ export async function mockTownControllerConnection(
           id: ourUserID,
           userName: testController.userName,
           location: { moving: false, x: 0, y: 0, rotation: 'back' },
+          artAuctionAccount: {
+            email: 'random@gmail.com',
+            wallet: {
+              networth: 0,
+              artwork: [],
+              money: 0,
+            },
+          },
         },
       ],
       friendlyName: nanoid(),
@@ -180,6 +188,14 @@ export async function mockTownControllerConnection(
         id: playerID,
         userName: nanoid(),
         location: { moving: false, x: 0, y: 0, rotation: 'back' },
+        artAuctionAccount: {
+          email: 'random2@gmail.com',
+          wallet: {
+            networth: 100,
+            artwork: [],
+            money: 0,
+          },
+        },
       });
       responseToSendController.interactables.push({
         id: nanoid(),
