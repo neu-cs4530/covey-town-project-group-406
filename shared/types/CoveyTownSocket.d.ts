@@ -15,13 +15,9 @@ export type TownJoinResponse = {
   isPubliclyListed: boolean;
   /** Current state of interactables in this town */
   interactables: TypedInteractable[];
-};
+}
 
-export type InteractableType =
-  | "ConversationArea"
-  | "ViewingArea"
-  | "TicTacToeArea"
-  | "AuctionHouseArea";
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -31,48 +27,18 @@ export interface Interactable {
 export type TownSettingsUpdate = {
   friendlyName?: string;
   isPubliclyListed?: boolean;
-};
+}
 
-export type Direction = "front" | "back" | "left" | "right";
+export type Direction = 'front' | 'back' | 'left' | 'right';
 
 export type PlayerID = string;
-
 export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
-  artAuctionAccount: ArtAuctionAccount | undefined
-}
-
-export interface AuctionHouseModel extends Interactable {
-  floors: AuctionFloorModel[];
-}
-
-export type AuctionFloorModel = {
-  id: string;
-  status: Status;
-  minBid: number;
-  artBeingAuctioned: Artwork;
-  timeLeft: number;
-  currentBid: { player: PlayerModel | undefined; bid: number };
-  auctioneer: PlayerModel | undefined;
-  observers: PlayerModel[];
-  bidders: PlayerModel[];
 };
 
-export type ArtAuctionAccount = {
-  email: string,
-  wallet: Wallet,
-}
-
-
-export type Wallet = {
-  money: number,
-  artwork: Artwork[],
-  networth: number,
-}
-
-export type XY = { x: number; y: number };
+export type XY = { x: number, y: number };
 
 export interface PlayerLocation {
   /* The CENTER x coordinate of this player's location */
@@ -83,7 +49,7 @@ export interface PlayerLocation {
   rotation: Direction;
   moving: boolean;
   interactableID?: string;
-}
+};
 export type ChatMessage = {
   author: string;
   sid: string;
@@ -93,13 +59,13 @@ export type ChatMessage = {
 
 export interface ConversationArea extends Interactable {
   topic?: string;
-}
+};
 export interface BoundingBox {
   x: number;
   y: number;
   width: number;
   height: number;
-}
+};
 
 export interface ViewingArea extends Interactable {
   video?: string;
@@ -107,13 +73,13 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
-export type GameStatus = "IN_PROGRESS" | "WAITING_TO_START" | "OVER";
+export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
 /**
  * Base type for the state of a game
  */
 export interface GameState {
   status: GameStatus;
-}
+} 
 
 /**
  * Type for the state of a game that can be won
@@ -137,7 +103,7 @@ export type TicTacToeGridPosition = 0 | 1 | 2;
  * Type for a move in TicTacToe
  */
 export interface TicTacToeMove {
-  gamePiece: "X" | "O";
+  gamePiece: 'X' | 'O';
   row: TicTacToeGridPosition;
   col: TicTacToeGridPosition;
 }
@@ -208,77 +174,36 @@ interface InteractableCommandBase {
   type: string;
 }
 
-/** type representing a piece of artwork */
-export type Artwork = {
-  description: string;
-  id: number;
-  primaryImage: string;
-  purchasePrice: number;
-  department: string;
-  title: string;
-  culture?: string;
-  period?: string;
-  artist: ArtistInfo;
-  medium: string;
-  countryOfOrigin?: string;
-  isBeingAuctioned: boolean;
-  purchaseHistory: Purchase[]
-};
-
-export type Purchase = {
-  player: Player,
-  sellPrice: number
-}
-
-export type ArtistInfo = {
-  name: string,
-  biography?: string,
-  nationality?: string,
-  begin?: string,
-  end?: string,
-  gender?: string,
-  wikiUrl?: string
-}
-
-export type InteractableCommand =
-  | ViewingAreaUpdateCommand
-  | JoinGameCommand
-  | GameMoveCommand<TicTacToeMove>
-  | LeaveGameCommand;
-export interface ViewingAreaUpdateCommand {
-  type: "ViewingAreaUpdate";
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand;
+export interface ViewingAreaUpdateCommand  {
+  type: 'ViewingAreaUpdate';
   update: ViewingArea;
 }
 export interface JoinGameCommand {
-  type: "JoinGame";
+  type: 'JoinGame';
 }
 export interface LeaveGameCommand {
-  type: "LeaveGame";
+  type: 'LeaveGame';
   gameID: GameInstanceID;
 }
 export interface GameMoveCommand<MoveType> {
-  type: "GameMove";
+  type: 'GameMove';
   gameID: GameInstanceID;
   move: MoveType;
 }
-export type InteractableCommandReturnType<
-  CommandType extends InteractableCommand
-> = CommandType extends JoinGameCommand
-  ? { gameID: string }
-  : CommandType extends ViewingAreaUpdateCommand
-  ? undefined
-  : CommandType extends GameMoveCommand<TicTacToeMove>
-  ? undefined
-  : CommandType extends LeaveGameCommand
-  ? undefined
-  : never;
+export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
+  CommandType extends JoinGameCommand ? { gameID: string}:
+  CommandType extends ViewingAreaUpdateCommand ? undefined :
+  CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
+  CommandType extends LeaveGameCommand ? undefined :
+  never;
 
 export type InteractableCommandResponse<MessageType> = {
   commandID: CommandID;
   interactableID: InteractableID;
   error?: string;
   payload?: InteractableCommandResponseMap[MessageType];
-};
+}
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
@@ -296,7 +221,5 @@ export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
-  interactableCommand: (
-    command: InteractableCommand & InteractableCommandBase
-  ) => void;
+  interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
 }
