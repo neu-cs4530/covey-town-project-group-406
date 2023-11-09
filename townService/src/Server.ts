@@ -13,9 +13,6 @@ import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
 
 // Create the server instances
-console.log('stall -2');
-
-console.log('stall -1');
 
 const app = Express();
 app.use(CORS());
@@ -24,22 +21,17 @@ const socketServer = new SocketServer<ClientToServerEvents, ServerToClientEvents
   cors: { origin: '*' },
 });
 
-console.log('stall 0');
 // Initialize the towns store with a factory that creates a broadcast emitter for a town
 TownsStore.initializeTownsStore((townID: string) => socketServer.to(townID));
 
-console.log('stall 1');
 // Connect the socket server to the TownsController. We use here the same pattern as tsoa
 // (the library that we use for REST), which creates a new controller instance for each request
 socketServer.on('connection', socket => {
   new TownsController().joinTown(socket);
 });
 
-console.log('stall 2');
 // Set the default content-type to JSON
 app.use(Express.json());
-
-console.log('stall 3');
 
 // Add a /docs endpoint that will display swagger auto-generated documentation
 app.use('/docs', swaggerUi.serve, async (_req: Express.Request, res: Express.Response) => {
@@ -47,11 +39,9 @@ app.use('/docs', swaggerUi.serve, async (_req: Express.Request, res: Express.Res
   return res.send(swaggerUi.generateHTML(JSON.parse(swaggerSpec)));
 });
 
-console.log('stall 4');
 // Register the TownsController routes with the express server
 RegisterRoutes(app);
 
-console.log('stall 5');
 // Add a middleware for Express to handle errors
 app.use(
   (
@@ -76,7 +66,6 @@ app.use(
     return next();
   },
 );
-console.log('stall 6');
 
 // Start the configured server, defaulting to port 8081 if $PORT is not set
 server.listen(process.env.PORT || 8081, () => {
@@ -84,8 +73,6 @@ server.listen(process.env.PORT || 8081, () => {
   // eslint-disable-next-line no-console
   console.log(`Listening on ${address.port}`);
   if (process.env.DEMO_TOWN_ID) {
-    console.log('stall 7');
     TownsStore.getInstance().createTown(process.env.DEMO_TOWN_ID, false);
-    console.log('stall 8');
   }
 });
