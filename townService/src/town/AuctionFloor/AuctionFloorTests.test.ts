@@ -1,11 +1,11 @@
-/* import { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
 import Player from '../../lib/Player';
 import { Artwork, TownEmitter } from '../../types/CoveyTownSocket';
-// import ArtworkDAO from '../../db/ArtworkDAO';
+import ArtworkDAO from '../../db/ArtworkDAO';
 import AuctionFloor from './AuctionFloor';
 
-// const dao = new ArtworkDAO();
+const dao = new ArtworkDAO();
 
 describe('when creating an auction floor', () => {
   let testArtwork: Artwork;
@@ -136,4 +136,3 @@ describe('when an auction starts', () => {
     expect(floor.timeLeft).toBe(0);
   }, 10000000);
 });
-*/

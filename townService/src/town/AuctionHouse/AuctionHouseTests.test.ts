@@ -1,4 +1,4 @@
-/* import { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import { TownEmitter, Artwork } from '../../types/CoveyTownSocket';
@@ -217,6 +217,7 @@ describe('when creating a new auction floor', () => {
     player.initializeArtAuctionAccount('player@gmail.com');
     await dao.addPlayer(player.email);
     await player.addArtwork(testArtwork);
+    await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
     await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
     expect((player.artwork[0].isBeingAuctioned = true));
@@ -535,6 +536,7 @@ describe('when an auction floor ends', () => {
       player.initializeArtAuctionAccount('player@gmail.com');
       await dao.addPlayer(player.email);
       await player.addArtwork(testArtwork);
+      await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
       await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
@@ -556,6 +558,7 @@ describe('when an auction floor ends', () => {
       player.initializeArtAuctionAccount('player@gmail.com');
       await dao.addPlayer(player.email);
       await player.addArtwork(testArtwork);
+      await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
       const player2 = new Player(nanoid(), mock<TownEmitter>());
       player2.initializeArtAuctionAccount('player2@gmail.com');
@@ -589,11 +592,13 @@ describe('when an auction floor ends', () => {
       player.initializeArtAuctionAccount('player@gmail.com');
       await dao.addPlayer(player.email);
       await player.addArtwork(testArtwork);
+      await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
       const player2 = new Player(nanoid(), mock<TownEmitter>());
       player2.initializeArtAuctionAccount('player2@gmail.com');
       await dao.addPlayer(player2.email);
       await player2.addArtwork(testArtwork2);
+      await dao.addArtworksToPlayer(player2.email, [testArtwork2]);
 
       const player3 = new Player(nanoid(), mock<TownEmitter>());
       player3.initializeArtAuctionAccount('player3@gmail.com');
@@ -669,4 +674,3 @@ describe('when an auction floor ends', () => {
     }, 100000);
   });
 });
-*/

@@ -5,7 +5,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
+console.log('here');
 initializeApp({
   credential: cert({
     projectId: process.env.FIRESTORE_PROJ_ID,
