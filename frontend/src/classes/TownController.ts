@@ -101,6 +101,13 @@ export type TownEvents = {
    * @param obj the interactable that is being interacted with
    */
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
+
+  /**
+   * represents if a login was successful or not
+   * @param success status of login
+   * @returns true if the player logged in, false otherwise
+   */
+  loginStatus: (success: boolean) => void;
 };
 
 /**
@@ -443,10 +450,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('auctionHouseLoginResponse', response => {
-      if (!response.success) {
-        // do something here? maybe emit?
-      } else {
-        // find the player, update their information
+      this.emit('loginStatus', response.success);
+      if (response.success && response.player) {
+        this.ourPlayer.setArtAuctionAccount(response.player.artAuctionAccount);
       }
     });
   }
