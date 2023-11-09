@@ -37,11 +37,6 @@ export type Direction = "front" | "back" | "left" | "right";
 
 export type PlayerID = string;
 
-
-
-
-
-
 export interface Player {
   id: PlayerID;
   userName: string;
@@ -54,14 +49,15 @@ export interface AuctionHouseModel extends Interactable {
 }
 
 export type AuctionFloorModel = {
-  _id: string;
-  _status: Status;
-  _artBeingAuctioned: Artwork;
-  _timeLeft: number;
-  _currentBid: { player: PlayerModel | undefined; bid: number };
-  _auctioneer: PlayerModel | undefined;
-  _observers: PlayerModel[];
-  _bidders: PlayerModel[];
+  id: string;
+  status: Status;
+  minBid: number;
+  artBeingAuctioned: Artwork;
+  timeLeft: number;
+  currentBid: { player: PlayerModel | undefined; bid: number };
+  auctioneer: PlayerModel | undefined;
+  observers: PlayerModel[];
+  bidders: PlayerModel[];
 };
 
 export type ArtAuctionAccount = {

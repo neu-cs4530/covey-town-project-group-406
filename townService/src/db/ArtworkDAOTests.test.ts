@@ -153,7 +153,7 @@ describe('when keeping track of all of the artwork IDs', () => {
 
 describe('when updating an auction house artwork', () => {
   it('updates the artwork properly', async () => {
-    const artworkWithUpdatedFields = {
+    const artworkWithUpdatedFields: Artwork = {
       description: 'test',
       id: 1,
       primaryImage: 'test',
