@@ -13,6 +13,7 @@ import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
+  AuctionHouseLoginCommand,
   ChatMessage,
   CoveyTownSocket,
   GameState,
@@ -511,6 +512,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       this._socket.on('commandResponse', ackListener);
       this._socket.emit('interactableCommand', commandMessage);
     });
+  }
+
+  public sendLoginCommand<CommandType extends AuctionHouseLoginCommand>(command: CommandType) {
+    this._socket.emit('auctionHouseLoginCommand', command.player);
   }
 
   /**

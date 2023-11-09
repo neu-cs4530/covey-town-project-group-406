@@ -244,7 +244,14 @@ export type InteractableCommand =
   | ViewingAreaUpdateCommand
   | JoinGameCommand
   | GameMoveCommand<TicTacToeMove>
-  | LeaveGameCommand;
+  | LeaveGameCommand
+  | AuctionHouseLoginCommand;
+
+export interface AuctionHouseLoginCommand {
+  type: "auctionHouseLogin";
+  player: Player;
+}
+
 export interface ViewingAreaUpdateCommand {
   type: "ViewingAreaUpdate";
   update: ViewingArea;
@@ -299,4 +306,5 @@ export interface ClientToServerEvents {
   interactableCommand: (
     command: InteractableCommand & InteractableCommandBase
   ) => void;
+  auctionHouseLoginCommand: (player: Player) => void;
 }
