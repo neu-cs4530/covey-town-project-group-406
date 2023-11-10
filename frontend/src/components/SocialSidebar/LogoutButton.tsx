@@ -42,6 +42,12 @@ export default function LogoutButton(): JSX.Element {
         if (townController.ourPlayer.artAuctionAccount) {
           console.log('logging out');
           logout(townController.ourPlayer.artAuctionAccount.email);
+        } else {
+          toast({
+            title: 'logout failed',
+            description: `you are not logged in`,
+            status: 'info',
+          });
         }
       }}>
       logout
