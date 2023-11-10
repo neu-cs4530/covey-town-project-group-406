@@ -32,6 +32,7 @@ export default function SignupForm(): JSX.Element {
   return (
     <>
       <div className='input-container'>
+        <h1>Signup</h1>
         <label>Username </label>
         <input type='text' value={email} onChange={e => setEmail(e.target.value)} />
       </div>
