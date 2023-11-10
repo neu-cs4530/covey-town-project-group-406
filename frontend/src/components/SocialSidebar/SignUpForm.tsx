@@ -50,11 +50,21 @@ export default function SignupForm(): JSX.Element {
       <div className='input-container'>
         <h1>Signup</h1>
         <label>Username </label>
-        <input type='text' value={email} onChange={e => setEmail(e.target.value)} />
+        <input
+          style={{ color: 'blue' }}
+          type='text'
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
       </div>
       <div className='input-container'>
         <label>Password </label>
-        <input type='password' value={pass} onChange={e => setPass(e.target.value)} />
+        <input
+          style={{ color: 'blue' }}
+          type='password'
+          value={pass}
+          onChange={e => setPass(e.target.value)}
+        />
       </div>
       <div className='button-container'>
         <button
