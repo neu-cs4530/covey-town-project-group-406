@@ -6,7 +6,9 @@ import ArtworkDAO from '../../db/ArtworkDAO';
 import AuctionFloor from './AuctionFloor';
 
 const dao = new ArtworkDAO();
-
+dao.userCollection = nanoid();
+dao.artworkIDsCollection = nanoid();
+dao.auctionHouseCollection = nanoid();
 describe('when creating an auction floor', () => {
   let testArtwork: Artwork;
   let player: Player;
