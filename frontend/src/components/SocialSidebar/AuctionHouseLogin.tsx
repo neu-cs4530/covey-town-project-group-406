@@ -8,8 +8,16 @@ export default function AuctionHouseLogin(): JSX.Element {
   townController.addListener('loginStatus', () => {
     console.log('user logged in!');
   });
+  // if the user creates an account or tries to log in, then do that and send the sendLoginCommand so
+  // the server can update the database value
   const sendLoginCommand = () => {
-    createUserWithEmailAndPassword(auth, 'dummy@gmail.com', 'bsstopthatbullshit');
+    try {
+      createUserWithEmailAndPassword(auth, 'dummy@gmail.com', 'bsstopthatbullshit');
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
     townController.sendLoginCommand();
   };
   return <button onClick={sendLoginCommand}>Login</button>;
