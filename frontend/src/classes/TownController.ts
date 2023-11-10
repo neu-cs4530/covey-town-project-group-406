@@ -463,9 +463,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             artwork: response.artworks as Artwork[],
           },
         };
-      } else {
-        this.emit('loginStatus', response.success);
       }
+      this.emit('loginStatus', response.success);
     });
 
     this._socket.on('auctionHouseCreateUserResponse', success => {
