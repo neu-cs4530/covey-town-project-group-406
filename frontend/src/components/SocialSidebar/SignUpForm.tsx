@@ -57,7 +57,12 @@ export default function SignupForm(): JSX.Element {
         <input type='password' value={pass} onChange={e => setPass(e.target.value)} />
       </div>
       <div className='button-container'>
-        <button onClick={() => sendLoginCommand(email, pass)}>submit</button>
+        <button
+          onClick={() => {
+            sendLoginCommand(email, pass);
+          }}>
+          submit
+        </button>
       </div>
     </>
   );
