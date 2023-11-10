@@ -17,7 +17,11 @@ export default function LoginForm(): JSX.Element {
       });
     } catch (err) {
       if (err instanceof Error) {
-        console.log(err.message);
+        toast({
+          title: 'user creation not successful',
+          description: `${err.message}`,
+          status: 'info',
+        });
       }
     }
     townController.sendLoginCommand();
