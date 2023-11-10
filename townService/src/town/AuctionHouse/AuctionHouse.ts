@@ -1,4 +1,4 @@
-import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
+/* import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
 import { nanoid } from 'nanoid';
 import Player from '../../lib/Player';
 import {
@@ -222,3 +222,4 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     throw new Error('not impl');
   }
 }
+*/

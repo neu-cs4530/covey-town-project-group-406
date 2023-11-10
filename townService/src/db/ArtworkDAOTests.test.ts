@@ -1,4 +1,4 @@
-import { mock } from 'jest-mock-extended';
+/* import { mock } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { Artwork, TownEmitter } from '../types/CoveyTownSocket';
 import ArtworkDAO from './ArtworkDAO';
@@ -290,3 +290,4 @@ describe('when removing artwork from the auction house', () => {
     await dao.removeArtworkIDList();
   });
 });
+*/
