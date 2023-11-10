@@ -8,22 +8,18 @@ export default function SignupForm(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
   const sendLoginCommand = (email: string, pass: string) => {
-    try {
-      createUserWithEmailAndPassword(auth, email, pass);
+    createUserWithEmailAndPassword(auth, email, pass).catch(err => {
       toast({
-        title: 'user creation successful',
-        description: `you have created your account and are now logged in as: ${email}`,
+        title: 'user creation not successful',
+        description: `${err.message}`,
         status: 'info',
       });
-    } catch (err) {
-      if (err instanceof Error) {
-        toast({
-          title: 'user creation not successful',
-          description: `${err.message}`,
-          status: 'info',
-        });
-      }
-    }
+    });
+    toast({
+      title: 'user creation successful',
+      description: `you have created your account and are now logged in as: ${email}`,
+      status: 'info',
+    });
     townController.sendLoginCommand();
   };
   const [email, setEmail] = useState('');
