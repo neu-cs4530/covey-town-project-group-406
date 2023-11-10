@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signOut } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
