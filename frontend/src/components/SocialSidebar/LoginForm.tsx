@@ -11,8 +11,8 @@ export default function LoginForm(): JSX.Element {
     try {
       createUserWithEmailAndPassword(auth, email, pass);
       toast({
-        title: 'login successful',
-        description: `you have logged in as: ${email}`,
+        title: 'user creation successful',
+        description: `you have created your account and are now logged in as: ${email}`,
         status: 'info',
       });
     } catch (err) {
