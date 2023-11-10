@@ -2,12 +2,19 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
+import { useToast } from '@chakra-ui/react';
 
 export default function LoginForm(): JSX.Element {
+  const toast = useToast();
   const townController = useTownController();
   const sendLoginCommand = (email: string, pass: string) => {
     try {
       createUserWithEmailAndPassword(auth, email, pass);
+      toast({
+        title: 'login successful',
+        description: `you have logged in as: ${email}`,
+        status: 'info',
+      });
     } catch (err) {
       if (err instanceof Error) {
         console.log(err.message);
