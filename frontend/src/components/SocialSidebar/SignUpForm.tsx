@@ -11,10 +11,10 @@ export default function SignupForm(): JSX.Element {
   const sendLoginCommand = (email: string, pass: string) => {
     createUserWithEmailAndPassword(auth, email, pass)
       .then(() => {
-        townController.ourPlayer.artAuctionAccount = {
+        /*townController.ourPlayer.artAuctionAccount = {
           email: email,
           wallet: { money: 1000000, networth: 1000000, artwork: [] },
-        };
+        };*/
         townController.addListener('loginStatus', success => {
           if (success) {
             toast({
@@ -32,21 +32,6 @@ export default function SignupForm(): JSX.Element {
         });
         townController.sendSignupCommand();
         townController.sendLoginCommand();
-        townController.addListener('loginStatus', success => {
-          if (success) {
-            toast({
-              title: 'sign up successful',
-              description: `you have successfully signed up and are now logged in`,
-              status: 'info',
-            });
-          } else {
-            toast({
-              title: 'user already logged in',
-              description: `there is a user already logged in with this information elsewhere`,
-              status: 'info',
-            });
-          }
-        });
       })
       .catch(err => {
         toast({

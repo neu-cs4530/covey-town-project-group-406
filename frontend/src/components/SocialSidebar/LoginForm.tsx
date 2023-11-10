@@ -12,11 +12,6 @@ export default function LoginForm(): JSX.Element {
     try {
       signInWithEmailAndPassword(auth, email, pass)
         .then(() => {
-          toast({
-            title: 'user login successful',
-            description: `you are now logged in as: ${email}`,
-            status: 'info',
-          });
           townController.addListener('loginStatus', success => {
             if (success) {
               toast({
@@ -46,7 +41,6 @@ export default function LoginForm(): JSX.Element {
         console.log(err.message);
       }
     }
-    townController.sendLoginCommand();
   };
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
