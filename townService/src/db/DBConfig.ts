@@ -1,11 +1,11 @@
 // example firebase db setup
 // // Import the functions you need from the SDKs you need
-/* import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
+console.log('hello world');
 initializeApp({
   credential: cert({
     projectId: process.env.FIRESTORE_PROJ_ID,
@@ -15,4 +15,4 @@ initializeApp({
 });
 
 const db = getFirestore();
-export default db; */
+export default db;

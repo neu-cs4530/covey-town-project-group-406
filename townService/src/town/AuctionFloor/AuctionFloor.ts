@@ -1,10 +1,10 @@
-/* import { EventEmitter } from 'events';
+import { EventEmitter } from 'events';
 import Player from '../../lib/Player';
 import { Player as PlayerModel, Artwork, AuctionFloorModel } from '../../types/CoveyTownSocket';
 import ArtworkDAO from '../../db/ArtworkDAO';
-import IAuctionFloor, { Status, Bid } from './IAuctionFloor'; */
+import IAuctionFloor, { Status, Bid } from './IAuctionFloor';
 
-/* export default class AuctionFloor extends EventEmitter implements IAuctionFloor {
+export default class AuctionFloor extends EventEmitter implements IAuctionFloor {
   // DAO instance
   static DAO = new ArtworkDAO();
 
@@ -227,4 +227,3 @@ import IAuctionFloor, { Status, Bid } from './IAuctionFloor'; */
     }, 1000);
   }
 }
-*/
