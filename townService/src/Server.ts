@@ -6,6 +6,8 @@ import swaggerUi from 'swagger-ui-express';
 import { ValidateError } from 'tsoa';
 import fs from 'fs/promises';
 import { Server as SocketServer } from 'socket.io';
+import { initializeApp } from 'firebase-admin';
+import { cert } from 'firebase-admin/app';
 import { RegisterRoutes } from '../generated/routes';
 import TownsStore from './lib/TownsStore';
 import { ClientToServerEvents, ServerToClientEvents } from './types/CoveyTownSocket';
@@ -13,6 +15,14 @@ import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
 
 // Create the server instances
+
+initializeApp({
+  credential: cert({
+    projectId: process.env.FIRESTORE_PROJ_ID,
+    privateKey: (process.env.FIRESTORE_PRIVATE_KEY as string).replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
+  }),
+});
 
 const app = Express();
 app.use(CORS());
