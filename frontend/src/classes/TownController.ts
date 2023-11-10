@@ -472,8 +472,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('auctionHouseLogoutCommandResponse', success => {
-      this.ourPlayer.artAuctionAccount = undefined;
-      this.emit('userLogoutStatus', success);
+      if (success) {
+        this.ourPlayer.artAuctionAccount = undefined;
+        this.emit('userLogoutStatus', success);
+      } else {
+        this.emit('userLogoutStatus', success);
+      }
     });
   }
 
