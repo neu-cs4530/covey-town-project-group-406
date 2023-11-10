@@ -9,7 +9,7 @@ export default function AuctionHouseLogin(): JSX.Element {
     console.log('user logged in!');
   });
   const sendLoginCommand = () => {
-    createUserWithEmailAndPassword(auth, 'dummy@gmail.com', 'bs');
+    createUserWithEmailAndPassword(auth, 'dummy@gmail.com', 'bsstopthatbullshit');
     townController.sendLoginCommand();
   };
   return <button onClick={sendLoginCommand}>Login</button>;
