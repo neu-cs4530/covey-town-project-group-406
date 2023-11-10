@@ -7,6 +7,7 @@ import { ValidateError } from 'tsoa';
 import fs from 'fs/promises';
 import { Server as SocketServer } from 'socket.io';
 import { initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import { RegisterRoutes } from '../generated/routes';
 import TownsStore from './lib/TownsStore';
 import { ClientToServerEvents, ServerToClientEvents } from './types/CoveyTownSocket';
@@ -22,6 +23,8 @@ initializeApp({
     clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
   }),
 });
+const db = getFirestore();
+export default db;
 
 const app = Express();
 app.use(CORS());
