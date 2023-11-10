@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import { useToast } from '@chakra-ui/react';
+import { Heading, useToast } from '@chakra-ui/react';
+import { Button, Input } from '@chakra-ui/react';
 
 export default function SignupForm(): JSX.Element {
   const toast = useToast();
@@ -48,10 +49,10 @@ export default function SignupForm(): JSX.Element {
   return (
     <>
       <div className='input-container'>
-        <h1>Signup</h1>
+        <Heading>Signup</Heading>
         <label>Username </label>
-        <input
-          style={{ color: 'blue' }}
+        <Input
+          style={{ color: 'blue', backgroundColor: 'red' }}
           type='text'
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -59,20 +60,20 @@ export default function SignupForm(): JSX.Element {
       </div>
       <div className='input-container'>
         <label>Password </label>
-        <input
-          style={{ color: 'blue' }}
+        <Input
+          style={{ color: 'blue', backgroundColor: 'red' }}
           type='password'
           value={pass}
           onChange={e => setPass(e.target.value)}
         />
       </div>
       <div className='button-container'>
-        <button
+        <Button
           onClick={() => {
             sendLoginCommand(email, pass);
           }}>
           submit
-        </button>
+        </Button>
       </div>
     </>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signOut } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import { useToast } from '@chakra-ui/react';
+import { Button, useToast } from '@chakra-ui/react';
 
 export default function LogoutButton(): JSX.Element {
   const toast = useToast();
@@ -37,7 +37,7 @@ export default function LogoutButton(): JSX.Element {
   };
 
   return (
-    <button
+    <Button
       onClick={() => {
         if (townController.ourPlayer.artAuctionAccount) {
           console.log('logging out');
@@ -45,7 +45,7 @@ export default function LogoutButton(): JSX.Element {
         }
       }}>
       logout
-    </button>
+    </Button>
   );
 
   /**/

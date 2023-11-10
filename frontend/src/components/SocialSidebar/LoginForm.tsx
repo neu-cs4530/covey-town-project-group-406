@@ -3,6 +3,7 @@ import useTownController from '../../hooks/useTownController';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
 import { useToast } from '@chakra-ui/react';
+import { Button, Input, Heading } from '@chakra-ui/react';
 
 export default function LoginForm(): JSX.Element {
   const toast = useToast();
@@ -48,10 +49,10 @@ export default function LoginForm(): JSX.Element {
   return (
     <>
       <div className='input-container'>
-        <h1>Login</h1>
+        <Heading>Login</Heading>
         <label>Username </label>
-        <input
-          style={{ color: 'blue' }}
+        <Input
+          style={{ color: 'blue', backgroundColor: 'red' }}
           type='text'
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -59,15 +60,15 @@ export default function LoginForm(): JSX.Element {
       </div>
       <div className='input-container'>
         <label>Password </label>
-        <input
-          style={{ color: 'blue' }}
+        <Input
+          style={{ color: 'blue', backgroundColor: 'red' }}
           type='password'
           value={pass}
           onChange={e => setPass(e.target.value)}
         />
       </div>
       <div className='button-container'>
-        <button onClick={() => sendLoginCommand(email, pass)}>submit</button>
+        <Button onClick={() => sendLoginCommand(email, pass)}>submit</Button>
       </div>
     </>
   );
