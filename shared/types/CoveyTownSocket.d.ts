@@ -297,6 +297,7 @@ export interface ServerToClientEvents {
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
   auctionHouseLoginResponse: (response: {success: boolean, player: Player | undefined}) => void;
+
 }
 
 export interface ClientToServerEvents {
@@ -307,4 +308,5 @@ export interface ClientToServerEvents {
     command: InteractableCommand & InteractableCommandBase
   ) => void;
   auctionHouseLoginCommand: (player: Player) => void;
+  auctionHouseCreateUserCommand: (player: Player) => void;
 }

@@ -163,7 +163,14 @@ export default class Town {
       }
     });
 
+    socket.on('auctionHouseCreateUserCommand', async player => {
+      if (player.artAuctionAccount) {
+        await AuctionFloor.DAO.addPlayer(player.artAuctionAccount?.email);
+      }
+    });
+
     socket.on('auctionHouseLoginCommand', async player => {
+      // need to create player if player does not exist so try to retrieve from db first
       try {
         if (player.artAuctionAccount) {
           const dbPlayer = await AuctionFloor.DAO.getPlayer(player.artAuctionAccount?.email);
