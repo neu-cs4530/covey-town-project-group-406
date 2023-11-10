@@ -14,7 +14,6 @@ import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
   Artwork,
-  AuctionHouseLoginCommand,
   ChatMessage,
   CoveyTownSocket,
   GameState,
