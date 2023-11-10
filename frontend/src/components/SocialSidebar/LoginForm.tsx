@@ -7,9 +7,7 @@ import { useToast } from '@chakra-ui/react';
 export default function LoginForm(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
-  townController.addListener('loginStatus', success => {
-    console.log(success);
-  });
+
   const sendLoginCommand = (email: string, pass: string) => {
     try {
       signInWithEmailAndPassword(auth, email, pass)
@@ -18,6 +16,21 @@ export default function LoginForm(): JSX.Element {
             title: 'user login successful',
             description: `you are now logged in as: ${email}`,
             status: 'info',
+          });
+          townController.addListener('loginStatus', success => {
+            if (success) {
+              toast({
+                title: 'login',
+                description: `you have successfully logged in as ${email}`,
+                status: 'info',
+              });
+            } else {
+              toast({
+                title: 'user already logged in',
+                description: `there is a user already logged in with this information elsewhere`,
+                status: 'info',
+              });
+            }
           });
           townController.sendLoginCommand();
         })

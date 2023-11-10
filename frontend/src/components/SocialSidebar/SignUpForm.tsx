@@ -7,20 +7,46 @@ import { useToast } from '@chakra-ui/react';
 export default function SignupForm(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
+
   const sendLoginCommand = (email: string, pass: string) => {
     createUserWithEmailAndPassword(auth, email, pass)
       .then(() => {
-        toast({
-          title: 'user creation successful',
-          description: `you have created your account and are now logged in as: ${email}`,
-          status: 'info',
-        });
         townController.ourPlayer.artAuctionAccount = {
           email: email,
           wallet: { money: 1000000, networth: 1000000, artwork: [] },
         };
+        townController.addListener('loginStatus', success => {
+          if (success) {
+            toast({
+              title: 'sign up successful',
+              description: `you have successfully signed up and are now logged in as ${email}`,
+              status: 'info',
+            });
+          } else {
+            toast({
+              title: 'user already logged in',
+              description: `there is a user already logged in with this information elsewhere`,
+              status: 'info',
+            });
+          }
+        });
         townController.sendSignupCommand();
         townController.sendLoginCommand();
+        townController.addListener('loginStatus', success => {
+          if (success) {
+            toast({
+              title: 'sign up successful',
+              description: `you have successfully signed up and are now logged in`,
+              status: 'info',
+            });
+          } else {
+            toast({
+              title: 'user already logged in',
+              description: `there is a user already logged in with this information elsewhere`,
+              status: 'info',
+            });
+          }
+        });
       })
       .catch(err => {
         toast({
