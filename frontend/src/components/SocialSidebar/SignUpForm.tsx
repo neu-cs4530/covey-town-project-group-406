@@ -19,6 +19,7 @@ export default function SignupForm(): JSX.Element {
           email: email,
           wallet: { money: 1000000, networth: 1000000, artwork: [] },
         };
+        townController.sendSignupCommand();
         townController.sendLoginCommand();
       })
       .catch(err => {

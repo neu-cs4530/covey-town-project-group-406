@@ -528,6 +528,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
   }
 
+  public sendSignupCommand() {
+    this._socket.emit('auctionHouseCreateUserCommand', this.ourPlayer.toPlayerModel());
+  }
+
   public sendLoginCommand() {
     this._socket.emit('auctionHouseLoginCommand', this.ourPlayer.toPlayerModel());
   }
