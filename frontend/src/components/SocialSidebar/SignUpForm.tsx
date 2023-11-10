@@ -15,6 +15,10 @@ export default function SignupForm(): JSX.Element {
           description: `you have created your account and are now logged in as: ${email}`,
           status: 'info',
         });
+        townController.ourPlayer.artAuctionAccount = {
+          email: email,
+          wallet: { money: 1000000, networth: 1000000, artwork: [] },
+        };
         townController.sendLoginCommand();
       })
       .catch(err => {
