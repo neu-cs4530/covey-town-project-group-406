@@ -23,7 +23,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
-// import AuctionFloor from './AuctionFloor/AuctionFloor';
+import AuctionFloor from './AuctionFloor/AuctionFloor';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -163,29 +163,38 @@ export default class Town {
       }
     });
 
-    socket.on('auctionHouseCreateUserCommand', async player => {
-      if (player.artAuctionAccount) {
-        // await AuctionFloor.DAO.addPlayer(player.artAuctionAccount?.email);
+    socket.on('auctionHouseCreateUserCommand', async email => {
+      try {
+        await AuctionFloor.DAO.addPlayer(email);
+        socket.emit('auctionHouseCreateUserResponse', true);
+      } catch (err) {
+        socket.emit('auctionHouseCreateUserResponse', false);
       }
     });
 
-    socket.on('auctionHouseLoginCommand', async player => {
-      socket.emit('auctionHouseLoginResponse', { success: true, player: undefined });
+    socket.on('auctionHouseLoginCommand', async email => {
+      // socket.emit('auctionHouseLoginResponse', { success: true, player: undefined });
       // need to create player if player does not exist so try to retrieve from db first
-      /* try {
-        if (player.artAuctionAccount) {
-          // const dbPlayer = await AuctionFloor.DAO.getPlayer(player.artAuctionAccount?.email);
-          if (!dbPlayer.isLoggedIn) {
-            socket.emit('auctionHouseLoginResponse', { success: true, player });
-          } else {
-            socket.emit('auctionHouseLoginResponse', { success: false, player: undefined });
-          }
+      try {
+        const dbPlayer = await AuctionFloor.DAO.getPlayer(email);
+        if (!dbPlayer.isLoggedIn) {
+          socket.emit('auctionHouseLoginResponse', {
+            success: true,
+            money: dbPlayer.money,
+            artworks: dbPlayer.artworks,
+          });
+        } else {
+          socket.emit('auctionHouseLoginResponse', {
+            success: false,
+            money: undefined,
+            artworks: undefined,
+          });
         }
       } catch (err) {
         if (err instanceof Error) {
           throw new Error(err.message);
         }
-      } */
+      }
     });
 
     // Set up a listener to process commands to interactables.

@@ -296,8 +296,8 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
-  auctionHouseLoginResponse: (response: {success: boolean, player: Player | undefined}) => void;
-
+  auctionHouseLoginResponse: (response: {success: boolean, artworks: Artwork[] | undefined, money: number | undefined}) => void;
+  auctionHouseCreateUserResponse: (success: boolean) => void
 }
 
 export interface ClientToServerEvents {
@@ -307,6 +307,6 @@ export interface ClientToServerEvents {
   interactableCommand: (
     command: InteractableCommand & InteractableCommandBase
   ) => void;
-  auctionHouseLoginCommand: (player: Player) => void;
-  auctionHouseCreateUserCommand: (player: Player) => void;
+  auctionHouseLoginCommand: (email: string) => void;
+  auctionHouseCreateUserCommand: (email: string) => void;
 }

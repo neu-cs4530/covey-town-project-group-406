@@ -11,10 +11,6 @@ export default function SignupForm(): JSX.Element {
   const sendLoginCommand = (email: string, pass: string) => {
     createUserWithEmailAndPassword(auth, email, pass)
       .then(() => {
-        /*townController.ourPlayer.artAuctionAccount = {
-          email: email,
-          wallet: { money: 1000000, networth: 1000000, artwork: [] },
-        };*/
         townController.addListener('loginStatus', success => {
           if (success) {
             toast({
@@ -30,8 +26,12 @@ export default function SignupForm(): JSX.Element {
             });
           }
         });
-        townController.sendSignupCommand();
-        townController.sendLoginCommand();
+        townController.addListener('createUserStatus', success => {
+          if (success) {
+            townController.sendLoginCommand(email);
+          }
+        });
+        townController.sendSignupCommand(email);
       })
       .catch(err => {
         toast({

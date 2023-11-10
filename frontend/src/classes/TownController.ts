@@ -108,6 +108,8 @@ export type TownEvents = {
    * @returns true if the player logged in, false otherwise
    */
   loginStatus: (success: boolean) => void;
+
+  createUserStatus: (success: boolean) => void;
 };
 
 /**
@@ -451,9 +453,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     this._socket.on('auctionHouseLoginResponse', response => {
       this.emit('loginStatus', response.success);
-      if (response.success && response.player && response.player.artAuctionAccount) {
-        this.ourPlayer.artAuctionAccount = response.player.artAuctionAccount;
-      }
+      // set player art auction account based on response here
+    });
+
+    this._socket.on('auctionHouseCreateUserResponse', success => {
+      this.emit('createUserStatus', success);
     });
   }
 
@@ -528,12 +532,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
   }
 
-  public sendSignupCommand() {
-    this._socket.emit('auctionHouseCreateUserCommand', this.ourPlayer.toPlayerModel());
+  public sendSignupCommand(email: string) {
+    this._socket.emit('auctionHouseCreateUserCommand', email);
   }
 
-  public sendLoginCommand() {
-    this._socket.emit('auctionHouseLoginCommand', this.ourPlayer.toPlayerModel());
+  public sendLoginCommand(email: string) {
+    this._socket.emit('auctionHouseLoginCommand', email);
   }
 
   /**

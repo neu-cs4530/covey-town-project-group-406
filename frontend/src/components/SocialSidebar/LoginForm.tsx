@@ -27,7 +27,7 @@ export default function LoginForm(): JSX.Element {
               });
             }
           });
-          townController.sendLoginCommand();
+          townController.sendLoginCommand(email);
         })
         .catch(err => {
           toast({
