@@ -165,7 +165,7 @@ export default class Town {
 
     socket.on('auctionHouseCreateUserCommand', async email => {
       try {
-        // await AuctionFloor.DAO.addPlayer(email);
+        await AuctionFloor.DAO.addPlayer(email);
         socket.emit('auctionHouseCreateUserResponse', true);
       } catch (err) {
         socket.emit('auctionHouseCreateUserResponse', false);
