@@ -298,6 +298,7 @@ export interface ServerToClientEvents {
   commandResponse: (response: InteractableCommandResponse) => void;
   auctionHouseLoginResponse: (response: {success: boolean, email: string, artworks: Artwork[] | undefined, money: number | undefined}) => void;
   auctionHouseCreateUserResponse: (success: boolean) => void
+  auctionHouseLogoutCommandResponse: (success: boolean) => void
 }
 
 export interface ClientToServerEvents {
@@ -309,4 +310,5 @@ export interface ClientToServerEvents {
   ) => void;
   auctionHouseLoginCommand: (email: string) => void;
   auctionHouseCreateUserCommand: (email: string) => void;
+  auctionHouseLogoutCommand: (email: string) => void;
 }

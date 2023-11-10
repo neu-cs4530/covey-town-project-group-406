@@ -111,6 +111,8 @@ export type TownEvents = {
   loginStatus: (success: boolean) => void;
 
   createUserStatus: (success: boolean) => void;
+
+  userLogoutStatus: (success: boolean) => void;
 };
 
 /**
@@ -467,6 +469,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.on('auctionHouseCreateUserResponse', success => {
       this.emit('createUserStatus', success);
     });
+
+    this._socket.on('auctionHouseLogoutCommandResponse', success => {
+      this.ourPlayer.artAuctionAccount = undefined;
+      this.emit('userLogoutStatus', success);
+    });
   }
 
   /**
@@ -546,6 +553,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   public sendLoginCommand(email: string) {
     this._socket.emit('auctionHouseLoginCommand', email);
+  }
+
+  public sendLogoutCommand(email: string) {
+    this._socket.emit('auctionHouseLogoutCommand', email);
   }
 
   /**

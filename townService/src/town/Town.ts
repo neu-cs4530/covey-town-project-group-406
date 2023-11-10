@@ -200,6 +200,16 @@ export default class Town {
       }
     });
 
+    socket.on('auctionHouseLogoutCommand', async email => {
+      try {
+        const dbPlayer = await AuctionFloor.DAO.getPlayer(email);
+        await AuctionFloor.DAO.updatePlayer(email, false, dbPlayer.money);
+        socket.emit('auctionHouseLogoutCommandResponse', true);
+      } catch (err) {
+        socket.emit('auctionHouseLogoutCommandResponse', false);
+      }
+    });
+
     // Set up a listener to process commands to interactables.
     // Dispatches commands to the appropriate interactable and sends the response back to the client
     socket.on('interactableCommand', (command: InteractableCommand & InteractableCommandBase) => {

@@ -41,7 +41,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return this._location;
   }
 
-  set artAuctionAccount(a: ArtAuctionAccount) {
+  set artAuctionAccount(a: ArtAuctionAccount | undefined) {
     this._artAuctionAccount = a;
   }
 

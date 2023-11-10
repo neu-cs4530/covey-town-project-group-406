@@ -12,7 +12,7 @@ export default function LoginForm(): JSX.Element {
     try {
       signInWithEmailAndPassword(auth, email, pass)
         .then(() => {
-          const l = townController.once('loginStatus', success => {
+          townController.once('loginStatus', success => {
             if (success) {
               toast({
                 title: 'login',
@@ -26,7 +26,6 @@ export default function LoginForm(): JSX.Element {
                 status: 'info',
               });
             }
-            //townController.removeListener(l);
           });
           townController.sendLoginCommand(email);
         })

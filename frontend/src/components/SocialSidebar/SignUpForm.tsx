@@ -25,7 +25,6 @@ export default function SignupForm(): JSX.Element {
               status: 'info',
             });
           }
-          //townController.removeListener('loginStatus', l);
         });
         townController.once('createUserStatus', success => {
           if (success) {
