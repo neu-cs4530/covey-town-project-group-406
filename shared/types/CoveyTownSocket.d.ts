@@ -296,7 +296,7 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
-  auctionHouseLoginResponse: (response: {success: boolean, artworks: Artwork[] | undefined, money: number | undefined}) => void;
+  auctionHouseLoginResponse: (response: {success: boolean, email: string, artworks: Artwork[] | undefined, money: number | undefined}) => void;
   auctionHouseCreateUserResponse: (success: boolean) => void
 }
 

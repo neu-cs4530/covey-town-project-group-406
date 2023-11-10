@@ -181,12 +181,14 @@ export default class Town {
           // need to also log them in
           await AuctionFloor.DAO.updatePlayer(email, true, dbPlayer.money);
           socket.emit('auctionHouseLoginResponse', {
+            email,
             success: true,
             money: dbPlayer.money,
             artworks: dbPlayer.artworks,
           });
         } else {
           socket.emit('auctionHouseLoginResponse', {
+            email,
             success: false,
             money: undefined,
             artworks: undefined,

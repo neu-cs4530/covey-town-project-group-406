@@ -13,6 +13,7 @@ import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
+  Artwork,
   AuctionHouseLoginCommand,
   ChatMessage,
   CoveyTownSocket,
@@ -452,8 +453,16 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('auctionHouseLoginResponse', response => {
-      this.emit('loginStatus', response.success);
+      this.ourPlayer.artAuctionAccount = {
+        email: response.email,
+        wallet: {
+          money: response.money as number,
+          networth: 1,
+          artwork: response.artworks as Artwork[],
+        },
+      };
       // set player art auction account based on response here
+      this.emit('loginStatus', response.success);
     });
 
     this._socket.on('auctionHouseCreateUserResponse', success => {
