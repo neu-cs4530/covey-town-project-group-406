@@ -23,6 +23,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import AuctionFloor from './AuctionFloor/AuctionFloor';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -162,13 +163,20 @@ export default class Town {
       }
     });
 
-    socket.on('auctionHouseLoginCommand', player => {
+    socket.on('auctionHouseLoginCommand', async player => {
       try {
-        // whatever email the player tries to login with, check the dao and see if that
-        // player is already logged in
-        socket.emit('auctionHouseLoginResponse', { success: true, player });
+        if (player.artAuctionAccount) {
+          const dbPlayer = await AuctionFloor.DAO.getPlayer(player.artAuctionAccount?.email);
+          if (!dbPlayer.isLoggedIn) {
+            socket.emit('auctionHouseLoginResponse', { success: true, player });
+          } else {
+            socket.emit('auctionHouseLoginResponse', { success: false, player: undefined });
+          }
+        }
       } catch (err) {
-        socket.emit('auctionHouseLoginResponse', { success: false, player: undefined });
+        if (err instanceof Error) {
+          throw new Error(err.message);
+        }
       }
     });
 
