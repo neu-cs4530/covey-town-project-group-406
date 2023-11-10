@@ -11,7 +11,7 @@ export default function SignupForm(): JSX.Element {
   const sendLoginCommand = (email: string, pass: string) => {
     createUserWithEmailAndPassword(auth, email, pass)
       .then(() => {
-        townController.addListener('loginStatus', success => {
+        townController.once('loginStatus', success => {
           if (success) {
             toast({
               title: 'sign up successful',
@@ -25,8 +25,9 @@ export default function SignupForm(): JSX.Element {
               status: 'info',
             });
           }
+          //townController.removeListener('loginStatus', l);
         });
-        townController.addListener('createUserStatus', success => {
+        townController.once('createUserStatus', success => {
           if (success) {
             townController.sendLoginCommand(email);
           }
