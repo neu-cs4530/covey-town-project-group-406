@@ -455,6 +455,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('auctionHouseLoginResponse', response => {
+      console.log('updating our players auction account');
       this.ourPlayer.artAuctionAccount = {
         email: response.email,
         wallet: {

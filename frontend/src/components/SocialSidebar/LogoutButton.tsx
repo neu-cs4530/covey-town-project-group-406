@@ -40,6 +40,7 @@ export default function LogoutButton(): JSX.Element {
     <button
       onClick={() => {
         if (townController.ourPlayer.artAuctionAccount) {
+          console.log('logging out');
           logout(townController.ourPlayer.artAuctionAccount.email);
         }
       }}>
