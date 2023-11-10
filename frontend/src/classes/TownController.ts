@@ -454,16 +454,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('auctionHouseLoginResponse', response => {
-      console.log('updating our players auction account');
-      this.ourPlayer.artAuctionAccount = {
-        email: response.email,
-        wallet: {
-          money: response.money as number,
-          networth: 1,
-          artwork: response.artworks as Artwork[],
-        },
-      };
-      this.emit('loginStatus', response.success);
+      if (response.success) {
+        this.ourPlayer.artAuctionAccount = {
+          email: response.email,
+          wallet: {
+            money: response.money as number,
+            networth: 1,
+            artwork: response.artworks as Artwork[],
+          },
+        };
+      } else {
+        this.emit('loginStatus', response.success);
+      }
     });
 
     this._socket.on('auctionHouseCreateUserResponse', success => {
