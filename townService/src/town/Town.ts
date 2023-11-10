@@ -178,7 +178,6 @@ export default class Town {
       try {
         const dbPlayer = await AuctionFloor.DAO.getPlayer(email);
         if (!dbPlayer.isLoggedIn) {
-          // need to also log them in
           await AuctionFloor.DAO.updatePlayer(email, true, dbPlayer.money);
           socket.emit('auctionHouseLoginResponse', {
             email,

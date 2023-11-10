@@ -461,7 +461,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           artwork: response.artworks as Artwork[],
         },
       };
-      // set player art auction account based on response here
       this.emit('loginStatus', response.success);
     });
 
