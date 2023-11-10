@@ -6,6 +6,7 @@ import IAuctionFloor, { Status, Bid } from './IAuctionFloor';
 
 export default class AuctionFloor extends EventEmitter implements IAuctionFloor {
   // DAO instance
+
   static DAO = new ArtworkDAO();
 
   // The ID of this auction floor (unique using nanoid())
