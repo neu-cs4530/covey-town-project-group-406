@@ -23,7 +23,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
-// import AuctionFloor from './AuctionFloor/AuctionFloor';
+import AuctionFloor from './AuctionFloor/AuctionFloor';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
