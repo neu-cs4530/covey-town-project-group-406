@@ -15,8 +15,8 @@ export default function LoginForm(): JSX.Element {
       signInWithEmailAndPassword(auth, email, pass)
         .then(() => {
           toast({
-            title: 'user creation successful',
-            description: `you have created your account and are now logged in as: ${email}`,
+            title: 'user login successful',
+            description: `you are now logged in as: ${email}`,
             status: 'info',
           });
           townController.sendLoginCommand();
