@@ -4,7 +4,7 @@ import { signOut } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
 import { useToast } from '@chakra-ui/react';
 
-export default function LogoutButton({ userEmail: string }): JSX.Element {
+export default function LogoutButton(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
   const logout = (email: string) => {
@@ -36,5 +36,16 @@ export default function LogoutButton({ userEmail: string }): JSX.Element {
       });
   };
 
-  return <button onClick={() => logout(userEmail)}>logout</button>;
+  return (
+    <button
+      onClick={() => {
+        if (townController.ourPlayer.artAuctionAccount) {
+          logout(townController.ourPlayer.artAuctionAccount.email);
+        }
+      }}>
+      logout
+    </button>
+  );
+
+  /**/
 }
