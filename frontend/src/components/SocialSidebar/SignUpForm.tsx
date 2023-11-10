@@ -70,7 +70,15 @@ export default function SignupForm(): JSX.Element {
       <div className='button-container'>
         <Button
           onClick={() => {
-            sendLoginCommand(email, pass);
+            if (!townController.ourPlayer.artAuctionAccount) {
+              sendLoginCommand(email, pass);
+            } else {
+              toast({
+                title: 'login failed',
+                description: `you are already logged in`,
+                status: 'info',
+              });
+            }
           }}>
           submit
         </Button>

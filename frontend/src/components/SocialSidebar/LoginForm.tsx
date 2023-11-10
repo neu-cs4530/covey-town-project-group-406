@@ -68,7 +68,20 @@ export default function LoginForm(): JSX.Element {
         />
       </div>
       <div className='button-container'>
-        <Button onClick={() => sendLoginCommand(email, pass)}>submit</Button>
+        <Button
+          onClick={() => {
+            if (!townController.ourPlayer.artAuctionAccount) {
+              sendLoginCommand(email, pass);
+            } else {
+              toast({
+                title: 'login failed',
+                description: `you are already logged in`,
+                status: 'info',
+              });
+            }
+          }}>
+          submit
+        </Button>
       </div>
     </>
   );
