@@ -198,9 +198,12 @@ export default class Town {
           });
         }
       } catch (err) {
-        if (err instanceof Error) {
-          throw new Error(err.message);
-        }
+        socket.emit('auctionHouseLoginResponse', {
+          email,
+          success: false,
+          money: undefined,
+          artworks: undefined,
+        });
       }
     });
 

@@ -32,7 +32,7 @@ export default function LoginForm(): JSX.Element {
         })
         .catch(err => {
           toast({
-            title: 'user creation not successful',
+            title: 'error logging in',
             description: `${err.message}`,
             status: 'info',
           });
