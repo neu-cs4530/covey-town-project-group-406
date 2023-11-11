@@ -52,7 +52,7 @@ export default function SignupForm(): JSX.Element {
         <Heading>Signup</Heading>
         <label>Username </label>
         <Input
-          style={{ color: 'blue', backgroundColor: 'red' }}
+          style={{ backgroundColor: 'lightblue'}}
           type='text'
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -61,7 +61,7 @@ export default function SignupForm(): JSX.Element {
       <div className='input-container'>
         <label>Password </label>
         <Input
-          style={{ color: 'blue', backgroundColor: 'red' }}
+          style={{ backgroundColor: 'lightblue' }}
           type='password'
           value={pass}
           onChange={e => setPass(e.target.value)}
@@ -79,7 +79,8 @@ export default function SignupForm(): JSX.Element {
                 status: 'info',
               });
             }
-          }}>
+          }}
+          style={{ width: '100%', marginTop: 10, marginBottom: 10}}>
           submit
         </Button>
       </div>
