@@ -14,9 +14,13 @@ import {
 import IAuctionHouse from './IAuctionHouse';
 import InteractableArea from '../InteractableArea';
 import AuctionFloor from '../AuctionFloor/AuctionFloor';
+import ArtworkDAO from '../../db/ArtworkDAO';
+import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
 
 export default class AuctionHouse extends InteractableArea implements IAuctionHouse {
   private _auctionFloors: AuctionFloor[];
+
+  private _dao: ArtworkDAO;
 
   static artworkToBeAuctioned: Artwork[] = [];
 
@@ -31,6 +35,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   constructor(id: string, coordinates: BoundingBox, townEmitter: TownEmitter) {
     super(id, coordinates, townEmitter);
     this._auctionFloors = [];
+    this._dao = SingletonArtworkDAO.instance();
   }
 
   public joinFloorAsObserver(player: Player, floorID: string): void {
@@ -54,8 +59,8 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   }
 
   public async addArtworksToAuctionHouse(artworks: Artwork[]) {
-    await AuctionFloor.DAO.addArtworksToAuctionHouse(artworks);
-    const artworksInAuctionHouse = await AuctionFloor.DAO.getAllAuctionHouseArtworks();
+    await this._dao.addArtworksToAuctionHouse(artworks);
+    const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
   }
 
@@ -80,7 +85,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     );
     if (artworkToAuction) {
       artworkToAuction.isBeingAuctioned = true;
-      await AuctionFloor.DAO.updateAuctionHouseArtworkByID(artworkToAuction);
+      await this._dao.updateAuctionHouseArtworkByID(artworkToAuction);
       const floor = new AuctionFloor(
         nanoid(),
         artworkToAuction,
@@ -104,7 +109,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   private async _deleteAuctionFloor(floorID: string): Promise<void> {
     const f = this.auctionFloors.find(floor => floor.id === floorID);
     if (f && !f.currentBid.player && f.artBeingAuctioned && f.auctioneer) {
-      await AuctionFloor.DAO.updatePlayerArtworkById(f.auctioneer.email, f.artBeingAuctioned);
+      await this._dao.updatePlayerArtworkById(f.auctioneer.email, f.artBeingAuctioned);
     }
     const res = this._auctionFloors.filter(floor => floor.id !== floorID);
     if (res.length === this.auctionFloors.length) {
@@ -115,7 +120,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   }
 
   private async _removeSoldArtworkFromAuctionHouse(art: Artwork) {
-    await AuctionFloor.DAO.removeArtworkFromAuctionHouseById(art.id);
+    await this._dao.removeArtworkFromAuctionHouseById(art.id);
     AuctionHouse.artworkToBeAuctioned = AuctionHouse.artworkToBeAuctioned.filter(
       a => a.id !== art.id,
     );
@@ -149,7 +154,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
         this._findAndSetNextArtworkForAuctionFloor(currentFloor);
       } else {
         currentFloor.artBeingAuctioned.isBeingAuctioned = true;
-        await AuctionFloor.DAO.updateAuctionHouseArtworkByID(currentFloor.artBeingAuctioned);
+        await this._dao.updateAuctionHouseArtworkByID(currentFloor.artBeingAuctioned);
       }
       await this._prepareAuctionFloorForNextAuction(currentFloor);
     } else {
@@ -174,7 +179,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     }
 
     artwork.isBeingAuctioned = true;
-    await AuctionFloor.DAO.updatePlayerArtworkById(player.email, artwork);
+    await this._dao.updatePlayerArtworkById(player.email, artwork);
     const floor = new AuctionFloor(
       nanoid(),
       artwork,

@@ -15,3 +15,5 @@ initializeApp({
 
 const db = getFirestore();
 export default db;
+
+// move this into singleton

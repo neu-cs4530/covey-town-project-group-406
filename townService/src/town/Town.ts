@@ -23,7 +23,8 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
-// import AuctionFloor from './AuctionFloor/AuctionFloor';
+import ArtworkDAO from '../db/ArtworkDAO';
+import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -94,6 +95,8 @@ export default class Town {
 
   private _connectedSockets: Set<CoveyTownSocket> = new Set();
 
+  private _dao: ArtworkDAO;
+
   constructor(
     friendlyName: string,
     isPubliclyListed: boolean,
@@ -106,6 +109,7 @@ export default class Town {
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
     this._broadcastEmitter = broadcastEmitter;
+    this._dao = SingletonArtworkDAO.instance();
   }
 
   /**
@@ -164,21 +168,21 @@ export default class Town {
     });
 
     socket.on('auctionHouseCreateUserCommand', async email => {
-      /* try {
-        await AuctionFloor.DAO.addPlayer(email);
+      try {
+        await this._dao.addPlayer(email);
         socket.emit('auctionHouseCreateUserResponse', true);
       } catch (err) {
         socket.emit('auctionHouseCreateUserResponse', false);
-      } */
+      }
     });
 
     socket.on('auctionHouseLoginCommand', async email => {
       // socket.emit('auctionHouseLoginResponse', { success: true, player: undefined });
       // need to create player if player does not exist so try to retrieve from db first
-      /* try {
-        const dbPlayer = await AuctionFloor.DAO.getPlayer(email);
+      try {
+        const dbPlayer = await this._dao.getPlayer(email);
         if (!dbPlayer.isLoggedIn) {
-          await AuctionFloor.DAO.updatePlayer(email, true, dbPlayer.money);
+          await this._dao.updatePlayer(email, true, dbPlayer.money);
           socket.emit('auctionHouseLoginResponse', {
             email,
             success: true,
@@ -197,17 +201,17 @@ export default class Town {
         if (err instanceof Error) {
           throw new Error(err.message);
         }
-      } */
+      }
     });
 
     socket.on('auctionHouseLogoutCommand', async email => {
-      /* try {
-        const dbPlayer = await AuctionFloor.DAO.getPlayer(email);
-        await AuctionFloor.DAO.updatePlayer(email, false, dbPlayer.money);
+      try {
+        const dbPlayer = await this._dao.getPlayer(email);
+        await this._dao.updatePlayer(email, false, dbPlayer.money);
         socket.emit('auctionHouseLogoutCommandResponse', true);
       } catch (err) {
         socket.emit('auctionHouseLogoutCommandResponse', false);
-      } */
+      }
     });
 
     // Set up a listener to process commands to interactables.
