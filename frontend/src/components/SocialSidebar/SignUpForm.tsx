@@ -45,45 +45,51 @@ export default function SignupForm(): JSX.Element {
 
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
+  const [isShown, setIsShown] = useState(false);
 
-  return (
-    <>
-      <div className='input-container'>
-      <Heading as='h1' size='lg' noOfLines={1}>Signup</Heading>
-        <label>Username </label>
-        <Input
-          style={{ backgroundColor: 'lightblue'}}
-          type='text'
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-      </div>
-      <div className='input-container'>
-        <label>Password </label>
-        <Input
-          style={{ backgroundColor: 'lightblue' }}
-          type='password'
-          value={pass}
-          onChange={e => setPass(e.target.value)}
-        />
-      </div>
-      <div className='button-container'>
-        <Button
-          onClick={() => {
-            if (!townController.ourPlayer.artAuctionAccount) {
-              sendLoginCommand(email, pass);
-            } else {
-              toast({
-                title: 'login failed',
-                description: `you are already logged in`,
-                status: 'info',
-              });
-            }
-          }}
-          style={{ width: '100%', marginTop: 10, marginBottom: 10}}>
-          submit
-        </Button>
-      </div>
-    </>
-  );
+  if (isShown) {
+    return (
+      <>
+      <Button style={{marginTop: 10, marginBottom: 10}}onClick={() => setIsShown(!isShown)}>Signup</Button>
+        <div className='input-container'>
+          <label>Username </label>
+          <Input
+            style={{ backgroundColor: 'lightblue'}}
+            type='text'
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+        </div>
+        <div className='input-container'>
+          <label>Password </label>
+          <Input
+            style={{ backgroundColor: 'lightblue' }}
+            type='password'
+            value={pass}
+            onChange={e => setPass(e.target.value)}
+          />
+        </div>
+        <div className='button-container'>
+          <Button
+            onClick={() => {
+              if (!townController.ourPlayer.artAuctionAccount) {
+                sendLoginCommand(email, pass);
+              } else {
+                toast({
+                  title: 'login failed',
+                  description: `you are already logged in`,
+                  status: 'info',
+                });
+              }
+            }}
+            style={{ width: '100%', marginTop: 10, marginBottom: 10}}>
+            submit
+          </Button>
+        </div>
+      </>
+    );
+  } else {
+    return (<Button style={{marginTop: 10, marginBottom: 10}}onClick={() => setIsShown(!isShown)}>Signup</Button>)
+  }
+
 }

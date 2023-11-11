@@ -38,6 +38,7 @@ export default function LogoutButton(): JSX.Element {
 
   return (
     <Button
+    style={{marginTop: 10, marginBottom: 10}}
       onClick={() => {
         if (townController.ourPlayer.artAuctionAccount) {
           console.log('logging out');
