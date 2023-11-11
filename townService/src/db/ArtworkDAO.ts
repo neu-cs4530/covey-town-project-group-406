@@ -10,7 +10,11 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   auctionHouseCollection = 'AuctionHouse';
 
-  private _db = SingletonDBConnection.instance();
+  private _db: FirebaseFirestore.Firestore;
+
+  public constructor() {
+    this._db = SingletonDBConnection.instance();
+  }
 
   /**
    * Gets a specific artwork from a user
