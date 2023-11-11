@@ -49,7 +49,7 @@ export default function LoginForm(): JSX.Element {
   return (
     <>
       <div className='input-container'>
-        <Heading>Login</Heading>
+      <Heading as='h1' size='lg' noOfLines={1}>Login</Heading>
         <label>Username </label>
         <Input
           style={{backgroundColor: 'lightblue' }}
