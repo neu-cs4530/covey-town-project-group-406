@@ -1,9 +1,8 @@
 import { mock } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { Artwork, TownEmitter } from '../types/CoveyTownSocket';
-import ArtworkDAO from './ArtworkDAO';
 import Player from '../lib/Player';
-import AuctionFloor from '../town/AuctionFloor/AuctionFloor';
+import SingletonArtworkDAO from './SingletonArtworkDAO';
 
 const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',
@@ -51,7 +50,7 @@ const testArtwork3: Artwork = {
   isBeingAuctioned: false,
   purchaseHistory: [],
 };
-const dao = new ArtworkDAO();
+const dao = SingletonArtworkDAO.instance();
 const VAL1 = nanoid();
 const VAL2 = nanoid();
 const VAL3 = nanoid();

@@ -1,21 +1,17 @@
 import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
-import ArtworkDAO from '../../db/ArtworkDAO';
 import { TownEmitter, Artwork } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
 import AuctionHouse from './AuctionHouse';
-import AuctionFloor from '../AuctionFloor/AuctionFloor';
+import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
 
-const dao = new ArtworkDAO();
+const dao = SingletonArtworkDAO.instance();
 const VAL1 = nanoid();
 const VAL2 = nanoid();
 const VAL3 = nanoid();
 dao.auctionHouseCollection = VAL1;
 dao.userCollection = VAL2;
 dao.artworkIDsCollection = VAL3;
-AuctionFloor.DAO.auctionHouseCollection = VAL1;
-AuctionFloor.DAO.userCollection = VAL2;
-AuctionFloor.DAO.artworkIDsCollection = VAL3;
 
 const testAreaBox = { x: 100, y: 100, width: 100, height: 100 };
 describe('when adding artworks to the auction house', () => {
