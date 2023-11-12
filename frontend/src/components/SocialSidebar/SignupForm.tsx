@@ -8,7 +8,25 @@ import { Button, Input } from '@chakra-ui/react';
 export default function SignupForm(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
-  
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
+  const [isShown, setIsShown] = useState(true);
+
+  townController.addListener('loginStatus', success => {
+    if (success) {
+      setIsShown(false);
+    } else {
+      setIsShown(true);
+    }
+  })
+
+  townController.addListener('userLogoutStatus', success => {
+    if (success) {
+      setIsShown(true);
+    } else {
+      setIsShown(false);
+    }
+  })
   
   const sendLoginCommand = (email: string, pass: string) => {
     createUserWithEmailAndPassword(auth, email, pass)
@@ -44,18 +62,6 @@ export default function SignupForm(): JSX.Element {
       });
   };
 
-  const [email, setEmail] = useState('');
-  const [pass, setPass] = useState('');
-  const [isShown, setIsShown] = useState(false);
-
-  /*townController.addListener('loginStatus', success => {
-    if (success) {
-      setIsShown(true);
-    } else {
-      setIsShown(false);
-    }
-  })*/
-
   if (isShown) {
     return (
       <>
@@ -81,7 +87,7 @@ export default function SignupForm(): JSX.Element {
         <div className='button-container'>
           <Button
             onClick={() => {
-              if (!townController.ourPlayer.artAuctionAccount) {
+              if (!townController.ourPlayer?.artAuctionAccount) {
                 sendLoginCommand(email, pass);
               } else {
                 toast({
@@ -98,7 +104,7 @@ export default function SignupForm(): JSX.Element {
       </>
     );
   } else {
-    return (<Button style={{marginTop: 10, marginBottom: 10}}onClick={() => setIsShown(!isShown)}>Signup</Button>)
+    return <></>
   }
 
 }

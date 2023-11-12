@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signOut } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
@@ -7,6 +7,24 @@ import { Button, useToast } from '@chakra-ui/react';
 export default function LogoutButton(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
+  const [isShown, setIsShown] = useState(false);
+
+  townController.addListener('loginStatus', success => {
+    if (success) {
+      setIsShown(true);
+    } else {
+      setIsShown(false);
+    }
+  })
+
+  townController.addListener('userLogoutStatus', success => {
+    if (success) {
+      setIsShown(false);
+    } else {
+      setIsShown(true);
+    }
+  })
+
   const logout = (email: string) => {
     townController.once('userLogoutStatus', success => {
       if (success) {
@@ -36,24 +54,29 @@ export default function LogoutButton(): JSX.Element {
       });
   };
 
-  return (
-    <Button
-    style={{marginTop: 10, marginBottom: 10}}
-      onClick={() => {
-        if (townController.ourPlayer?.artAuctionAccount) {
-          console.log('logging out');
-          logout(townController.ourPlayer.artAuctionAccount.email);
-        } else {
-          toast({
-            title: 'logout failed',
-            description: `you are not logged in`,
-            status: 'info',
-          });
-        }
-      }}>
-      logout
-    </Button>
-  );
+  if (isShown) {
+    return (
+      <Button
+      style={{marginTop: 10, marginBottom: 10}}
+        onClick={() => {
+          if (townController.ourPlayer?.artAuctionAccount) {
+            console.log('logging out');
+            logout(townController.ourPlayer.artAuctionAccount.email);
+          } else {
+            toast({
+              title: 'logout failed',
+              description: `you are not logged in`,
+              status: 'info',
+            });
+          }
+        }}>
+        logout
+      </Button>
+    );
+  } else {
+    return <></>
+  }
+
 
   /**/
 }
