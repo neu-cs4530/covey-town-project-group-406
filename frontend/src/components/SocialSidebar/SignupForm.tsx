@@ -64,7 +64,7 @@ export default function SignupForm(): JSX.Element {
 
   if (isShown) {
     return (
-      <>
+      <div style={{borderStyle: 'solid', borderColor: 'blue', borderWidth: 1, padding: 5, margin: 5}}>
       <Heading style={{marginTop: 10, marginBottom: 10}}>Signup</Heading>
         <div className='input-container'>
           <label>Username </label>
@@ -101,7 +101,7 @@ export default function SignupForm(): JSX.Element {
             submit
           </Button>
         </div>
-      </>
+      </div>
     );
   } else {
     return <></>

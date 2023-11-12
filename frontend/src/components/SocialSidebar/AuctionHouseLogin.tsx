@@ -9,10 +9,10 @@ export default function AuctionHouseLogin(): JSX.Element {
   // the server can update the database value
   return (
     <>
+      <ArtAuctionAccountInfo />
       <SignupForm />
       <LoginForm />
       <LogoutButton />
-      <ArtAuctionAccountInfo />
     </>
   );
 }

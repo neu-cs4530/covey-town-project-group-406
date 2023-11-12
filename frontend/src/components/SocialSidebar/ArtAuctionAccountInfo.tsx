@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signOut } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import { Button, useToast } from '@chakra-ui/react';
+import { Button, Heading, useToast } from '@chakra-ui/react';
+import { blue } from '@material-ui/core/colors';
 
 export default function ArtAuctionAccountInfo(): JSX.Element {
   const townController = useTownController();
@@ -25,10 +26,16 @@ export default function ArtAuctionAccountInfo(): JSX.Element {
 
   if (isLoggedIn) {
     return (
-      <div>currently signed in as {user}</div>
+      <div style={{borderStyle: 'solid', borderColor: 'blue', borderWidth: 1, padding: 5, margin: 5}}>
+        <Heading> currently signed in as {user}</Heading>
+      </div>
     );
   } else {
-    return <div>Currently not signed in</div>
+    return (
+      <div style={{borderStyle: 'solid', borderColor: 'blue', borderWidth: 1, padding: 5, margin: 5}}>
+        <Heading>Currently not signed in</Heading>
+      </div>
+    )
   }
 
 }
