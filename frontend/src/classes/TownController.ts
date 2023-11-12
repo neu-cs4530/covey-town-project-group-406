@@ -553,15 +553,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   public sendSignupCommand(email: string) {
-    this._socket.emit('auctionHouseCreateUserCommand', email);
+    this._socket.emit('auctionHouseCreateUserCommand', email, this.ourPlayer.id);
   }
 
   public sendLoginCommand(email: string) {
-    this._socket.emit('auctionHouseLoginCommand', email);
+    this._socket.emit('auctionHouseLoginCommand', email, this.ourPlayer.id);
   }
 
   public sendLogoutCommand(email: string) {
-    this._socket.emit('auctionHouseLogoutCommand', email);
+    this._socket.emit('auctionHouseLogoutCommand', email, this.ourPlayer.id);
   }
 
   /**

@@ -167,22 +167,33 @@ export default class Town {
       }
     });
 
-    socket.on('auctionHouseCreateUserCommand', async email => {
+    socket.on('auctionHouseCreateUserCommand', async (email: string, playerID: string) => {
       try {
         await this._dao.addPlayer(email);
+        for (const player of this.players) {
+          if (player.id === playerID) {
+            player.initializeArtAuctionAccount(email);
+          }
+        }
         socket.emit('auctionHouseCreateUserResponse', true);
       } catch (err) {
         socket.emit('auctionHouseCreateUserResponse', false);
       }
     });
 
-    socket.on('auctionHouseLoginCommand', async email => {
-      // socket.emit('auctionHouseLoginResponse', { success: true, player: undefined });
-      // need to create player if player does not exist so try to retrieve from db first
+    socket.on('auctionHouseLoginCommand', async (email: string, playerID: string) => {
       try {
         const dbPlayer = await this._dao.getPlayer(email);
         if (!dbPlayer.isLoggedIn) {
           await this._dao.updatePlayer(email, true, dbPlayer.money);
+          for (const player of this.players) {
+            if (player.id === playerID) {
+              player.initializeArtAuctionAccount(email);
+              player.wallet.money = dbPlayer.money;
+              player.wallet.artwork = dbPlayer.artworks;
+              player.calculateNetWorth();
+            }
+          }
           socket.emit('auctionHouseLoginResponse', {
             email,
             success: true,
@@ -207,7 +218,7 @@ export default class Town {
       }
     });
 
-    socket.on('auctionHouseLogoutCommand', async email => {
+    socket.on('auctionHouseLogoutCommand', async (email: string, playerID: string) => {
       try {
         const dbPlayer = await this._dao.getPlayer(email);
         await this._dao.updatePlayer(email, false, dbPlayer.money);

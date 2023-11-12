@@ -308,7 +308,7 @@ export interface ClientToServerEvents {
   interactableCommand: (
     command: InteractableCommand & InteractableCommandBase
   ) => void;
-  auctionHouseLoginCommand: (email: string) => void;
-  auctionHouseCreateUserCommand: (email: string) => void;
-  auctionHouseLogoutCommand: (email: string) => void;
+  auctionHouseLoginCommand: (email: string, playerID: string) => void;
+  auctionHouseCreateUserCommand: (email: string, playerID: string) => void;
+  auctionHouseLogoutCommand: (email: string, playerID: string) => void;
 }
