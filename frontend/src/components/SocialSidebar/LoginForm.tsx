@@ -28,9 +28,6 @@ export default function LoginForm(): JSX.Element {
     }
   })
 
-
-  
-
   const sendLoginCommand = (email: string, pass: string) => {
     try {
       signInWithEmailAndPassword(auth, email, pass)
