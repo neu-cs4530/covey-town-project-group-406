@@ -66,7 +66,7 @@ export default function LoginForm(): JSX.Element {
   if (isShown) {
     return (
       <>
-      <Button style={{marginTop: 10, marginBottom: 10}}onClick={() => setIsShown(!isShown)}>Login</Button>
+      <Heading style={{marginTop: 10, marginBottom: 10}}>Login</Heading>
         <div className='input-container'>
           <label>Username </label>
           <Input
