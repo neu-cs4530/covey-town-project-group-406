@@ -222,6 +222,11 @@ export default class Town {
       try {
         const dbPlayer = await this._dao.getPlayer(email);
         await this._dao.updatePlayer(email, false, dbPlayer.money);
+        for (const player of this.players) {
+          if (player.id === playerID) {
+            player.uninitializeArtAuctionAccount();
+          }
+        }
         socket.emit('auctionHouseLogoutCommandResponse', true);
       } catch (err) {
         socket.emit('auctionHouseLogoutCommandResponse', false);

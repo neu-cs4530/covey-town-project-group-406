@@ -61,6 +61,10 @@ export default class Player {
     };
   }
 
+  public uninitializeArtAuctionAccount() {
+    this._artAuctionAccount = undefined;
+  }
+
   /**
    * Calculates the net worth of the user based on purchase price of artwork and their money
    */
