@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import { useToast } from '@chakra-ui/react';
+import { Box, useToast } from '@chakra-ui/react';
 import { Button, Input, Heading } from '@chakra-ui/react';
 
 export default function LoginForm(): JSX.Element {
@@ -65,9 +65,9 @@ export default function LoginForm(): JSX.Element {
 
   if (isShown) {
     return (
-      <div style={{borderStyle: 'solid', borderColor: 'blue', borderWidth: 1, padding: 5, margin: 5}}>
-      <Heading style={{marginTop: 10, marginBottom: 10}}>Login</Heading>
-        <div className='input-container'>
+      <Box>
+      <Heading as='h2' fontSize='xl' style={{marginTop: 10, marginBottom: 10}}>Login</Heading>
+        <Box className='input-container'>
           <label>Username </label>
           <Input
             style={{backgroundColor: 'lightblue' }}
@@ -75,8 +75,8 @@ export default function LoginForm(): JSX.Element {
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
-        </div>
-        <div className='input-container'>
+        </Box>
+        <Box className='input-container'>
           <label>Password </label>
           <Input
             style={{ backgroundColor: 'lightblue' }}
@@ -84,8 +84,8 @@ export default function LoginForm(): JSX.Element {
             value={pass}
             onChange={e => setPass(e.target.value)}
           />
-        </div>
-        <div className='button-container'>
+        </Box>
+        <Box className='button-container'>
           <Button
             onClick={() => {
               if (!townController.ourPlayer?.artAuctionAccount) {
@@ -101,8 +101,8 @@ export default function LoginForm(): JSX.Element {
             style={{ width: '100%', marginTop: 10, marginBottom: 10}}>
             submit
           </Button>
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   } else {
     return <></>

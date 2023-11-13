@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signOut } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import { Button, Heading, useToast } from '@chakra-ui/react';
+import { Box, Button, Heading, useToast } from '@chakra-ui/react';
 import { blue } from '@material-ui/core/colors';
 import { Artwork } from '../../types/CoveyTownSocket';
 
@@ -32,18 +32,18 @@ export default function ArtAuctionAccountInfo(): JSX.Element {
 
   if (isLoggedIn) {
     return (
-      <div style={{borderStyle: 'solid', borderColor: 'blue', borderWidth: 1, padding: 5, margin: 5}}>
-        <Heading style={{marginTop: 10, marginBottom: 10}}> currently signed in as {userEmail}</Heading>
-        <Heading style={{marginTop: 10, marginBottom: 10}}> money: {userMoney}</Heading>
-        {userArtworks.map(artwork => <Heading style={{marginTop: 10, marginBottom: 10}}> artwork: {artwork.id}</Heading>)}
+      <Box>
+        <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> currently signed in as {userEmail}</Heading>
+        <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> money: {userMoney}</Heading>
+        {userArtworks.map(artwork => <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> artwork: {artwork.id}</Heading>)}
 
-      </div>
+      </Box>
     );
   } else {
     return (
-      <div style={{borderStyle: 'solid', borderColor: 'blue', borderWidth: 1, padding: 5, margin: 5}}>
-        <Heading>Currently not signed in</Heading>
-      </div>
+      <Box>
+        <Heading as='h3' fontSize='m'>Currently not signed in</Heading>
+      </Box>
     )
   }
 
