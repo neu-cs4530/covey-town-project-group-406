@@ -2,7 +2,6 @@ import { Heading, StackDivider, VStack } from '@chakra-ui/react';
 import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
-import AuctionHouseLogin from './AuctionHouseLogin';
 import ArtAuctionAccountInfo from './ArtAuctionAccountInfo';
 import SignupForm from './SignupForm';
 import LoginForm from './LoginForm';
