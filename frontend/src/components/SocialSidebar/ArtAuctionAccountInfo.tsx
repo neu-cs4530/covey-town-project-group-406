@@ -5,6 +5,7 @@ import auth from '../../classes/FirestoreConfig';
 import { Box, Button, Heading, useToast } from '@chakra-ui/react';
 import { blue } from '@material-ui/core/colors';
 import { Artwork } from '../../types/CoveyTownSocket';
+import UserArtworks from './UserArtworks';
 
 export default function ArtAuctionAccountInfo(): JSX.Element {
   const townController = useTownController();
@@ -35,8 +36,7 @@ export default function ArtAuctionAccountInfo(): JSX.Element {
       <Box>
         <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> currently signed in as {userEmail}</Heading>
         <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> money: {userMoney}</Heading>
-        {userArtworks.map(artwork => <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> artwork: {artwork.id}</Heading>)}
-
+        <UserArtworks userArtworks={userArtworks}/>
       </Box>
     );
   } else {
