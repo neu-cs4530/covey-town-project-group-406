@@ -100,19 +100,19 @@ export default class ArtworkDAO implements IArtworkDAO {
   private async _addArtworkToAuctionHouse(artwork: Artwork): Promise<void> {
     try {
       let allArtworkIDsCollection = await this._db
-        .collection(this.auctionHouseCollection)
+        .collection(this.artworkIDsCollection)
         .doc('artworks')
         .get();
 
       if (!allArtworkIDsCollection.exists) {
         await this._db
-          .collection(this.auctionHouseCollection)
+          .collection(this.artworkIDsCollection)
           .doc('artworks')
           .set({ artworkIDs: [] });
       }
 
       allArtworkIDsCollection = await this._db
-        .collection(this.auctionHouseCollection)
+        .collection(this.artworkIDsCollection)
         .doc('artworks')
         .get();
 
@@ -166,7 +166,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   private async _addArtworkIDToLog(id: number): Promise<void> {
     await this._db
-      .collection(this.auctionHouseCollection)
+      .collection(this.artworkIDsCollection)
       .doc('artworks')
       .update({
         artworkIDs: FieldValue.arrayUnion(id),
@@ -268,7 +268,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    * Removes collection that keeps track of all artwork IDs in the database
    */
   public async removeArtworkIDList(): Promise<void> {
-    await this._db.collection(this.auctionHouseCollection).doc('artworks').delete();
+    await this._db.collection(this.artworkIDsCollection).doc('artworks').delete();
   }
 
   /**
@@ -276,7 +276,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    * @returns a list of the ids in the colletion
    */
   public async getAllArtworkIDs(): Promise<number[]> {
-    const ref = await this._db.collection(this.auctionHouseCollection).doc('artworks').get();
+    const ref = await this._db.collection(this.artworkIDsCollection).doc('artworks').get();
     if (!ref.exists) {
       throw new Error('artwork ids collection not instantiated properly');
     }

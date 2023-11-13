@@ -68,8 +68,9 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     const floor = this.auctionFloors.find(f => f.id === floorID);
     if (floor) {
       if (
-        (floor.currentBid.player === undefined && bid > floor.minBid) ||
-        (floor.currentBid.player !== undefined && bid > floor.currentBid.bid)
+        ((floor.currentBid.player === undefined && bid > floor.minBid) ||
+          (floor.currentBid.player !== undefined && bid > floor.currentBid.bid)) &&
+        player.wallet.money >= bid
       ) {
         floor.currentBid.player = player;
         floor.currentBid.bid = bid;
