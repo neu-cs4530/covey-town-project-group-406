@@ -19,4 +19,4 @@ export default interface IAuctionFloor {
 }
 
 export type Status = 'IN_PROGRESS' | 'WAITING_TO_START' | 'ENDED';
-export type Bid = { player: Player | undefined; bid: number };
+export type Bid = { player: Player; bid: number } | undefined;

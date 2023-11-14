@@ -47,7 +47,7 @@ describe('when creating an auction floor', () => {
       nanoid(),
       testArtwork,
       1,
-      { player: undefined, bid: 0 },
+      undefined,
       [player],
       [player2],
       1,
@@ -60,16 +60,7 @@ describe('when creating an auction floor', () => {
     expect(floor.auctioneer).toBeUndefined();
   });
   it('creates a plyer floor properly', () => {
-    const floor = new AuctionFloor(
-      nanoid(),
-      testArtwork,
-      1,
-      { player: undefined, bid: 0 },
-      [],
-      [player2],
-      1,
-      player,
-    );
+    const floor = new AuctionFloor(nanoid(), testArtwork, 1, undefined, [], [player2], 1, player);
     expect(floor.artBeingAuctioned).toEqual(testArtwork);
     expect(floor.timeLeft).toBe(1);
     expect(floor.observers).toEqual([]);
@@ -112,16 +103,7 @@ describe('when an auction starts', () => {
     await dao.removePlayer(player2.email);
   });
   it('sets the status to in progress, begins decreasing the time left, and calls endAuction', async () => {
-    const floor = new AuctionFloor(
-      nanoid(),
-      testArtwork,
-      3,
-      { player: undefined, bid: 0 },
-      [],
-      [player2],
-      1,
-      player,
-    );
+    const floor = new AuctionFloor(nanoid(), testArtwork, 3, undefined, [], [player2], 1, player);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const decreaseAuctionTimeLeftSpy = jest.spyOn(floor as any, '_decreaseAuctionTimeLeft');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
