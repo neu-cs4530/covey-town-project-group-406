@@ -112,8 +112,14 @@ export function SingupWrapper(): JSX.Element {
 
     return (
       <Box>
-      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => setModalIsOpen(true)}>Sign up</Button> : <></>}
-      <Modal isOpen={modalIsOpen} onClose={() => {setModalIsOpen(false)}} closeOnOverlayClick={false}>
+      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => {
+        setModalIsOpen(true)
+        townController.pause();
+        }}>Sign up</Button> : <></>}
+      <Modal isOpen={modalIsOpen} onClose={() => {
+        setModalIsOpen(false)
+        townController.unPause()
+      }} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Sign up</ModalHeader>

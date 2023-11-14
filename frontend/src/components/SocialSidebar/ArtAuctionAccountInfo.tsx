@@ -15,7 +15,7 @@ type Props = {
 export default function ArtAuctionAccountInfo({userEmail, userMoney, userArtworks}: Props): JSX.Element {
     return (
       <Box>
-        <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> currently signed in as {userEmail}</Heading>
+        <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> email: {userEmail}</Heading>
         <Heading as='h3' fontSize='m' style={{marginTop: 10, marginBottom: 10}}> money: {userMoney}</Heading>
         <UserArtworks userArtworks={userArtworks}/>
       </Box>
@@ -52,8 +52,12 @@ export function ArtAuctionAccountInfoWrapper(): JSX.Element {
 
   return (
     <Box>
-      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => setModalIsOpen(true)}>Account Info</Button> : <></>}
-      <Modal isOpen={modalIsOpen} onClose={() => {setModalIsOpen(false)}} closeOnOverlayClick={false}>
+      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => {setModalIsOpen(true)
+      townController.pause()}}>Account Information</Button> : <></>}
+      <Modal isOpen={modalIsOpen} onClose={() => {
+        setModalIsOpen(false)
+        townController.unPause()
+        }} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Account Information</ModalHeader>

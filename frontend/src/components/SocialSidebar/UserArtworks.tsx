@@ -15,7 +15,8 @@ export default function UserArtworks({userArtworks}: Props): JSX.Element {
         {userArtworks.map((artwork: Artwork) => {
             return (
             <Box>
-                <Heading as='h2' fontSize='lg'>{artwork.id}</Heading>
+                <Heading as='h3' fontSize='m'>title: {artwork.title}</Heading>
+                <Heading as='h3' fontSize='m'>artist: {artwork.artist}</Heading>
                 <Image src={artwork.primaryImage} alt="not found"></Image>
             </Box>
             )}
