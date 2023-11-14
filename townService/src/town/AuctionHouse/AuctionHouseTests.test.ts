@@ -68,6 +68,16 @@ describe('when adding artworks to the auction house', () => {
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
   });
+  it('initializes the auction house properly when artwork is in the database already', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+    AuctionHouse.artworkToBeAuctioned = [];
+    await house.initializeAuctionHouseArtworks();
+    expect(AuctionHouse.artworkToBeAuctioned).toContainEqual(testArtwork);
+    expect(AuctionHouse.artworkToBeAuctioned).toContainEqual(testArtwork2);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
 });
 
 describe('when making a bid', () => {

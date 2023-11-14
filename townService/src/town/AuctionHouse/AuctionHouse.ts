@@ -33,6 +33,17 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     this._auctionFloors = [];
   }
 
+  public async initializeAuctionHouseArtworks(): Promise<boolean> {
+    if (AuctionHouse.artworkToBeAuctioned.length === 0) {
+      const artworks = await AuctionFloor.DAO.getAllAuctionHouseArtworks();
+      for (const artwork of artworks) {
+        AuctionHouse.artworkToBeAuctioned.push(artwork);
+      }
+      return true;
+    }
+    return false;
+  }
+
   public joinFloorAsObserver(player: Player, floorID: string): void {
     for (const floor of this._auctionFloors) {
       if (floor.id === floorID) {
