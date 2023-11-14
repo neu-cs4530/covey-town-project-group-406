@@ -111,7 +111,7 @@ export function LoginWrapper(): JSX.Element {
 
     return (
       <Box>
-      {buttonIsShown ? <Button style={{width: '100%'}}onClick={() => setModalIsOpen(true)}>login</Button> : <></>}
+      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => setModalIsOpen(true)}>login</Button> : <></>}
       <Modal isOpen={modalIsOpen} onClose={() => {setModalIsOpen(false)}} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
