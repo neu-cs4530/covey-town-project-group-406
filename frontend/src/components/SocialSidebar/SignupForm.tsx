@@ -110,7 +110,7 @@ export function SingupWrapper(): JSX.Element {
 
     return (
       <Box>
-      {buttonIsShown ? <Button onClick={() => setModalIsOpen(true)}>Sign up</Button> : <></>}
+      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => setModalIsOpen(true)}>Sign up</Button> : <></>}
       <Modal isOpen={modalIsOpen} onClose={() => {setModalIsOpen(false)}} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
