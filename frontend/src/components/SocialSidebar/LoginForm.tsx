@@ -96,6 +96,7 @@ export function LoginWrapper(): JSX.Element {
   townController.addListener('loginStatus', success => {
     if (success) {
       setButtonIsShown(false);
+      setModalIsOpen(false);
     } else {
       setButtonIsShown(true);
     }
@@ -106,6 +107,7 @@ export function LoginWrapper(): JSX.Element {
       setButtonIsShown(true);
     } else {
       setButtonIsShown(false);
+      setModalIsOpen(false);
     }
   })
 

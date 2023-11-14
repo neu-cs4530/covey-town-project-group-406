@@ -95,6 +95,7 @@ export function SingupWrapper(): JSX.Element {
   townController.addListener('loginStatus', success => {
     if (success) {
       setButtonIsShown(false);
+      setModalIsOpen(false);
     } else {
       setButtonIsShown(true);
     }
@@ -105,6 +106,7 @@ export function SingupWrapper(): JSX.Element {
       setButtonIsShown(true);
     } else {
       setButtonIsShown(false);
+      setModalIsOpen(false);
     }
   })
 
