@@ -63,11 +63,18 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     const floor = this.auctionFloors.find(f => f.id === floorID);
     if (floor) {
       if (
-        (floor.currentBid.player === undefined && bid > floor.minBid) ||
-        (floor.currentBid.player !== undefined && bid > floor.currentBid.bid)
+        (floor.currentBid === undefined && bid > floor.minBid) ||
+        (floor.currentBid !== undefined && bid > floor.currentBid.bid)
       ) {
-        floor.currentBid.player = player;
-        floor.currentBid.bid = bid;
+        if (floor.currentBid) {
+          floor.currentBid.player = player;
+          floor.currentBid.bid = bid;
+        } else {
+          floor.currentBid = {
+            player,
+            bid,
+          };
+        }
       }
     } else {
       throw new Error('floor not found');
@@ -85,7 +92,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
         nanoid(),
         artworkToAuction,
         30,
-        { player: undefined, bid: 0 },
+        undefined,
         [],
         [],
         minBid,
@@ -103,7 +110,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
 
   private async _deleteAuctionFloor(floorID: string): Promise<void> {
     const f = this.auctionFloors.find(floor => floor.id === floorID);
-    if (f && !f.currentBid.player && f.artBeingAuctioned && f.auctioneer) {
+    if (f && !f.currentBid && f.artBeingAuctioned && f.auctioneer) {
       await AuctionFloor.DAO.updatePlayerArtworkById(f.auctioneer.email, f.artBeingAuctioned);
     }
     const res = this._auctionFloors.filter(floor => floor.id !== floorID);
@@ -136,7 +143,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     floor.status = 'WAITING_TO_START';
     floor.artBeingAuctioned.isBeingAuctioned = true;
     floor.timeLeft = 30;
-    floor.currentBid = { player: undefined, bid: 0 };
+    floor.currentBid = undefined;
     floor.observers = [];
     floor.bidders = [];
   }
@@ -144,7 +151,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
   private async _resetAuctionFloor(floorID: string): Promise<void> {
     const currentFloor = this._auctionFloors.find(f => f.id === floorID);
     if (currentFloor) {
-      if (currentFloor.currentBid.player !== undefined) {
+      if (currentFloor.currentBid !== undefined) {
         await this._removeSoldArtworkFromAuctionHouse(currentFloor.artBeingAuctioned);
         this._findAndSetNextArtworkForAuctionFloor(currentFloor);
       } else {
@@ -175,16 +182,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
 
     artwork.isBeingAuctioned = true;
     await AuctionFloor.DAO.updatePlayerArtworkById(player.email, artwork);
-    const floor = new AuctionFloor(
-      nanoid(),
-      artwork,
-      30,
-      { player: undefined, bid: 0 },
-      [player],
-      [],
-      minBid,
-      player,
-    );
+    const floor = new AuctionFloor(nanoid(), artwork, 30, undefined, [player], [], minBid, player);
     floor.on('auctionEnded', f => {
       this._deleteAuctionFloor(f.id);
     });
