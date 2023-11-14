@@ -98,8 +98,8 @@ describe('when making a bid', () => {
     await house.addArtworksToAuctionHouse([testArtwork]);
     await house.createNewAuctionFloorNonPlayer(1);
     house.makeBid(player, house.auctionFloors[0].id, 10);
-    expect(house.auctionFloors[0].currentBid.player).toEqual(player);
-    expect(house.auctionFloors[0].currentBid.bid).toBe(10);
+    expect(house.auctionFloors[0].currentBid?.player).toEqual(player);
+    expect(house.auctionFloors[0].currentBid?.bid).toBe(10);
     await dao.removePlayer(player.email);
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
@@ -113,8 +113,8 @@ describe('when making a bid', () => {
     await house.addArtworksToAuctionHouse([testArtwork]);
     await house.createNewAuctionFloorNonPlayer(100);
     house.makeBid(player, house.auctionFloors[0].id, 10);
-    expect(house.auctionFloors[0].currentBid.player).toEqual(undefined);
-    expect(house.auctionFloors[0].currentBid.bid).toBe(0);
+    expect(house.auctionFloors[0].currentBid?.player).toEqual(undefined);
+    expect(house.auctionFloors[0].currentBid?.bid).toBe(undefined);
     await dao.removePlayer(player.email);
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
