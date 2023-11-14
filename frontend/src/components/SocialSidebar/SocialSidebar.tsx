@@ -2,7 +2,7 @@ import { Heading, StackDivider, VStack } from '@chakra-ui/react';
 import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
-import ArtAuctionAccountInfo from './ArtAuctionAccountInfo';
+import ArtAuctionAccountInfo, { ArtAuctionAccountInfoWrapper } from './ArtAuctionAccountInfo';
 import SignupForm, { SingupWrapper } from './SignupForm';
 import LoginForm, { LoginWrapper } from './LoginForm';
 import LogoutButton from './LogoutButton';
@@ -24,7 +24,7 @@ export default function SocialSidebar(): JSX.Element {
       </Heading>
       <PlayersList />
       <ConversationAreasList />
-      <ArtAuctionAccountInfo />
+      <ArtAuctionAccountInfoWrapper />
       <SingupWrapper />
       <LoginWrapper />
       <LogoutButton />
