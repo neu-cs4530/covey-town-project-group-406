@@ -133,9 +133,18 @@ export default class Town {
     // Register an event listener for the client socket: if the client disconnects,
     // clean up our listener adapter, and then let the CoveyTownController know that the
     // player's session is disconnected
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
       this._removePlayer(newPlayer);
       this._connectedSockets.delete(socket);
+      try {
+        const playerFromDB = await this._dao.getPlayer(newPlayer.email);
+        await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money);
+      } catch (err) {
+        if (err instanceof Error) {
+          // eslint-disable-next-line no-console
+          console.log(err.message);
+        }
+      }
     });
 
     // Set up a listener to forward all chat messages to all clients in the town

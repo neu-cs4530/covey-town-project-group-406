@@ -1,5 +1,5 @@
 import { Heading, StackDivider, VStack } from '@chakra-ui/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
 import ArtAuctionAccountInfo, { ArtAuctionAccountInfoWrapper } from './ArtAuctionAccountInfo';

@@ -5,6 +5,7 @@ import auth from '../../classes/FirestoreConfig';
 import { Box, Heading, Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useToast } from '@chakra-ui/react';
 import { Button, Input } from '@chakra-ui/react';
 
+
 export default function SignupForm(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
