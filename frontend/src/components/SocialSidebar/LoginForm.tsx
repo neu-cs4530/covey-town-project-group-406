@@ -99,6 +99,7 @@ export function LoginWrapper(): JSX.Element {
       setModalIsOpen(false);
     } else {
       setButtonIsShown(true);
+      townController.unPause()
     }
   })
 
@@ -108,16 +109,16 @@ export function LoginWrapper(): JSX.Element {
     } else {
       setButtonIsShown(false);
       setModalIsOpen(false);
+      townController.unPause();
     }
   })
 
     return (
       <Box>
-      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => {setModalIsOpen(true) 
-        townController.pause()}}>login</Button> : <></>}
+      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => {setModalIsOpen(true)
+      }}>login</Button> : <></>}
       <Modal isOpen={modalIsOpen} onClose={() => {
         setModalIsOpen(false)
-        townController.unPause()
         }} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>

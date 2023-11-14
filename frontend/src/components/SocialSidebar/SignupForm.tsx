@@ -10,7 +10,7 @@ export default function SignupForm(): JSX.Element {
   const townController = useTownController();
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
-  
+
   const sendLoginCommand = (email: string, pass: string) => {
     createUserWithEmailAndPassword(auth, email, pass)
       .then(() => {
@@ -98,12 +98,14 @@ export function SingupWrapper(): JSX.Element {
       setModalIsOpen(false);
     } else {
       setButtonIsShown(true);
+      townController.unPause();
     }
   })
 
   townController.addListener('userLogoutStatus', success => {
     if (success) {
       setButtonIsShown(true);
+      townController.unPause();
     } else {
       setButtonIsShown(false);
       setModalIsOpen(false);
@@ -114,11 +116,9 @@ export function SingupWrapper(): JSX.Element {
       <Box>
       {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => {
         setModalIsOpen(true)
-        townController.pause();
-        }}>Sign up</Button> : <></>}
+      }}>Sign up</Button> : <></>}
       <Modal isOpen={modalIsOpen} onClose={() => {
-        setModalIsOpen(false)
-        townController.unPause()
+        setModalIsOpen(false);
       }} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
