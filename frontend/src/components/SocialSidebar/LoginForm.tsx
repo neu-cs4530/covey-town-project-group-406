@@ -97,6 +97,7 @@ export function LoginWrapper(): JSX.Element {
     if (success) {
       setButtonIsShown(false);
       setModalIsOpen(false);
+      townController.unPause();
     } else {
       setButtonIsShown(true);
       townController.unPause()
@@ -106,6 +107,7 @@ export function LoginWrapper(): JSX.Element {
   townController.addListener('userLogoutStatus', success => {
     if (success) {
       setButtonIsShown(true);
+      townController.unPause();
     } else {
       setButtonIsShown(false);
       setModalIsOpen(false);
@@ -115,10 +117,13 @@ export function LoginWrapper(): JSX.Element {
 
     return (
       <Box>
-      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => {setModalIsOpen(true)
+      {buttonIsShown ? <Button style={{width: '100%'}} onClick={() => {
+        setModalIsOpen(true)
+        townController.pause()
       }}>login</Button> : <></>}
       <Modal isOpen={modalIsOpen} onClose={() => {
         setModalIsOpen(false)
+        townController.unPause();
         }} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
