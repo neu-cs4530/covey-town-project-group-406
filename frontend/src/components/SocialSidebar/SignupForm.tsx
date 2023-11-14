@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import { Box, Heading, useToast } from '@chakra-ui/react';
+import { Box, Heading, Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useToast } from '@chakra-ui/react';
 import { Button, Input } from '@chakra-ui/react';
 
 export default function SignupForm(): JSX.Element {
@@ -10,23 +10,6 @@ export default function SignupForm(): JSX.Element {
   const townController = useTownController();
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
-  const [isShown, setIsShown] = useState(true);
-
-  townController.addListener('loginStatus', success => {
-    if (success) {
-      setIsShown(false);
-    } else {
-      setIsShown(true);
-    }
-  })
-
-  townController.addListener('userLogoutStatus', success => {
-    if (success) {
-      setIsShown(true);
-    } else {
-      setIsShown(false);
-    }
-  })
   
   const sendLoginCommand = (email: string, pass: string) => {
     createUserWithEmailAndPassword(auth, email, pass)
@@ -62,7 +45,6 @@ export default function SignupForm(): JSX.Element {
       });
   };
 
-  if (isShown) {
     return (
       <Box>
       <Heading as='h2' fontSize='xl' style={{marginTop: 10, marginBottom: 10}}>Signup</Heading>
@@ -103,8 +85,40 @@ export default function SignupForm(): JSX.Element {
         </Box>
       </Box>
     );
-  } else {
-    return <></>
   }
 
+export function SingupWrapper(): JSX.Element {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [buttonIsShown, setButtonIsShown] = useState(true);
+  const townController = useTownController();
+
+  townController.addListener('loginStatus', success => {
+    if (success) {
+      setButtonIsShown(false);
+    } else {
+      setButtonIsShown(true);
+    }
+  })
+
+  townController.addListener('userLogoutStatus', success => {
+    if (success) {
+      setButtonIsShown(true);
+    } else {
+      setButtonIsShown(false);
+    }
+  })
+
+    return (
+      <Box>
+      {buttonIsShown ? <Button onClick={() => setModalIsOpen(true)}>Sign up</Button> : <></>}
+      <Modal isOpen={modalIsOpen} onClose={() => {setModalIsOpen(false)}} closeOnOverlayClick={false}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Sign up</ModalHeader>
+          <ModalCloseButton />
+          <SignupForm />
+        </ModalContent>
+      </Modal>
+      </Box>
+    );
 }

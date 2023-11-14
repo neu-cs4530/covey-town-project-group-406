@@ -3,8 +3,8 @@ import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
 import ArtAuctionAccountInfo from './ArtAuctionAccountInfo';
-import SignupForm from './SignupForm';
-import LoginForm from './LoginForm';
+import SignupForm, { SingupWrapper } from './SignupForm';
+import LoginForm, { LoginWrapper } from './LoginForm';
 import LogoutButton from './LogoutButton';
 
 export default function SocialSidebar(): JSX.Element {
@@ -25,8 +25,8 @@ export default function SocialSidebar(): JSX.Element {
       <PlayersList />
       <ConversationAreasList />
       <ArtAuctionAccountInfo />
-      <SignupForm />
-      <LoginForm />
+      <SingupWrapper />
+      <LoginWrapper />
       <LogoutButton />
     </VStack>
   );
