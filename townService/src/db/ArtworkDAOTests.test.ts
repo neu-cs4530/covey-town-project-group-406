@@ -3,7 +3,6 @@ import { nanoid } from 'nanoid';
 import { Artwork, TownEmitter } from '../types/CoveyTownSocket';
 import ArtworkDAO from './ArtworkDAO';
 import Player from '../lib/Player';
-import AuctionFloor from '../town/AuctionFloor/AuctionFloor';
 
 const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',

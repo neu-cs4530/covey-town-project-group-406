@@ -20,6 +20,7 @@ import CoveyTownsStore from '../lib/TownsStore';
 import {
   ConversationArea,
   CoveyTownSocket,
+  Interactable,
   TownSettingsUpdate,
   ViewingArea,
 } from '../types/CoveyTownSocket';
@@ -130,6 +131,24 @@ export class TownsController extends Controller {
     }
   }
 
+  @Post('{townID}/auctionHouseArea')
+  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  public async createAuctionHouseArea(
+    @Path() townID: string,
+    @Header('X-Session-Token') sessionToken: string,
+    @Body() requestBody: Interactable,
+  ): Promise<void> {
+    const town = this._townsStore.getTownByID(townID);
+    if (!town?.getPlayerBySessionToken(sessionToken)) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    const success = await town.addAuctionHouseArea({ ...requestBody, type: 'AuctionHouseArea' });
+
+    if (!success) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+  }
+
   /**
    * Creates a viewing area in a given town
    *
@@ -182,6 +201,7 @@ export class TownsController extends Controller {
     socket.join(town.townID);
 
     const newPlayer = await town.addPlayer(userName, socket);
+
     assert(newPlayer.videoToken);
     socket.emit('initialize', {
       userID: newPlayer.id,

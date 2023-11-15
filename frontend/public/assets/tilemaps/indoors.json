@@ -545,15 +545,15 @@
                 {
                  "height":92.2796984663374,
                  "id":39,
-                 "name":"Tic Tac Toe 2",
+                 "name":"Art Auction House",
                  "properties":[
                         {
                          "name":"type",
                          "type":"string",
-                         "value":"TicTacToe"
+                         "value":"AuctionHouse"
                         }],
                  "rotation":0,
-                 "type":"GameArea",
+                 "type":"AuctionHouseArea",
                  "visible":true,
                  "width":135.170262542241,
                  "x":2941.25292435664,
