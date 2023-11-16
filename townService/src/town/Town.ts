@@ -324,9 +324,11 @@ export default class Town {
               isBeingAuctioned: false,
             }),
           );
-          AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
         }
         await Promise.all(results);
+        for (const artwork of artworks) {
+          AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
+        }
       } catch (err) {
         await area.addArtworksToAuctionHouse([
           {
@@ -366,6 +368,7 @@ export default class Town {
       await area.createNewAuctionFloorNonPlayer(5000);
     }
 
+    // console.log(area.toModel())
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }

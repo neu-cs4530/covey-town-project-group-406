@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-import useTownController from '../../hooks/useTownController';
 import {
   AuctionFloorArea,
   AuctionHouseArea as AuctionHouseAreaModel,
@@ -12,7 +10,7 @@ import InteractableAreaController, { BaseInteractableEventMap } from './Interact
  * are only ever emitted to local components (not to the townService).
  */
 export type AuctionHouseAreaEvents = BaseInteractableEventMap & {
-  fetchedAuctionFloors: (newFloors: AuctionFloorArea[]) => void;
+  interactableAreaChanged: (model: AuctionHouseAreaModel) => void;
 };
 
 // The special string that will be displayed when a auction house area does not have an artwork set
@@ -49,7 +47,7 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
    * Setting the topic to the value `undefined` will indicate that the conversation area is not active
    */
   set auctionFloors(auctionFloors: AuctionFloorArea[]) {
-    this.emit('floorsChange', auctionFloors);
+    this.emit('interactableAreaChanged', this.toInteractableAreaModel());
     this._auctionFloors = auctionFloors;
   }
 
@@ -98,31 +96,4 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     ret.occupants = playerFinder(auctionHouseAreaModel.occupants);
     return ret;
   }
-}
-
-/**
- * A react hook to retrieve the topic of a ConversationAreaController.
- * If there is currently no topic defined, it will return NO_TOPIC_STRING.
- *
- * This hook will re-render any components that use it when the topic changes.
- */
-export function useAuctionHouseAreaArtwork(area: AuctionHouseAreaController): AuctionFloorArea[] {
-  const [floors, setFloors] = useState(area.auctionFloors);
-  const townController = useTownController();
-
-  useEffect(() => {
-    const handleChanged = () => {
-      const auctionController = townController.auctionHouseAreas.find(c => c.id == area.id);
-      if (auctionController) {
-        setFloors(auctionController.auctionFloors);
-      }
-    };
-
-    area.addListener('interactableAreasChanged', handleChanged);
-    return () => {
-      area.removeListener('interactableAreasChanged', handleChanged);
-    };
-  }, [area, townController]);
-
-  return floors;
 }

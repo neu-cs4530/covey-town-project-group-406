@@ -1,10 +1,9 @@
 import { Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/react';
-import React, { useCallback, useEffect } from 'react';
-import AuctionHouseAreaController, {
-  useAuctionHouseAreaArtwork,
-} from '../../../classes/interactable/AuctionHouseAreaController';
+import React, { useCallback, useEffect, useState } from 'react';
+import AuctionHouseAreaController from '../../../classes/interactable/AuctionHouseAreaController';
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
+import { AuctionFloorArea, AuctionHouseArea } from '../../../types/CoveyTownSocket';
 import AuctionHouseAreaInteractable from './AuctionHouseArea';
 
 function AuctionHouseComponent({
@@ -12,12 +11,21 @@ function AuctionHouseComponent({
 }: {
   controller: AuctionHouseAreaController;
 }): JSX.Element {
-  const floors = useAuctionHouseAreaArtwork(controller);
+  const [floors, setFloors] = useState<AuctionFloorArea[]>([]);
   const townController = useTownController();
 
   useEffect(() => {
+    const handleChanged = (model: AuctionHouseArea) => {
+      setFloors(model.floors);
+    };
+
+    controller.addListener('interactableAreaChanged', handleChanged);
     townController.createAuctionHouseArea({ id: 'Art Auction House', occupants: [] });
-  }, [townController]);
+
+    return () => {
+      controller.removeListener('interactableAreaChanged', handleChanged);
+    };
+  }, [controller, townController]);
 
   return <div>Hello auction house! We have {floors.length} floors!</div>;
 }
