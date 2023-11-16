@@ -296,9 +296,14 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
-  auctionHouseLoginResponse: (response: {success: boolean, email: string, artworks: Artwork[] | undefined, money: number | undefined}) => void;
-  auctionHouseCreateUserResponse: (success: boolean) => void
-  auctionHouseLogoutCommandResponse: (success: boolean) => void
+  auctionHouseLoginResponse: (response: {
+    success: boolean;
+    email: string;
+    artworks: Artwork[] | undefined;
+    money: number | undefined;
+  }) => void;
+  auctionHouseCreateUserResponse: (success: boolean) => void;
+  auctionHouseLogoutCommandResponse: (success: boolean) => void;
 }
 
 export interface ClientToServerEvents {
@@ -311,8 +316,14 @@ export interface ClientToServerEvents {
   auctionHouseLoginCommand: (email: string, playerID: string) => void;
   auctionHouseCreateUserCommand: (email: string, playerID: string) => void;
   auctionHouseLogoutCommand: (email: string, playerID: string) => void;
-  auctionHouseJoinAuctionFloorCommand: (floorID: number, asBidder: boolean) => void;
+  auctionHouseJoinAuctionFloorCommand: (
+    floorID: number,
+    asBidder: boolean
+  ) => void;
   auctionHouseLeaveAuctionFloorCommand: (floorID: number) => void;
   auctionHouseMakeBidCommand: (floorID: number, bid: number) => void;
-  auctionHouseCreateAuctionFloorPlayerCommand: (artwork: Artwork, minBid: number) => void; 
+  auctionHouseCreateAuctionFloorPlayerCommand: (
+    artwork: Artwork,
+    minBid: number
+  ) => void;
 }
