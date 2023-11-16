@@ -110,19 +110,19 @@ export function useAuctionHouseAreaArtwork(area: AuctionHouseAreaController): Au
   const [floors, setFloors] = useState(area.auctionFloors);
   const townController = useTownController();
 
-  const handleChanged = () => {
-    const auctionController = townController.auctionHouseAreas.find(c => c.id == area.id);
-    if (auctionController) {
-      setFloors(auctionController.auctionFloors);
-    }
-  };
-
   useEffect(() => {
+    const handleChanged = () => {
+      const auctionController = townController.auctionHouseAreas.find(c => c.id == area.id);
+      if (auctionController) {
+        setFloors(auctionController.auctionFloors);
+      }
+    };
+
     area.addListener('interactableAreasChanged', handleChanged);
     return () => {
       area.removeListener('interactableAreasChanged', handleChanged);
     };
-  }, [area]);
+  }, [area, townController]);
 
   return floors;
 }

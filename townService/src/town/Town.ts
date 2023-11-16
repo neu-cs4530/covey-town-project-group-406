@@ -303,6 +303,7 @@ export default class Town {
     return true;
   }
 
+  // TODO - refactor this method once API is setup
   public async addAuctionHouseArea(interactable: Interactable): Promise<boolean> {
     const area = this._interactables.find(
       eachArea => eachArea.id === interactable.id,

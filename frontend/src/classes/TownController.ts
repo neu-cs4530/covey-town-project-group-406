@@ -22,6 +22,7 @@ import {
   InteractableCommandBase,
   InteractableCommandResponse,
   InteractableID,
+  InteractableType,
   PlayerID,
   PlayerLocation,
   TownSettingsUpdate,
@@ -564,7 +565,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   async createAuctionHouseArea(newArea: { id: string; occupants: Array<string> }) {
-    const area = { ...newArea, type: 'AuctionHouseArea' };
+    const area = { ...newArea, type: 'AuctionHouseArea' as InteractableType };
     await this._townsService.createAuctionHouseArea(this.townID, this.sessionToken, area);
   }
 
