@@ -7,8 +7,6 @@ import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
 // import singleton class
 
 export default class AuctionFloor extends EventEmitter implements IAuctionFloor {
-  // DAO instance
-
   private _dao: ArtworkDAO;
 
   // The ID of this auction floor (unique using nanoid())
