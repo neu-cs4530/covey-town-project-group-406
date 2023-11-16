@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "openapi-typescript-codegen": "^0.23.0",
     "@chakra-ui/react": "^1.8.9",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
@@ -24,6 +23,7 @@
     "@types/react": "^17.0.60",
     "@types/react-dom": "^17.0.20",
     "@types/react-router-dom": "^5.3.3",
+    "@types/swagger-ui-express": "^4.1.6",
     "assert": "^2.0.0",
     "axios": "^0.27.2",
     "clsx": "^1.2.1",
@@ -38,6 +38,7 @@
     "lodash.throttle": "^4.1.1",
     "nanoid": "^4.0.0",
     "next": "^12.3.4",
+    "openapi-typescript-codegen": "^0.23.0",
     "phaser": "^3.60.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -73,8 +74,16 @@
     "stryker": "stryker run"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
     "@geckos.io/phaser-on-nodejs": "^1.2.7",
