@@ -15,7 +15,7 @@ export default function LogoutButton(): JSX.Element {
     } else {
       setIsShown(false);
     }
-  })
+  });
 
   townController.addListener('userLogoutStatus', success => {
     if (success) {
@@ -23,7 +23,7 @@ export default function LogoutButton(): JSX.Element {
     } else {
       setIsShown(true);
     }
-  })
+  });
 
   const logout = (email: string) => {
     townController.once('userLogoutStatus', success => {
@@ -57,7 +57,7 @@ export default function LogoutButton(): JSX.Element {
   if (isShown) {
     return (
       <Button
-      style={{marginTop: 10, marginBottom: 10}}
+        style={{ marginTop: 10, marginBottom: 10 }}
         onClick={() => {
           if (townController.ourPlayer?.artAuctionAccount) {
             console.log('logging out');
@@ -74,9 +74,8 @@ export default function LogoutButton(): JSX.Element {
       </Button>
     );
   } else {
-    return <></>
+    return <></>;
   }
-
 
   /**/
 }
