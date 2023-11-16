@@ -148,7 +148,7 @@ export function LoginWrapper(): JSX.Element {
         closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>login</ModalHeader>
+          <ModalHeader>Login</ModalHeader>
           <ModalCloseButton />
           <LoginForm />
         </ModalContent>
