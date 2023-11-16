@@ -311,4 +311,8 @@ export interface ClientToServerEvents {
   auctionHouseLoginCommand: (email: string, playerID: string) => void;
   auctionHouseCreateUserCommand: (email: string, playerID: string) => void;
   auctionHouseLogoutCommand: (email: string, playerID: string) => void;
+  auctionHouseJoinAuctionFloorCommand: (email: string, floorID: number, asBidder: boolean) => void;
+  auctionHouseLeaveAuctionFloorCommand: (email: string, floorID: number) => void;
+  auctionHouseMakeBidCommand: (email: string, floorID: number, bid: number) => void;
+  auctionHouseCreateAuctionFloorPlayerCommand: (email: string, artwork: Artwork) => void; 
 }
