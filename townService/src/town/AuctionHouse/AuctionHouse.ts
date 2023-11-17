@@ -38,6 +38,28 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     this._dao = SingletonArtworkDAO.instance();
   }
 
+  public async leaveAuctionFloor(player: Player, floorID: string): Promise<void> {
+    const floor = this.auctionFloors.find(f => f.id === floorID);
+    if (floor) {
+      // if the person is an observer, just remove them
+      if (floor.observers.find(p => p.id === player.id)) {
+        floor.observers = floor.observers.filter(o => o.id !== player.id);
+      } else if (floor.bidders.find(p => p.id === player.id)) {
+        // if their bid is not the curent bid, just remove them too
+        floor.bidders = floor.bidders.filter(b => b.id !== player.id);
+        // if their bid is the current bid, reset the current bid to undefined
+        if (floor.currentBid?.player.id === player.id) {
+          floor.currentBid = undefined;
+        }
+      } else if (floor.auctioneer?.id === player.id) {
+        // shut down the auction floor, make it so that the artwork is not being auctioned
+        floor.artBeingAuctioned.isBeingAuctioned = false;
+        await this._dao.updatePlayerArtworkById(player.email, floor.artBeingAuctioned);
+        this.auctionFloors = this.auctionFloors.filter(f => f.id !== floorID);
+      }
+    }
+  }
+
   public joinFloorAsObserver(player: Player, floorID: string): void {
     for (const floor of this._auctionFloors) {
       if (floor.id === floorID) {
@@ -188,7 +210,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
 
     artwork.isBeingAuctioned = true;
     await this._dao.updatePlayerArtworkById(player.email, artwork);
-    const floor = new AuctionFloor(nanoid(), artwork, 30, undefined, [player], [], minBid, player);
+    const floor = new AuctionFloor(nanoid(), artwork, 30, undefined, [], [], minBid, player);
     floor.on('auctionEnded', f => {
       this._deleteAuctionFloor(f.id);
     });

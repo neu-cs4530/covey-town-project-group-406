@@ -282,6 +282,133 @@ describe('when joining an auction floor', () => {
   });
 });
 
+describe('when leaving an auction floor', () => {
+  let testArtwork: Artwork;
+
+  beforeEach(() => {
+    testArtwork = {
+      description: 'Its the Mona Lisa',
+      id: 1,
+      primaryImage: 'monalisa.png',
+      purchasePrice: 500000,
+      department: 'unknown',
+      title: 'The mona lisa',
+      culture: 'unknown',
+      period: '1500',
+      artist: { name: 'da Vinci' },
+      medium: 'Canvas',
+      countryOfOrigin: 'Italy',
+      isBeingAuctioned: false,
+      purchaseHistory: [],
+    };
+  });
+  it('removes the player properly if they are just an observer', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    const player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+    await dao.addPlayer(player.email);
+    await player.addArtwork(testArtwork);
+
+    const player2 = new Player(nanoid(), mock<TownEmitter>());
+    player2.initializeArtAuctionAccount('player2@gmail.com');
+    await dao.addPlayer(player2.email);
+
+    await dao.addArtworksToPlayer(player.email, [testArtwork]);
+    await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
+
+    house.joinFloorAsObserver(player2, house.auctionFloors[0].id);
+    expect(house.auctionFloors[0].observers).toHaveLength(1);
+    house.leaveAuctionFloor(player2, house.auctionFloors[0].id);
+    expect(house.auctionFloors[0].observers).toHaveLength(0);
+
+    await dao.removePlayer(player.email);
+    await dao.removePlayer(player2.email);
+  });
+  it('removes the player properly if they are a bidder and their bid is not the current bid', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    const player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+    await dao.addPlayer(player.email);
+    await player.addArtwork(testArtwork);
+
+    const player2 = new Player(nanoid(), mock<TownEmitter>());
+    player2.initializeArtAuctionAccount('player2@gmail.com');
+    await dao.addPlayer(player2.email);
+
+    await dao.addArtworksToPlayer(player.email, [testArtwork]);
+    await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
+
+    house.joinFloorAsBidder(player2, house.auctionFloors[0].id);
+    expect(house.auctionFloors[0].bidders).toHaveLength(1);
+    house.leaveAuctionFloor(player2, house.auctionFloors[0].id);
+    expect(house.auctionFloors[0].bidders).toHaveLength(0);
+
+    await dao.removePlayer(player.email);
+    await dao.removePlayer(player2.email);
+  });
+  it('removes the player properly if they are a bidder and their bid is the current bid', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    const player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+    await dao.addPlayer(player.email);
+    await player.addArtwork(testArtwork);
+
+    const player2 = new Player(nanoid(), mock<TownEmitter>());
+    player2.initializeArtAuctionAccount('player2@gmail.com');
+    await dao.addPlayer(player2.email);
+
+    await dao.addArtworksToPlayer(player.email, [testArtwork]);
+    await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
+
+    house.joinFloorAsBidder(player2, house.auctionFloors[0].id);
+    house.makeBid(player2, house.auctionFloors[0].id, 100);
+
+    expect(house.auctionFloors[0].bidders).toHaveLength(1);
+    expect(house.auctionFloors[0].currentBid?.bid).toBe(100);
+    expect(house.auctionFloors[0].currentBid?.player).toEqual(player2);
+
+    house.leaveAuctionFloor(player2, house.auctionFloors[0].id);
+
+    expect(house.auctionFloors[0].bidders).toHaveLength(0);
+    expect(house.auctionFloors[0].currentBid).toBeUndefined();
+
+    await dao.removePlayer(player.email);
+    await dao.removePlayer(player2.email);
+  });
+  it('removes the player properly if they are the auctioneer, and removes the floor and sets artwork to not being auctioned', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    const player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+    await dao.addPlayer(player.email);
+    await player.addArtwork(testArtwork);
+
+    const player2 = new Player(nanoid(), mock<TownEmitter>());
+    player2.initializeArtAuctionAccount('player2@gmail.com');
+    await dao.addPlayer(player2.email);
+
+    await dao.addArtworksToPlayer(player.email, [testArtwork]);
+    await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
+
+    house.joinFloorAsBidder(player2, house.auctionFloors[0].id);
+
+    expect(house.auctionFloors).toHaveLength(1);
+    expect(player.artwork[0].isBeingAuctioned).toBe(true);
+    const dbPlayer = await dao.getPlayer(player.email);
+    const dbPlayerArtworks = dbPlayer.artworks;
+    expect(dbPlayerArtworks[0].isBeingAuctioned).toBe(true);
+
+    await house.leaveAuctionFloor(player, house.auctionFloors[0].id);
+
+    expect(house.auctionFloors).toHaveLength(0);
+    expect(player.artwork[0].isBeingAuctioned).toBe(false);
+    const dbPlayer2 = await dao.getPlayer(player.email);
+    const dbPlayerArtworks2 = dbPlayer2.artworks;
+    expect(dbPlayerArtworks2[0].isBeingAuctioned).toBe(false);
+
+    await dao.removePlayer(player.email);
+    await dao.removePlayer(player2.email);
+  });
+});
 describe('when an auction floor ends', () => {
   let testArtwork: Artwork;
   let testArtworkIsNotBeingAuctioned: Artwork;
