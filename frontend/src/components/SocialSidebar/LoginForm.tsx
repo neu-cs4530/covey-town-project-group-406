@@ -52,7 +52,7 @@ export default function LoginForm(): JSX.Element {
         Login
       </Heading>
       <Box className='input-container'>
-        <label>Username </label>
+        <label>Email </label>
         <Input
           style={{ backgroundColor: 'lightblue' }}
           type='text'
@@ -83,7 +83,7 @@ export default function LoginForm(): JSX.Element {
             }
           }}
           style={{ width: '100%', marginTop: 10, marginBottom: 10 }}>
-          submit
+          Submit
         </Button>
       </Box>
     </Box>

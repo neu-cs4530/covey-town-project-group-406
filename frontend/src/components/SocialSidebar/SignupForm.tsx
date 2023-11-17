@@ -82,7 +82,7 @@ export default function SignupForm(): JSX.Element {
             }
           }}
           style={{ width: '100%', marginTop: 10, marginBottom: 10 }}>
-          submit
+          Submit
         </Button>
       </Box>
     </Box>
