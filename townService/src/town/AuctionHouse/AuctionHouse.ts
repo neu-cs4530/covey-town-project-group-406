@@ -182,7 +182,7 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
         playerHasArtwork = true;
       }
     }
-    if (!playerHasArtwork) {
+    if (!playerHasArtwork || artwork.isBeingAuctioned) {
       throw new Error('player does not have artwork with id');
     }
 
