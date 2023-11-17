@@ -2,16 +2,7 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import {
-  Box,
-  Heading,
-  Modal,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  useToast,
-} from '@chakra-ui/react';
+import { Box, Heading, useToast } from '@chakra-ui/react';
 import { Button, Input } from '@chakra-ui/react';
 
 export default function SignupForm(): JSX.Element {
@@ -60,7 +51,7 @@ export default function SignupForm(): JSX.Element {
         Signup
       </Heading>
       <Box className='input-container'>
-        <label>Username </label>
+        <label>Email </label>
         <Input
           style={{ backgroundColor: 'lightblue' }}
           type='text'
@@ -94,63 +85,6 @@ export default function SignupForm(): JSX.Element {
           submit
         </Button>
       </Box>
-    </Box>
-  );
-}
-
-export function SingupWrapper(): JSX.Element {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [buttonIsShown, setButtonIsShown] = useState(true);
-  const townController = useTownController();
-
-  townController.addListener('loginStatus', success => {
-    if (success) {
-      setButtonIsShown(false);
-      setModalIsOpen(false);
-      townController.unPause();
-    } else {
-      setButtonIsShown(true);
-    }
-  });
-
-  townController.addListener('userLogoutStatus', success => {
-    if (success) {
-      setButtonIsShown(true);
-      townController.unPause();
-    } else {
-      setButtonIsShown(false);
-      setModalIsOpen(false);
-    }
-  });
-
-  return (
-    <Box>
-      {buttonIsShown ? (
-        <Button
-          style={{ width: '100%' }}
-          onClick={() => {
-            setModalIsOpen(true);
-            townController.pause();
-          }}>
-          Sign up
-        </Button>
-      ) : (
-        <></>
-      )}
-      <Modal
-        isOpen={modalIsOpen}
-        onClose={() => {
-          setModalIsOpen(false);
-          townController.unPause();
-        }}
-        closeOnOverlayClick={false}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Sign up</ModalHeader>
-          <ModalCloseButton />
-          <SignupForm />
-        </ModalContent>
-      </Modal>
     </Box>
   );
 }

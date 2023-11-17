@@ -3,9 +3,8 @@ import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
 import { ArtAuctionAccountInfoWrapper } from './ArtAuctionAccountInfo';
-import { SingupWrapper } from './SignupForm';
-import { LoginWrapper } from './LoginForm';
 import LogoutButton from './LogoutButton';
+import SingupLoginWrapper from './SignupLoginForm';
 
 export default function SocialSidebar(): JSX.Element {
   return (
@@ -25,9 +24,8 @@ export default function SocialSidebar(): JSX.Element {
       <PlayersList />
       <ConversationAreasList />
       <ArtAuctionAccountInfoWrapper />
-      <SingupWrapper />
-      <LoginWrapper />
       <LogoutButton />
+      <SingupLoginWrapper />
     </VStack>
   );
 }

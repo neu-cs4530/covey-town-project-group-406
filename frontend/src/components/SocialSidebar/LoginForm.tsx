@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import {
-  Box,
-  Modal,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  useToast,
-} from '@chakra-ui/react';
+import { Box, useToast } from '@chakra-ui/react';
 import { Button, Input, Heading } from '@chakra-ui/react';
 
 export default function LoginForm(): JSX.Element {
@@ -94,65 +86,6 @@ export default function LoginForm(): JSX.Element {
           submit
         </Button>
       </Box>
-    </Box>
-  );
-}
-
-export function LoginWrapper(): JSX.Element {
-  const townController = useTownController();
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [buttonIsShown, setButtonIsShown] = useState(true);
-
-  townController.addListener('loginStatus', success => {
-    if (success) {
-      setButtonIsShown(false);
-      setModalIsOpen(false);
-      townController.unPause();
-    } else {
-      setButtonIsShown(true);
-      townController.unPause();
-    }
-  });
-
-  townController.addListener('userLogoutStatus', success => {
-    if (success) {
-      setButtonIsShown(true);
-      townController.unPause();
-    } else {
-      setButtonIsShown(false);
-      setModalIsOpen(false);
-      townController.unPause();
-    }
-  });
-
-  return (
-    <Box>
-      {buttonIsShown ? (
-        <Button
-          style={{ width: '100%' }}
-          onClick={() => {
-            setModalIsOpen(true);
-            townController.pause();
-          }}>
-          login
-        </Button>
-      ) : (
-        <></>
-      )}
-      <Modal
-        isOpen={modalIsOpen}
-        onClose={() => {
-          setModalIsOpen(false);
-          townController.unPause();
-        }}
-        closeOnOverlayClick={false}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Login</ModalHeader>
-          <ModalCloseButton />
-          <LoginForm />
-        </ModalContent>
-      </Modal>
     </Box>
   );
 }
