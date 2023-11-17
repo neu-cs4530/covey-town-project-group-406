@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Tabs,
   TabList,
@@ -17,6 +17,12 @@ import SignupForm from './SignupForm';
 export default function SingupLoginWrapper(): JSX.Element {
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const townController = useTownController();
+
+  useEffect(() => {
+    if (modalIsOpen) {
+      townController.pause();
+    }
+  }, [modalIsOpen, townController]);
 
   townController.addListener('loginStatus', success => {
     if (success) {
