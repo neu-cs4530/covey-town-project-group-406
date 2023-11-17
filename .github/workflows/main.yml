@@ -35,7 +35,10 @@ jobs:
       - name: Build and test frontend components
         run: cd frontend; npm install && npm run prestart && npm run lint && npm test
   deploy:
+<<<<<<< HEAD
       #if: github.ref == 'refs/heads/main'
+=======
+>>>>>>> baa7ad3dd5a8dc6ef507c464a4841d00c2e45ed0
       needs: build-and-test
       runs-on: ubuntu-latest
       steps:
