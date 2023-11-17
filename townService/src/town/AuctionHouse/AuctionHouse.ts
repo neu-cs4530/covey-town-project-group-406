@@ -58,7 +58,6 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
         this.auctionFloors = this.auctionFloors.filter(f => f.id !== floorID);
       }
     }
-    this._emitAreaChanged();
   }
 
   public joinFloorAsObserver(player: Player, floorID: string): void {
