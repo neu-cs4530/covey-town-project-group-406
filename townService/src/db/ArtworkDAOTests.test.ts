@@ -3,6 +3,9 @@ import { nanoid } from 'nanoid';
 import { Artwork, TownEmitter } from '../types/CoveyTownSocket';
 import ArtworkDAO from './ArtworkDAO';
 import Player from '../lib/Player';
+import APIUtils from '../api/APIUtils';
+import exp from 'constants';
+import { ExportContext } from 'twilio/lib/rest/bulkexports/v1/export';
 
 const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',
@@ -58,7 +61,7 @@ describe('when adding artwork to an auction house', () => {
     await dao.removeArtworkIDList();
   });
   it('adds non-conflict art proplery', async () => {
-    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2], 0);
     const resultArray = await dao.getAllAuctionHouseArtworks();
     expect(resultArray).toContainEqual(testArtwork);
     expect(resultArray).toContainEqual(testArtwork2);
@@ -69,9 +72,9 @@ describe('when adding artwork to an auction house', () => {
     expect(ids).toHaveLength(2);
   });
   it('throws an error when duplicate artwork is added', async () => {
-    await dao.addArtworksToAuctionHouse([testArtwork]);
-    await dao.addArtworksToAuctionHouse([testArtwork2]);
-    await expect(dao.addArtworksToAuctionHouse([testArtwork])).rejects.toThrowError();
+    await dao.addArtworksToAuctionHouse([testArtwork], 0);
+    await dao.addArtworksToAuctionHouse([testArtwork2], 0);
+    await expect(dao.addArtworksToAuctionHouse([testArtwork], 0)).rejects.toThrowError();
   });
 });
 
@@ -139,8 +142,8 @@ describe('when updating a player fields', () => {
 
 describe('when keeping track of all of the artwork IDs', () => {
   it('does not duplicate anything and keeps track properly', async () => {
-    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
-    await dao.addArtworksToAuctionHouse([testArtwork3]);
+    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2], 0);
+    await dao.addArtworksToAuctionHouse([testArtwork3], 0);
     const idResponse = await dao.getAllArtworkIDs();
     expect(idResponse).toContain(1);
     expect(idResponse).toContain(2);
@@ -168,7 +171,7 @@ describe('when updating an auction house artwork', () => {
       isBeingAuctioned: true,
       purchaseHistory: [],
     };
-    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2, testArtwork3]);
+    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2, testArtwork3], 0);
     await dao.updateAuctionHouseArtworkByID(artworkWithUpdatedFields);
     const artworkResponse = await dao.getAllAuctionHouseArtworks();
     expect(artworkResponse).toContainEqual(artworkWithUpdatedFields);
@@ -179,7 +182,7 @@ describe('when updating an auction house artwork', () => {
     await dao.removeArtworkIDList();
   });
   it('throws an error when no artwork with the given id is found', async () => {
-    await dao.addArtworksToAuctionHouse([testArtwork]);
+    await dao.addArtworksToAuctionHouse([testArtwork], 0);
     await expect(dao.updateAuctionHouseArtworkByID(testArtwork2)).rejects.toThrowError();
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
@@ -273,7 +276,7 @@ describe('when removing artwork from a player', () => {
 
 describe('when removing artwork from the auction house', () => {
   it('removes the artwork properly', async () => {
-    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2, testArtwork3]);
+    await dao.addArtworksToAuctionHouse([testArtwork, testArtwork2, testArtwork3], 0);
     await dao.removeArtworkFromAuctionHouseById(testArtwork2.id);
     const auctionHouseArtworksResponse = await dao.getAllAuctionHouseArtworks();
     expect(auctionHouseArtworksResponse).toContainEqual(testArtwork);
@@ -281,5 +284,20 @@ describe('when removing artwork from the auction house', () => {
     expect(auctionHouseArtworksResponse).toHaveLength(2);
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
+  });
+
+  describe('Test add artworks from API', () => {
+    it('adds the first artwork from the API response', async () => {
+      const validArtID = 188005;
+      const utils = new APIUtils();
+      const artwork1: Artwork = await utils.createArtwork(validArtID);
+      await dao.addArtworksToAuctionHouse([artwork1], 1);
+      const auctionHouseArtworksResponse = await dao.getAllAuctionHouseArtworks();
+      const indexResponse = await dao.getArtworkIndex();
+      expect(auctionHouseArtworksResponse).toContainEqual(artwork1);
+      expect(indexResponse).toContainEqual(1);
+      await dao.removeAuctionHouse();
+      await dao.removeArtworkIDList();
+    });
   });
 });

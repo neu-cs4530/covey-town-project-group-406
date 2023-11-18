@@ -10,6 +10,8 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   AUCTION_HOUSE_COLLECTION = 'AuctionHouse';
 
+  INDEX_COLLECTION = 'index';
+
   /**
    * Gets a specific artwork from a user
    * @param email the user
@@ -187,11 +189,20 @@ export default class ArtworkDAO implements IArtworkDAO {
     return true;
   }
 
+  private async _updateArtworkIDIndex(endIndex: number) {
+    await db
+      .collection(this.INDEX_COLLECTION)
+      .doc('index')
+      .set({ index: endIndex }, { merge: true });
+  }
+
   /**
    * Adds multiple artworks to the auction house
+   * Takes in the list of artworks and the index number of the last artwork
    * */
-  public async addArtworksToAuctionHouse(artworks: Artwork[]) {
+  public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
     await Promise.all(artworks.map(async artwork => this._addArtworkToAuctionHouse(artwork)));
+    await this._updateArtworkIDIndex(endIndex);
   }
 
   /**
@@ -287,6 +298,21 @@ export default class ArtworkDAO implements IArtworkDAO {
         throw new Error(err.message);
       }
       throw new Error('Error getting auction house Artworks');
+    }
+  }
+
+  public async getArtworkIndex(): Promise<number> {
+    try {
+      const response = await db.collection(this.INDEX_COLLECTION).doc('index').get();
+      if (!response.exists) {
+        throw new Error('index has not been added');
+      }
+      return response.data()?.index;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+      throw new Error('Error getting artwork index');
     }
   }
 
