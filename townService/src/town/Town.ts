@@ -396,10 +396,10 @@ export default class Town {
     if (AuctionHouse.artworkToBeAuctioned.length === 0) {
       const results = [];
       try {
-        const artworks = await AuctionFloor.DAO.getAllAuctionHouseArtworks();
+        const artworks = await this._dao.getAllAuctionHouseArtworks();
         for (const artwork of artworks) {
           results.push(
-            AuctionFloor.DAO.updateAuctionHouseArtworkByID({
+            this._dao.updateAuctionHouseArtworkByID({
               ...artwork,
               isBeingAuctioned: false,
             }),
