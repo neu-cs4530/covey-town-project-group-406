@@ -18,9 +18,9 @@ import { Town, TownCreateParams, TownCreateResponse } from '../api/Model';
 import InvalidParametersError from '../lib/InvalidParametersError';
 import CoveyTownsStore from '../lib/TownsStore';
 import {
+  AuctionHouseArea,
   ConversationArea,
   CoveyTownSocket,
-  Interactable,
   TownSettingsUpdate,
   ViewingArea,
 } from '../types/CoveyTownSocket';
@@ -136,7 +136,7 @@ export class TownsController extends Controller {
   public async createAuctionHouseArea(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: Interactable,
+    @Body() requestBody: Omit<AuctionHouseArea, 'floors'>,
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town?.getPlayerBySessionToken(sessionToken)) {

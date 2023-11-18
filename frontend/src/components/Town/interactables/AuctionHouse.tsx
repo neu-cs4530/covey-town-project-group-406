@@ -2,6 +2,7 @@ import { Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay } from
 import React, { useCallback, useEffect, useState } from 'react';
 import AuctionHouseAreaController from '../../../classes/interactable/AuctionHouseAreaController';
 import { useInteractable } from '../../../classes/TownController';
+import { InteractableType } from '../../../generated/client';
 import useTownController from '../../../hooks/useTownController';
 import { AuctionFloorArea, AuctionHouseArea } from '../../../types/CoveyTownSocket';
 import AuctionHouseAreaInteractable from './AuctionHouseArea';
@@ -20,7 +21,11 @@ function AuctionHouseComponent({
     };
 
     controller.addListener('interactableAreaChanged', handleChanged);
-    townController.createAuctionHouseArea({ id: 'Art Auction House', occupants: [] });
+    townController.createAuctionHouseArea({
+      id: 'Art Auction House',
+      occupants: [],
+      type: 'ArtAutionHouse' as InteractableType,
+    });
 
     return () => {
       controller.removeListener('interactableAreaChanged', handleChanged);
