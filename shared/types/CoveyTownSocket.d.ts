@@ -313,7 +313,6 @@ export interface ClientToServerEvents {
   interactableCommand: (
     command: InteractableCommand & InteractableCommandBase
   ) => void;
-<<<<<<< HEAD
   auctionHouseLoginCommand: (email: string, playerID: string) => void;
   auctionHouseCreateUserCommand: (email: string, playerID: string) => void;
   auctionHouseLogoutCommand: (email: string, playerID: string) => void;
@@ -328,6 +327,3 @@ export interface ClientToServerEvents {
     minBid: number
   ) => void;
 }
-=======
-}
->>>>>>> create-interactable-area

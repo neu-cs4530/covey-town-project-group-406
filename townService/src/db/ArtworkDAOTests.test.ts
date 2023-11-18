@@ -2,10 +2,7 @@ import { mock } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { Artwork, TownEmitter } from '../types/CoveyTownSocket';
 import Player from '../lib/Player';
-<<<<<<< HEAD
 import SingletonArtworkDAO from './SingletonArtworkDAO';
-=======
->>>>>>> create-interactable-area
 
 const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',
