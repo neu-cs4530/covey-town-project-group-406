@@ -4,11 +4,11 @@ import db from './DBConfig';
 import IArtworkDAO from './IArtworkDAO';
 
 export default class ArtworkDAO implements IArtworkDAO {
-  ARTWORK_IDS_COLLECTION = 'artworkIDs';
+  artworkIDsCollection = 'artworkIDs';
 
-  USER_COLLECTION = 'users';
+  userCollection = 'users';
 
-  AUCTION_HOUSE_COLLECTION = 'AuctionHouse';
+  auctionHouseCollection = 'AuctionHouse';
 
   INDEX_COLLECTION = 'index';
 
@@ -79,7 +79,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       }
 
       await db
-        .collection(this.USER_COLLECTION)
+        .collection(this.userCollection)
         .doc(email)
         .set({ artworks: FieldValue.arrayUnion(artwork) }, { merge: true });
     } catch (err) {
@@ -96,30 +96,30 @@ export default class ArtworkDAO implements IArtworkDAO {
   private async _addArtworkToAuctionHouse(artwork: Artwork): Promise<void> {
     try {
       let allArtworkIDsCollection = await db
-        .collection(this.ARTWORK_IDS_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .get();
 
       if (!allArtworkIDsCollection.exists) {
-        await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').set({ artworkIDs: [] });
+        await db.collection(this.auctionHouseCollection).doc('artworks').set({ artworkIDs: [] });
       }
 
       allArtworkIDsCollection = await db
-        .collection(this.ARTWORK_IDS_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .get();
 
       let auctionHouseCollection = await db
-        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .get();
 
       if (!auctionHouseCollection) {
-        await db.collection(this.AUCTION_HOUSE_COLLECTION).doc('artworks').set({ artworks: [] });
+        await db.collection(this.auctionHouseCollection).doc('artworks').set({ artworks: [] });
       }
 
       auctionHouseCollection = await db
-        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .get();
 
@@ -129,7 +129,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       }
 
       await db
-        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .set({ artworks: FieldValue.arrayUnion(artwork) }, { merge: true });
       await this._addArtworkIDToLog(artwork.id);
@@ -146,7 +146,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    * @returns the userRef from the database
    */
   private async _getUserFromDatabase(email: string) {
-    const userRef = await db.collection(this.USER_COLLECTION).doc(email).get();
+    const userRef = await db.collection(this.userCollection).doc(email).get();
     return userRef;
   }
 
@@ -156,7 +156,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   private async _addArtworkIDToLog(id: number): Promise<void> {
     await db
-      .collection(this.ARTWORK_IDS_COLLECTION)
+      .collection(this.auctionHouseCollection)
       .doc('artworks')
       .update({
         artworkIDs: FieldValue.arrayUnion(id),
@@ -215,7 +215,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       if (userRef.exists) {
         throw new Error('user with username already exists');
       }
-      await db.collection(this.USER_COLLECTION).doc(email).set({
+      await db.collection(this.userCollection).doc(email).set({
         artworks: [],
         money: 1000000,
         isLoggedIn: false,
@@ -242,7 +242,7 @@ export default class ArtworkDAO implements IArtworkDAO {
   public async getPlayer(
     email: string,
   ): Promise<{ artworks: Artwork[]; money: number; isLoggedIn: boolean }> {
-    const playerResponse = await db.collection(this.USER_COLLECTION).doc(email).get();
+    const playerResponse = await db.collection(this.userCollection).doc(email).get();
     const data = playerResponse.data();
     if (data) {
       return { artworks: data.artworks, money: data.money, isLoggedIn: data.isLoggedIn };
@@ -255,7 +255,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   public async updatePlayer(email: string, isLoggedIn: boolean, money: number) {
     try {
-      await db.collection(this.USER_COLLECTION).doc(email).update({ isLoggedIn, money });
+      await db.collection(this.userCollection).doc(email).update({ isLoggedIn, money });
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -267,7 +267,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    * Removes collection that keeps track of all artwork IDs in the database
    */
   public async removeArtworkIDList(): Promise<void> {
-    await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').delete();
+    await db.collection(this.auctionHouseCollection).doc('artworks').delete();
   }
 
   /**
@@ -275,7 +275,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    * @returns a list of the ids in the colletion
    */
   public async getAllArtworkIDs(): Promise<number[]> {
-    const ref = await db.collection(this.ARTWORK_IDS_COLLECTION).doc('artworks').get();
+    const ref = await db.collection(this.auctionHouseCollection).doc('artworks').get();
     if (!ref.exists) {
       throw new Error('artwork ids collection not instantiated properly');
     }
@@ -288,7 +288,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   public async getAllAuctionHouseArtworks(): Promise<Artwork[]> {
     try {
-      const response = await db.collection(this.AUCTION_HOUSE_COLLECTION).doc('artworks').get();
+      const response = await db.collection(this.auctionHouseCollection).doc('artworks').get();
       if (!response.exists) {
         throw new Error('auction house not instantiated properly');
       }
@@ -328,14 +328,14 @@ export default class ArtworkDAO implements IArtworkDAO {
         throw new Error('no artwork with id');
       }
       await db
-        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .update({
           artworks: FieldValue.arrayRemove(artworkToRemove),
         });
 
       await db
-        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .update({
           artworks: FieldValue.arrayUnion(artwork),
@@ -356,14 +356,14 @@ export default class ArtworkDAO implements IArtworkDAO {
     try {
       const artworkToRemove = await this._getPlayerArtworkById(email, artwork.id);
       await db
-        .collection(this.USER_COLLECTION)
+        .collection(this.userCollection)
         .doc(email)
         .update({
           artworks: FieldValue.arrayRemove(artworkToRemove),
         });
 
       await db
-        .collection(this.USER_COLLECTION)
+        .collection(this.userCollection)
         .doc(email)
         .update({
           artworks: FieldValue.arrayUnion(artwork),
@@ -388,7 +388,7 @@ export default class ArtworkDAO implements IArtworkDAO {
         throw new Error('no artwork with id');
       }
       await db
-        .collection(this.USER_COLLECTION)
+        .collection(this.userCollection)
         .doc(email)
         .update({
           artworks: FieldValue.arrayRemove(artworkToRemove),
@@ -406,7 +406,7 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   public async removeArtworkFromAuctionHouseById(id: number): Promise<void> {
     try {
-      const response = await db.collection(this.AUCTION_HOUSE_COLLECTION).doc('artworks').get();
+      const response = await db.collection(this.auctionHouseCollection).doc('artworks').get();
       if (!response.exists) {
         throw new Error('auction house not insantiated properly');
       }
@@ -417,7 +417,7 @@ export default class ArtworkDAO implements IArtworkDAO {
         throw new Error('no artwork with id');
       }
       await db
-        .collection(this.AUCTION_HOUSE_COLLECTION)
+        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .update({
           artworks: FieldValue.arrayRemove(artworkToRemove),
@@ -439,7 +439,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       if (!userRef.exists) {
         throw new Error('user does not exist');
       }
-      await db.collection(this.USER_COLLECTION).doc(email).delete();
+      await db.collection(this.userCollection).doc(email).delete();
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -452,11 +452,11 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   public async removeAuctionHouse(): Promise<void> {
     try {
-      const paintingsRef = await db.collection(this.AUCTION_HOUSE_COLLECTION).doc('artworks').get();
+      const paintingsRef = await db.collection(this.auctionHouseCollection).doc('artworks').get();
       if (!paintingsRef.exists) {
         throw new Error('artworks do not exist');
       }
-      await db.collection(this.AUCTION_HOUSE_COLLECTION).doc('artworks').delete();
+      await db.collection(this.auctionHouseCollection).doc('artworks').delete();
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);

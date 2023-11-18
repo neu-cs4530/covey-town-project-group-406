@@ -5,7 +5,6 @@ import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
 initializeApp({
   credential: cert({
     projectId: process.env.FIRESTORE_PROJ_ID,
@@ -15,5 +14,4 @@ initializeApp({
 });
 
 const db = getFirestore();
-
 export default db;

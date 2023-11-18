@@ -4,8 +4,19 @@ import ArtworkDAO from '../../db/ArtworkDAO';
 import { TownEmitter, Artwork } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
 import AuctionHouse from './AuctionHouse';
+import AuctionFloor from '../AuctionFloor/AuctionFloor';
 
 const dao = new ArtworkDAO();
+const VAL1 = nanoid();
+const VAL2 = nanoid();
+const VAL3 = nanoid();
+dao.auctionHouseCollection = VAL1;
+dao.userCollection = VAL2;
+dao.artworkIDsCollection = VAL3;
+AuctionFloor.DAO.auctionHouseCollection = VAL1;
+AuctionFloor.DAO.userCollection = VAL2;
+AuctionFloor.DAO.artworkIDsCollection = VAL3;
+
 const testAreaBox = { x: 100, y: 100, width: 100, height: 100 };
 describe('when adding artworks to the auction house', () => {
   let testArtwork: Artwork;
@@ -44,6 +55,7 @@ describe('when adding artworks to the auction house', () => {
   });
   it('updates the static array and database properly', async () => {
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+
     await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
     const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
     const artworkIDs = await dao.getAllArtworkIDs();
@@ -86,8 +98,8 @@ describe('when making a bid', () => {
     await house.addArtworksToAuctionHouse([testArtwork]);
     await house.createNewAuctionFloorNonPlayer(1);
     house.makeBid(player, house.auctionFloors[0].id, 10);
-    expect(house.auctionFloors[0].currentBid.player).toEqual(player);
-    expect(house.auctionFloors[0].currentBid.bid).toBe(10);
+    expect(house.auctionFloors[0].currentBid?.player).toEqual(player);
+    expect(house.auctionFloors[0].currentBid?.bid).toBe(10);
     await dao.removePlayer(player.email);
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
@@ -101,8 +113,8 @@ describe('when making a bid', () => {
     await house.addArtworksToAuctionHouse([testArtwork]);
     await house.createNewAuctionFloorNonPlayer(100);
     house.makeBid(player, house.auctionFloors[0].id, 10);
-    expect(house.auctionFloors[0].currentBid.player).toEqual(undefined);
-    expect(house.auctionFloors[0].currentBid.bid).toBe(0);
+    expect(house.auctionFloors[0].currentBid?.player).toEqual(undefined);
+    expect(house.auctionFloors[0].currentBid?.bid).toBe(undefined);
     await dao.removePlayer(player.email);
     await dao.removeAuctionHouse();
     await dao.removeArtworkIDList();
@@ -217,6 +229,7 @@ describe('when creating a new auction floor', () => {
     player.initializeArtAuctionAccount('player@gmail.com');
     await dao.addPlayer(player.email);
     await player.addArtwork(testArtwork);
+    await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
     await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
     expect((player.artwork[0].isBeingAuctioned = true));
@@ -535,6 +548,7 @@ describe('when an auction floor ends', () => {
       player.initializeArtAuctionAccount('player@gmail.com');
       await dao.addPlayer(player.email);
       await player.addArtwork(testArtwork);
+      await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
       await house.createNewAuctionFloorPlayer(player, testArtwork, 1);
@@ -556,6 +570,7 @@ describe('when an auction floor ends', () => {
       player.initializeArtAuctionAccount('player@gmail.com');
       await dao.addPlayer(player.email);
       await player.addArtwork(testArtwork);
+      await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
       const player2 = new Player(nanoid(), mock<TownEmitter>());
       player2.initializeArtAuctionAccount('player2@gmail.com');
@@ -589,11 +604,13 @@ describe('when an auction floor ends', () => {
       player.initializeArtAuctionAccount('player@gmail.com');
       await dao.addPlayer(player.email);
       await player.addArtwork(testArtwork);
+      await dao.addArtworksToPlayer(player.email, [testArtwork]);
 
       const player2 = new Player(nanoid(), mock<TownEmitter>());
       player2.initializeArtAuctionAccount('player2@gmail.com');
       await dao.addPlayer(player2.email);
       await player2.addArtwork(testArtwork2);
+      await dao.addArtworksToPlayer(player2.email, [testArtwork2]);
 
       const player3 = new Player(nanoid(), mock<TownEmitter>());
       player3.initializeArtAuctionAccount('player3@gmail.com');

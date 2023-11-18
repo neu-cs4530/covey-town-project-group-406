@@ -140,7 +140,9 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
       minBid: this._minBid,
       artBeingAuctioned: this._artBeingAuctioned,
       timeLeft: this._timeLeft,
-      currentBid: { player: this._currentBid.player?.toPlayerModel(), bid: this._currentBid.bid },
+      currentBid: this._currentBid
+        ? { player: this._currentBid.player, bid: this._currentBid.bid }
+        : undefined,
       auctioneer: this._auctioneer?.toPlayerModel(),
       observers: this._observers.map(o => o.toPlayerModel()) as PlayerModel[],
       bidders: this._bidders.map(b => b.toPlayerModel()) as PlayerModel[],
@@ -148,17 +150,26 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   }
 
   private async _giveArtworkToBuyer(): Promise<void> {
-    const winner = this._currentBid.player;
-    if (winner !== undefined) {
-      const artwork = { ...this._artBeingAuctioned };
-      artwork.isBeingAuctioned = false;
-      await winner.addArtwork(artwork);
+    if (this._currentBid) {
+      const winner = this._currentBid.player;
+      if (winner !== undefined && this._currentBid.player?.email) {
+        const artwork = { ...this._artBeingAuctioned };
+        artwork.isBeingAuctioned = false;
+        await winner.addArtwork(artwork);
+        await AuctionFloor.DAO.addArtworksToPlayer(this._currentBid.player?.email, [
+          this.artBeingAuctioned,
+        ]);
+      }
     }
   }
 
   private async _removeArtworkFromAuctioneer(): Promise<void> {
     if (this._auctioneer) {
       await this._auctioneer.removeArtwork(this._artBeingAuctioned);
+      await AuctionFloor.DAO.removeArtworkFromPlayerById(
+        this._auctioneer.email,
+        this.artBeingAuctioned.id,
+      );
     }
   }
 
@@ -168,8 +179,8 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   }
 
   private async _addMoneyToAuctioneer() {
-    if (this._auctioneer) {
-      this._auctioneer.wallet.money += this.currentBid.bid;
+    if (this._auctioneer && this._currentBid) {
+      this._auctioneer.wallet.money += this._currentBid.bid;
       this._auctioneer.calculateNetWorth();
       await AuctionFloor.DAO.updatePlayer(
         this._auctioneer.email,
@@ -180,8 +191,8 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   }
 
   private async _removeMoneyFromBuyer() {
-    if (this._currentBid.player !== undefined) {
-      this._currentBid.player.wallet.money -= this.currentBid.bid;
+    if (this._currentBid !== undefined) {
+      this._currentBid.player.wallet.money -= this._currentBid.bid;
       this._currentBid.player.calculateNetWorth();
       await AuctionFloor.DAO.updatePlayer(
         this._currentBid.player.email,
@@ -194,8 +205,8 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   private async _endAuction(): Promise<void> {
     this.status = 'ENDED';
     this.artBeingAuctioned.isBeingAuctioned = false;
-    if (this._currentBid.player !== undefined) {
-      this.artBeingAuctioned.purchasePrice = this.currentBid.bid;
+    if (this._currentBid !== undefined) {
+      this.artBeingAuctioned.purchasePrice = this._currentBid.bid;
       if (this._auctioneer) {
         await this._removeArtworkFromAuctioneer();
         await this._addMoneyToAuctioneer();
