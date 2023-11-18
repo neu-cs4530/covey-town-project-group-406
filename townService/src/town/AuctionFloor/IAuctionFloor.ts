@@ -1,5 +1,5 @@
 import Player from '../../lib/Player';
-import { AuctionFloorModel } from '../../types/CoveyTownSocket';
+import { AuctionFloorArea } from '../../types/CoveyTownSocket';
 /*
   Represents an auction floor component where users can go and bid on artwork
   Can be created by a player or the auction house itself
@@ -15,7 +15,7 @@ export default interface IAuctionFloor {
    * Returns a model representation of the Auction Floor
    * To be sent to the frontend
    */
-  toModel(): AuctionFloorModel;
+  toModel(): AuctionFloorArea;
 }
 
 export type Status = 'IN_PROGRESS' | 'WAITING_TO_START' | 'ENDED';
