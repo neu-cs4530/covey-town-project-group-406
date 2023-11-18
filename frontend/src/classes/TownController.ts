@@ -11,11 +11,7 @@ import ConversationArea from '../components/Town/interactables/ConversationArea'
 import GameArea from '../components/Town/interactables/GameArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
 import { LoginController } from '../contexts/LoginControllerContext';
-import {
-  Omit_AuctionHouseArea_floors_,
-  TownsService,
-  TownsServiceClient,
-} from '../generated/client';
+import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
   ChatMessage,
@@ -568,7 +564,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     await this._townsService.createConversationArea(this.townID, this.sessionToken, newArea);
   }
 
-  async createAuctionHouseArea(newArea: Omit_AuctionHouseArea_floors_) {
+  async createAuctionHouseArea(newArea: { id: string; occupants: Array<string> }) {
     await this._townsService.createAuctionHouseArea(this.townID, this.sessionToken, newArea);
   }
 

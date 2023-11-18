@@ -135,6 +135,29 @@
 				"$ref": "#/components/schemas/Pick_ConversationArea.Exclude_keyofConversationArea.type__",
 				"description": "Construct a type with the properties of T except for those in type K."
 			},
+			"Pick_Omit_AuctionHouseArea.floors_.Exclude_keyofOmit_AuctionHouseArea.floors_.type__": {
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/InteractableID"
+					},
+					"occupants": {
+						"items": {
+							"$ref": "#/components/schemas/PlayerID"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"occupants"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_Omit_AuctionHouseArea.floors_.type_": {
+				"$ref": "#/components/schemas/Pick_Omit_AuctionHouseArea.floors_.Exclude_keyofOmit_AuctionHouseArea.floors_.type__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
 			"Pick_ViewingArea.Exclude_keyofViewingArea.type__": {
 				"properties": {
 					"id": {
@@ -408,6 +431,58 @@
 							"schema": {
 								"$ref": "#/components/schemas/Omit_ConversationArea.type_",
 								"description": "The new conversation area to create"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/towns/{townID}/auctionHouseArea": {
+			"post": {
+				"operationId": "CreateAuctionHouseArea",
+				"responses": {
+					"204": {
+						"description": "No content"
+					},
+					"400": {
+						"description": "Invalid values specified",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/InvalidParametersError"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"towns"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "townID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "X-Session-Token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Omit_Omit_AuctionHouseArea.floors_.type_"
 							}
 						}
 					}
