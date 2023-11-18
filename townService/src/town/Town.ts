@@ -19,6 +19,8 @@ import {
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
+import AuctionFloor from './AuctionFloor/AuctionFloor';
+import AuctionHouse from './AuctionHouse/AuctionHouse';
 import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
@@ -381,6 +383,76 @@ export default class Town {
     return true;
   }
 
+  // TODO - refactor this method once API is setup
+  public async addAuctionHouseArea(interactable: Interactable): Promise<boolean> {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === interactable.id,
+    ) as AuctionHouse;
+    if (!area) {
+      return false;
+    }
+    area.addPlayersWithinBounds(this._players);
+
+    if (AuctionHouse.artworkToBeAuctioned.length === 0) {
+      const results = [];
+      try {
+        const artworks = await AuctionFloor.DAO.getAllAuctionHouseArtworks();
+        for (const artwork of artworks) {
+          results.push(
+            AuctionFloor.DAO.updateAuctionHouseArtworkByID({
+              ...artwork,
+              isBeingAuctioned: false,
+            }),
+          );
+        }
+        await Promise.all(results);
+        for (const artwork of artworks) {
+          AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
+        }
+      } catch (err) {
+        await area.addArtworksToAuctionHouse([
+          {
+            description: 'Its stary night',
+            id: 2,
+            primaryImage: 'starynight.png',
+            purchasePrice: 10000,
+            department: 'unknown',
+            title: 'Stary Night',
+            culture: 'unknown',
+            period: '1800',
+            artist: { name: 'Van Gogh' },
+            medium: 'Canvas',
+            countryOfOrigin: 'France',
+            isBeingAuctioned: false,
+            purchaseHistory: [],
+          },
+          {
+            description: 'Its the Mona Lisa',
+            id: 1,
+            primaryImage: 'monalisa.png',
+            purchasePrice: 5000,
+            department: 'unknown',
+            title: 'The mona lisa',
+            culture: 'unknown',
+            period: '1500',
+            artist: { name: 'da Vinci' },
+            medium: 'Canvas',
+            countryOfOrigin: 'Italy',
+            isBeingAuctioned: false,
+            purchaseHistory: [],
+          },
+        ]);
+      }
+
+      await area.createNewAuctionFloorNonPlayer(10000);
+      await area.createNewAuctionFloorNonPlayer(5000);
+    }
+
+    // console.log(area.toModel())
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
   /**
    * Creates a new viewing area in this town if there is not currently an active
    * viewing area with the same ID. The viewing area ID must match the name of a
@@ -480,6 +552,10 @@ export default class Town {
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
 
+    const auctionHouseAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'AuctionHouseArea')
+      .map(eachConvAreaObj => AuctionHouse.fromMapObject(eachConvAreaObj, this._broadcastEmitter));
+
     const gameAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'GameArea')
       .map(eachGameAreaObj => GameAreaFactory(eachGameAreaObj, this._broadcastEmitter));
@@ -487,7 +563,8 @@ export default class Town {
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)
-      .concat(gameAreas);
+      .concat(gameAreas)
+      .concat(auctionHouseAreas);
     this._validateInteractables();
   }
 

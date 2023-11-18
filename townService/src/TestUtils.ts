@@ -12,6 +12,7 @@ import {
 } from 'socket.io/dist/typed-events';
 import Player from './lib/Player';
 import {
+  AuctionHouseArea,
   BoundingBox,
   ClientToServerEvents,
   ConversationArea,
@@ -207,6 +208,10 @@ export function expectArraysToContainSameMembers<T>(actual: T[], expected: T[]):
 
 export function isViewingArea(interactable: Interactable): interactable is ViewingArea {
   return 'isPlaying' in interactable;
+}
+
+export function isAuctionHouseArea(interactable: Interactable): interactable is AuctionHouseArea {
+  return 'floors' in interactable;
 }
 
 export function isConversationArea(interactable: Interactable): interactable is ConversationArea {

@@ -8,16 +8,16 @@ import {
   InteractableCommand,
   InteractableCommandReturnType,
   BoundingBox,
-  AuctionFloorModel,
-  AuctionHouseModel,
+  AuctionFloorArea,
+  AuctionHouseArea,
+  InteractableID,
 } from '../../types/CoveyTownSocket';
-import IAuctionHouse from './IAuctionHouse';
 import InteractableArea from '../InteractableArea';
 import AuctionFloor from '../AuctionFloor/AuctionFloor';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
 
-export default class AuctionHouse extends InteractableArea implements IAuctionHouse {
+export default class AuctionHouse extends InteractableArea {
   private _auctionFloors: AuctionFloor[];
 
   private _dao: ArtworkDAO;
@@ -224,8 +224,8 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     return 'AuctionHouseArea';
   }
 
-  public toModel(): AuctionHouseModel {
-    const floorArray: AuctionFloorModel[] = [];
+  public toModel(): AuctionHouseArea {
+    const floorArray: AuctionFloorArea[] = [];
     for (const floor of this._auctionFloors) {
       floorArray.push(floor.toModel());
     }
@@ -237,6 +237,17 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     };
   }
 
+  public get isActive(): boolean {
+    return this._occupants.length > 0;
+  }
+
+  public remove(player: Player) {
+    super.remove(player);
+    if (this._occupants.length === 0) {
+      this._emitAreaChanged();
+    }
+  }
+
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
@@ -244,7 +255,15 @@ export default class AuctionHouse extends InteractableArea implements IAuctionHo
     throw new Error('Method not implemented.');
   }
 
-  static fromMapObject(mapObject: ITiledMapObject, broadcastEmitter: TownEmitter): AuctionHouse {
-    throw new Error('not impl');
+  public static fromMapObject(
+    mapObject: ITiledMapObject,
+    broadcastEmitter: TownEmitter,
+  ): AuctionHouse {
+    const { name, width, height } = mapObject;
+    if (!width || !height) {
+      throw new Error(`Malformed viewing area ${name}`);
+    }
+    const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
+    return new AuctionHouse(name as InteractableID, rect, broadcastEmitter);
   }
 }

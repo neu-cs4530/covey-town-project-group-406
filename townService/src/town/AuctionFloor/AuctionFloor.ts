@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import Player from '../../lib/Player';
-import { Player as PlayerModel, Artwork, AuctionFloorModel } from '../../types/CoveyTownSocket';
+import { Player as PlayerModel, Artwork, AuctionFloorArea } from '../../types/CoveyTownSocket';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import IAuctionFloor, { Status, Bid } from './IAuctionFloor';
 import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
@@ -135,7 +135,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     this.emit('auctionEnded', this);
   }
 
-  public toModel(): AuctionFloorModel {
+  public toModel(): AuctionFloorArea {
     return {
       id: this._id,
       status: this._status,

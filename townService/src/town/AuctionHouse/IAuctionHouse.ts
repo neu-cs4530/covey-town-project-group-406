@@ -1,4 +1,4 @@
-import { InteractableType, Artwork, AuctionHouseModel } from '../../types/CoveyTownSocket';
+import { InteractableType, Artwork, AuctionHouseArea } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
 
 /**
@@ -57,5 +57,5 @@ export default interface IAuctionHouse {
   /**
    * Model to send to the frontend
    */
-  toModel(): AuctionHouseModel;
+  toModel(): AuctionHouseArea;
 }

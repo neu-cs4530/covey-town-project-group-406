@@ -44,11 +44,11 @@ export interface Player {
   artAuctionAccount: ArtAuctionAccount | undefined;
 }
 
-export interface AuctionHouseModel extends Interactable {
-  floors: AuctionFloorModel[];
+export interface AuctionHouseArea extends Interactable {
+  floors: AuctionFloorArea[];
 }
 
-export type AuctionFloorModel = {
+export type AuctionFloorArea = {
   id: string;
   status: Status;
   minBid: number;
@@ -313,6 +313,7 @@ export interface ClientToServerEvents {
   interactableCommand: (
     command: InteractableCommand & InteractableCommandBase
   ) => void;
+<<<<<<< HEAD
   auctionHouseLoginCommand: (email: string, playerID: string) => void;
   auctionHouseCreateUserCommand: (email: string, playerID: string) => void;
   auctionHouseLogoutCommand: (email: string, playerID: string) => void;
@@ -327,3 +328,6 @@ export interface ClientToServerEvents {
     minBid: number
   ) => void;
 }
+=======
+}
+>>>>>>> create-interactable-area

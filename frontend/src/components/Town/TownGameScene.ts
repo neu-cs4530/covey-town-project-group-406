@@ -5,6 +5,7 @@ import TownController from '../../classes/TownController';
 import { PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
+import AuctionHouseArea from './interactables/AuctionHouseArea';
 import ConversationArea from './interactables/ConversationArea';
 import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
@@ -21,6 +22,8 @@ function interactableTypeForObjectType(type: string): any {
     return ViewingArea;
   } else if (type === 'GameArea') {
     return GameArea;
+  } else if (type === 'AuctionHouseArea') {
+    return AuctionHouseArea;
   } else {
     throw new Error(`Unknown object type: ${type}`);
   }
