@@ -4,7 +4,6 @@ import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
 import { ArtAuctionAccountInfoWrapper } from './ArtAuctionAccountInfo';
 import LogoutButton from './LogoutButton';
-import SingupLoginWrapper from './SignupLoginForm';
 
 export default function SocialSidebar(): JSX.Element {
   return (
@@ -25,7 +24,6 @@ export default function SocialSidebar(): JSX.Element {
       <ConversationAreasList />
       <ArtAuctionAccountInfoWrapper />
       <LogoutButton />
-      <SingupLoginWrapper />
     </VStack>
   );
 }
