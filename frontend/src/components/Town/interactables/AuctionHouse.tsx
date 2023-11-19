@@ -39,6 +39,14 @@ export default function AuctionHouseAreaWrapper(): JSX.Element {
   const townController = useTownController();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  useEffect(() => {
+    if (auctionHouseArea) {
+      townController.pause();
+    } else {
+      townController.unPause();
+    }
+  }, [townController, auctionHouseArea]);
+
   townController.addListener('loginStatus', success => {
     if (success) {
       setIsLoggedIn(true);
@@ -61,7 +69,13 @@ export default function AuctionHouseAreaWrapper(): JSX.Element {
 
   if (auctionHouseArea && auctionHouseArea.getData('type') === 'AuctionHouse') {
     return (
-      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
+      <Modal
+        isOpen={true}
+        onClose={() => {
+          closeModal();
+          townController.unPause();
+        }}
+        closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
           {isLoggedIn ? (
