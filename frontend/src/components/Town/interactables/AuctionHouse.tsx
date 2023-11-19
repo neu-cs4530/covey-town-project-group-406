@@ -5,6 +5,7 @@ import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import { AuctionFloorArea, AuctionHouseArea } from '../../../types/CoveyTownSocket';
 import AuctionHouseAreaInteractable from './AuctionHouseArea';
+import SignupSignIn from '../../Login/ArtAuctionHouseLogin/SignupSignIn';
 
 function AuctionHouseComponent({
   controller,
@@ -36,6 +37,20 @@ function AuctionHouseComponent({
 export default function AuctionHouseAreaWrapper(): JSX.Element {
   const auctionHouseArea = useInteractable<AuctionHouseAreaInteractable>('auctionHouseArea');
   const townController = useTownController();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  townController.addListener('loginStatus', success => {
+    if (success) {
+      setIsLoggedIn(true);
+    }
+  });
+
+  townController.addListener('userLogoutStatus', success => {
+    if (success) {
+      setIsLoggedIn(false);
+    }
+  });
+
   const closeModal = useCallback(() => {
     if (auctionHouseArea) {
       townController.interactEnd(auctionHouseArea);
@@ -49,11 +64,20 @@ export default function AuctionHouseAreaWrapper(): JSX.Element {
       <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{auctionHouseArea.name}</ModalHeader>
-          <ModalCloseButton />
-          <AuctionHouseComponent
-            controller={townController.getAuctionHouseAreaController(auctionHouseArea)}
-          />
+          {isLoggedIn ? (
+            <>
+              <ModalHeader>{auctionHouseArea.name}</ModalHeader>
+              <ModalCloseButton />
+              <AuctionHouseComponent
+                controller={townController.getAuctionHouseAreaController(auctionHouseArea)}
+              />
+            </>
+          ) : (
+            <>
+              <ModalCloseButton />
+              <SignupSignIn />
+            </>
+          )}
         </ModalContent>
       </Modal>
     );

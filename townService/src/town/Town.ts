@@ -19,7 +19,6 @@ import {
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
-import AuctionFloor from './AuctionFloor/AuctionFloor';
 import AuctionHouse from './AuctionHouse/AuctionHouse';
 import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
