@@ -11,9 +11,11 @@ import TownsStore from './lib/TownsStore';
 import { ClientToServerEvents, ServerToClientEvents } from './types/CoveyTownSocket';
 import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
+import SingletonArtworkDAO from './db/SingletonArtworkDAO';
 
 // Create the server instances
 const app = Express();
+const dao = SingletonArtworkDAO.instance();
 app.use(CORS());
 const server = http.createServer(app);
 const socketServer = new SocketServer<ClientToServerEvents, ServerToClientEvents>(server, {
@@ -40,6 +42,8 @@ app.use('/docs', swaggerUi.serve, async (_req: Express.Request, res: Express.Res
 
 // Register the TownsController routes with the express server
 RegisterRoutes(app);
+
+await dao.logOutAllPlayers();
 
 // Add a middleware for Express to handle errors
 app.use(

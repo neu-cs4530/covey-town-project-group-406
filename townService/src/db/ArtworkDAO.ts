@@ -1,4 +1,5 @@
 import { FieldValue } from 'firebase-admin/firestore';
+import { resolve6 } from 'dns';
 import { Artwork } from '../types/CoveyTownSocket';
 import IArtworkDAO from './IArtworkDAO';
 import SingletonDBConnection from './SingletonDBConnection';
@@ -249,6 +250,19 @@ export default class ArtworkDAO implements IArtworkDAO {
       return { artworks: data.artworks, money: data.money, isLoggedIn: data.isLoggedIn };
     }
     throw new Error('cannot find user data');
+  }
+
+  public async logOutAllPlayers(): Promise<void> {
+    const playersResponse = await this._db.collection(this.userCollection).get();
+    const { docs } = playersResponse;
+
+    await Promise.all(
+      docs.map(async doc => {
+        await this._db.collection(this.userCollection).doc(doc.id).update({
+          isLoggedIn: false,
+        });
+      }),
+    );
   }
 
   /**
