@@ -80,8 +80,8 @@ export default class AuctionHouse extends InteractableArea {
     throw new Error('no floor with ID found');
   }
 
-  public async addArtworksToAuctionHouse(artworks: Artwork[]) {
-    await this._dao.addArtworksToAuctionHouse(artworks);
+  public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
+    await this._dao.addArtworksToAuctionHouse(artworks, endIndex);
     const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
   }

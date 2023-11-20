@@ -1,5 +1,4 @@
 import { FieldValue } from 'firebase-admin/firestore';
-import { resolve6 } from 'dns';
 import { Artwork } from '../types/CoveyTownSocket';
 import IArtworkDAO from './IArtworkDAO';
 import SingletonDBConnection from './SingletonDBConnection';
@@ -11,13 +10,13 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   auctionHouseCollection = 'AuctionHouse';
 
+  indexCollection = 'index';
+
   private _db: FirebaseFirestore.Firestore;
 
   public constructor() {
     this._db = SingletonDBConnection.instance();
   }
-
-  indexCollection = 'index';
 
   /**
    * Gets a specific artwork from a user

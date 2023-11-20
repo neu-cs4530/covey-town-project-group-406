@@ -26,6 +26,7 @@ import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
 import ArtworkDAO from '../db/ArtworkDAO';
 import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
+import APIUtils from '../api/APIUtils';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -409,38 +410,10 @@ export default class Town {
           AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
         }
       } catch (err) {
-        await area.addArtworksToAuctionHouse([
-          {
-            description: 'Its stary night',
-            id: 2,
-            primaryImage: 'starynight.png',
-            purchasePrice: 10000,
-            department: 'unknown',
-            title: 'Stary Night',
-            culture: 'unknown',
-            period: '1800',
-            artist: { name: 'Van Gogh' },
-            medium: 'Canvas',
-            countryOfOrigin: 'France',
-            isBeingAuctioned: false,
-            purchaseHistory: [],
-          },
-          {
-            description: 'Its the Mona Lisa',
-            id: 1,
-            primaryImage: 'monalisa.png',
-            purchasePrice: 5000,
-            department: 'unknown',
-            title: 'The mona lisa',
-            culture: 'unknown',
-            period: '1500',
-            artist: { name: 'da Vinci' },
-            medium: 'Canvas',
-            countryOfOrigin: 'Italy',
-            isBeingAuctioned: false,
-            purchaseHistory: [],
-          },
-        ]);
+        const utils = new APIUtils();
+        const index = await this._dao.getArtworkIndex();
+        const artworks = await utils.nextArtworks(index, index + 10);
+        await area.addArtworksToAuctionHouse(artworks, index);
       }
 
       await area.createNewAuctionFloorNonPlayer(10000);

@@ -55,9 +55,11 @@ const dao = SingletonArtworkDAO.instance();
 const VAL1 = nanoid();
 const VAL2 = nanoid();
 const VAL3 = nanoid();
+const VAL4 = nanoid();
 dao.userCollection = VAL1;
 dao.artworkIDsCollection = VAL2;
 dao.auctionHouseCollection = VAL3;
+dao.indexCollection = VAL4;
 
 describe('when adding artwork to an auction house', () => {
   afterEach(async () => {
