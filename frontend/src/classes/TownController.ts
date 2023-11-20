@@ -677,7 +677,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             );
           } else if (isAuctionHouseArea(eachInteractable)) {
             this._interactableControllers.push(
-              new AuctionHouseAreaController(eachInteractable.id, eachInteractable.floors),
+              new AuctionHouseAreaController(eachInteractable.id, eachInteractable.floors, this),
             );
           }
         });

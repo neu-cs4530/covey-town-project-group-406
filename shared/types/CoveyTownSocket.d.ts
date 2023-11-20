@@ -54,10 +54,10 @@ export type AuctionFloorArea = {
   minBid: number;
   artBeingAuctioned: Artwork;
   timeLeft: number;
-  currentBid: { player: PlayerModel; bid: number } | undefined;
-  auctioneer: PlayerModel | undefined;
-  observers: PlayerModel[];
-  bidders: PlayerModel[];
+  currentBid: { player: Player; bid: number } | undefined;
+  auctioneer: Player | undefined;
+  observers: Player[];
+  bidders: Player[];
 };
 
 export type ArtAuctionAccount = {
@@ -244,6 +244,8 @@ export type InteractableCommand =
   | JoinGameCommand
   | GameMoveCommand<TicTacToeMove>
   | LeaveGameCommand
+  | JoinAuctionFloorCommand
+  | LeaveAuctionFloorCommand
   | AuctionHouseLoginCommand;
 
 export interface AuctionHouseLoginCommand {
@@ -261,6 +263,14 @@ export interface JoinGameCommand {
 export interface LeaveGameCommand {
   type: "LeaveGame";
   gameID: GameInstanceID;
+}
+export interface JoinAuctionFloorCommand {
+  type: "JoinAuctionFloor";
+  floor: AuctionFloorArea;
+}
+export interface LeaveAuctionFloorCommand {
+  type: "LeaveAuctionFloor";
+  floor: AuctionFloorArea;
 }
 export interface GameMoveCommand<MoveType> {
   type: "GameMove";

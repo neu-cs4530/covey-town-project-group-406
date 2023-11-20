@@ -1,13 +1,28 @@
-import { Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/react';
+import {
+  Button,
+  Modal,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  UnorderedList,
+  ListItem,
+  Divider,
+  Badge,
+  Spinner,
+} from '@chakra-ui/react';
+import { Typography } from '@material-ui/core';
 import React, { useCallback, useEffect, useState } from 'react';
-import AuctionHouseAreaController from '../../../classes/interactable/AuctionHouseAreaController';
-import { useInteractable } from '../../../classes/TownController';
-import useTownController from '../../../hooks/useTownController';
-import { AuctionFloorArea, AuctionHouseArea } from '../../../types/CoveyTownSocket';
-import AuctionHouseAreaInteractable from './AuctionHouseArea';
-import SignupSignIn from '../../Login/ArtAuctionHouseLogin/SignupSignIn';
+import AuctionHouseAreaController from '../../../../classes/interactable/AuctionHouseAreaController';
+import { useInteractable } from '../../../../classes/TownController';
+import useTownController from '../../../../hooks/useTownController';
+import { AuctionFloorArea, AuctionHouseArea } from '../../../../types/CoveyTownSocket';
+import AuctionHouseAreaInteractable from '../AuctionHouseArea';
+import SignupSignIn from '../../../Login/ArtAuctionHouseLogin/SignupSignIn';
+import AuctionFloorCard from './AuctionFloorCard';
+import ArtworkDisplay from './ArtworkDisplay';
 
-function AuctionHouseComponent({
+function ArtAuctionHouseArea({
   controller,
 }: {
   controller: AuctionHouseAreaController;
@@ -17,7 +32,7 @@ function AuctionHouseComponent({
 
   useEffect(() => {
     const handleChanged = (model: AuctionHouseArea) => {
-      setFloors(model.floors);
+      setFloors(model.floors)
     };
 
     controller.addListener('interactableAreaChanged', handleChanged);
@@ -31,7 +46,12 @@ function AuctionHouseComponent({
     };
   }, [controller, townController]);
 
-  return <div>Hello auction house! We have {floors.length} floors!</div>;
+
+  return (
+    <div>
+      Hello! We have {floors.length} floors!
+    </div>
+  );
 }
 
 export default function AuctionHouseAreaWrapper(): JSX.Element {
@@ -75,14 +95,15 @@ export default function AuctionHouseAreaWrapper(): JSX.Element {
           closeModal();
           townController.unPause();
         }}
-        closeOnOverlayClick={false}>
+        closeOnOverlayClick={false}
+        size='6xl'>
         <ModalOverlay />
         <ModalContent>
           {isLoggedIn ? (
             <>
               <ModalHeader>{auctionHouseArea.name}</ModalHeader>
               <ModalCloseButton />
-              <AuctionHouseComponent
+              <ArtAuctionHouseArea
                 controller={townController.getAuctionHouseAreaController(auctionHouseArea)}
               />
             </>
