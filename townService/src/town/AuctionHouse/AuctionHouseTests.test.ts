@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
+import { AuthorizationDocumentContext } from 'twilio/lib/rest/preview/hosted_numbers/authorizationDocument';
 import { TownEmitter, Artwork } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
 import AuctionHouse from './AuctionHouse';
