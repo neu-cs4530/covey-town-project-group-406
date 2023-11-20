@@ -44,11 +44,11 @@ export interface Player {
   artAuctionAccount: ArtAuctionAccount | undefined;
 }
 
-export interface AuctionHouseModel extends Interactable {
-  floors: AuctionFloorModel[];
+export interface AuctionHouseArea extends Interactable {
+  floors: AuctionFloorArea[];
 }
 
-export type AuctionFloorModel = {
+export type AuctionFloorArea = {
   id: string;
   status: Status;
   minBid: number;
@@ -243,7 +243,14 @@ export type InteractableCommand =
   | ViewingAreaUpdateCommand
   | JoinGameCommand
   | GameMoveCommand<TicTacToeMove>
-  | LeaveGameCommand;
+  | LeaveGameCommand
+  | AuctionHouseLoginCommand;
+
+export interface AuctionHouseLoginCommand {
+  type: "auctionHouseLogin";
+  player: Player;
+}
+
 export interface ViewingAreaUpdateCommand {
   type: "ViewingAreaUpdate";
   update: ViewingArea;
@@ -289,6 +296,14 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
+  auctionHouseLoginResponse: (response: {
+    success: boolean;
+    email: string;
+    artworks: Artwork[] | undefined;
+    money: number | undefined;
+  }) => void;
+  auctionHouseCreateUserResponse: (success: boolean) => void;
+  auctionHouseLogoutCommandResponse: (success: boolean) => void;
 }
 
 export interface ClientToServerEvents {
@@ -297,5 +312,18 @@ export interface ClientToServerEvents {
   interactableUpdate: (update: Interactable) => void;
   interactableCommand: (
     command: InteractableCommand & InteractableCommandBase
+  ) => void;
+  auctionHouseLoginCommand: (email: string, playerID: string) => void;
+  auctionHouseCreateUserCommand: (email: string, playerID: string) => void;
+  auctionHouseLogoutCommand: (email: string, playerID: string) => void;
+  auctionHouseJoinAuctionFloorCommand: (
+    floorID: number,
+    asBidder: boolean
+  ) => void;
+  auctionHouseLeaveAuctionFloorCommand: (floorID: number) => void;
+  auctionHouseMakeBidCommand: (floorID: number, bid: number) => void;
+  auctionHouseCreateAuctionFloorPlayerCommand: (
+    artwork: Artwork,
+    minBid: number
   ) => void;
 }

@@ -2,10 +2,10 @@ import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
 import Player from '../../lib/Player';
 import { Artwork, TownEmitter } from '../../types/CoveyTownSocket';
-import ArtworkDAO from '../../db/ArtworkDAO';
 import AuctionFloor from './AuctionFloor';
+import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
 
-const dao = new ArtworkDAO();
+const dao = SingletonArtworkDAO.instance();
 dao.userCollection = nanoid();
 dao.artworkIDsCollection = nanoid();
 dao.auctionHouseCollection = nanoid();

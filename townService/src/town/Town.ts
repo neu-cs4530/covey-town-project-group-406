@@ -19,10 +19,13 @@ import {
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
+import AuctionHouse from './AuctionHouse/AuctionHouse';
 import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import ArtworkDAO from '../db/ArtworkDAO';
+import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -93,6 +96,8 @@ export default class Town {
 
   private _connectedSockets: Set<CoveyTownSocket> = new Set();
 
+  private _dao: ArtworkDAO;
+
   constructor(
     friendlyName: string,
     isPubliclyListed: boolean,
@@ -105,6 +110,7 @@ export default class Town {
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
     this._broadcastEmitter = broadcastEmitter;
+    this._dao = SingletonArtworkDAO.instance();
   }
 
   /**
@@ -128,9 +134,18 @@ export default class Town {
     // Register an event listener for the client socket: if the client disconnects,
     // clean up our listener adapter, and then let the CoveyTownController know that the
     // player's session is disconnected
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
       this._removePlayer(newPlayer);
       this._connectedSockets.delete(socket);
+      try {
+        const playerFromDB = await this._dao.getPlayer(newPlayer.email);
+        await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money);
+      } catch (err) {
+        if (err instanceof Error) {
+          // eslint-disable-next-line no-console
+          console.log(err.message);
+        }
+      }
     });
 
     // Set up a listener to forward all chat messages to all clients in the town
@@ -159,6 +174,72 @@ export default class Town {
         if (viewingArea) {
           (viewingArea as ViewingArea).updateModel(update);
         }
+      }
+    });
+
+    socket.on('auctionHouseCreateUserCommand', async (email: string, playerID: string) => {
+      try {
+        await this._dao.addPlayer(email);
+        for (const player of this.players) {
+          if (player.id === playerID) {
+            player.initializeArtAuctionAccount(email);
+          }
+        }
+        socket.emit('auctionHouseCreateUserResponse', true);
+      } catch (err) {
+        socket.emit('auctionHouseCreateUserResponse', false);
+      }
+    });
+
+    socket.on('auctionHouseLoginCommand', async (email: string, playerID: string) => {
+      try {
+        const dbPlayer = await this._dao.getPlayer(email);
+        if (!dbPlayer.isLoggedIn) {
+          await this._dao.updatePlayer(email, true, dbPlayer.money);
+          for (const player of this.players) {
+            if (player.id === playerID) {
+              player.initializeArtAuctionAccount(email);
+              player.wallet.money = dbPlayer.money;
+              player.wallet.artwork = dbPlayer.artworks;
+              player.calculateNetWorth();
+            }
+          }
+          socket.emit('auctionHouseLoginResponse', {
+            email,
+            success: true,
+            money: dbPlayer.money,
+            artworks: dbPlayer.artworks,
+          });
+        } else {
+          socket.emit('auctionHouseLoginResponse', {
+            email,
+            success: false,
+            money: undefined,
+            artworks: undefined,
+          });
+        }
+      } catch (err) {
+        socket.emit('auctionHouseLoginResponse', {
+          email,
+          success: false,
+          money: undefined,
+          artworks: undefined,
+        });
+      }
+    });
+
+    socket.on('auctionHouseLogoutCommand', async (email: string, playerID: string) => {
+      try {
+        const dbPlayer = await this._dao.getPlayer(email);
+        await this._dao.updatePlayer(email, false, dbPlayer.money);
+        for (const player of this.players) {
+          if (player.id === playerID) {
+            player.uninitializeArtAuctionAccount();
+          }
+        }
+        socket.emit('auctionHouseLogoutCommandResponse', true);
+      } catch (err) {
+        socket.emit('auctionHouseLogoutCommandResponse', false);
       }
     });
 
@@ -301,6 +382,76 @@ export default class Town {
     return true;
   }
 
+  // TODO - refactor this method once API is setup
+  public async addAuctionHouseArea(interactable: Interactable): Promise<boolean> {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === interactable.id,
+    ) as AuctionHouse;
+    if (!area) {
+      return false;
+    }
+    area.addPlayersWithinBounds(this._players);
+
+    if (AuctionHouse.artworkToBeAuctioned.length === 0) {
+      const results = [];
+      try {
+        const artworks = await this._dao.getAllAuctionHouseArtworks();
+        for (const artwork of artworks) {
+          results.push(
+            this._dao.updateAuctionHouseArtworkByID({
+              ...artwork,
+              isBeingAuctioned: false,
+            }),
+          );
+        }
+        await Promise.all(results);
+        for (const artwork of artworks) {
+          AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
+        }
+      } catch (err) {
+        await area.addArtworksToAuctionHouse([
+          {
+            description: 'Its stary night',
+            id: 2,
+            primaryImage: 'starynight.png',
+            purchasePrice: 10000,
+            department: 'unknown',
+            title: 'Stary Night',
+            culture: 'unknown',
+            period: '1800',
+            artist: { name: 'Van Gogh' },
+            medium: 'Canvas',
+            countryOfOrigin: 'France',
+            isBeingAuctioned: false,
+            purchaseHistory: [],
+          },
+          {
+            description: 'Its the Mona Lisa',
+            id: 1,
+            primaryImage: 'monalisa.png',
+            purchasePrice: 5000,
+            department: 'unknown',
+            title: 'The mona lisa',
+            culture: 'unknown',
+            period: '1500',
+            artist: { name: 'da Vinci' },
+            medium: 'Canvas',
+            countryOfOrigin: 'Italy',
+            isBeingAuctioned: false,
+            purchaseHistory: [],
+          },
+        ]);
+      }
+
+      await area.createNewAuctionFloorNonPlayer(10000);
+      await area.createNewAuctionFloorNonPlayer(5000);
+    }
+
+    // console.log(area.toModel())
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
   /**
    * Creates a new viewing area in this town if there is not currently an active
    * viewing area with the same ID. The viewing area ID must match the name of a
@@ -400,6 +551,10 @@ export default class Town {
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
 
+    const auctionHouseAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'AuctionHouseArea')
+      .map(eachConvAreaObj => AuctionHouse.fromMapObject(eachConvAreaObj, this._broadcastEmitter));
+
     const gameAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'GameArea')
       .map(eachGameAreaObj => GameAreaFactory(eachGameAreaObj, this._broadcastEmitter));
@@ -407,7 +562,8 @@ export default class Town {
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)
-      .concat(gameAreas);
+      .concat(gameAreas)
+      .concat(auctionHouseAreas);
     this._validateInteractables();
   }
 

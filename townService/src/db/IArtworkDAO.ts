@@ -1,5 +1,4 @@
 import { Artwork } from '../types/CoveyTownSocket';
-
 /*
   Interface for the Data access object that interacts with the database to get player and artwork info
 */

@@ -1,10 +1,9 @@
 import { mock } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { Artwork, TownEmitter } from '../types/CoveyTownSocket';
-import ArtworkDAO from './ArtworkDAO';
 import Player from '../lib/Player';
 import APIUtils from '../api/APIUtils';
-import AuctionFloor from '../town/AuctionFloor/AuctionFloor';
+import SingletonArtworkDAO from './SingletonArtworkDAO';
 
 const testArtwork: Artwork = {
   description: 'Its the Mona Lisa',
@@ -52,7 +51,7 @@ const testArtwork3: Artwork = {
   isBeingAuctioned: false,
   purchaseHistory: [],
 };
-const dao = new ArtworkDAO();
+const dao = SingletonArtworkDAO.instance();
 const VAL1 = nanoid();
 const VAL2 = nanoid();
 const VAL3 = nanoid();
@@ -126,6 +125,40 @@ describe('when trying to add artworks to a player', () => {
     expect(playerArtworks).toContainEqual(testArtwork3);
     expect(playerArtworks).toHaveLength(3);
     await dao.removePlayer(player.email);
+  });
+});
+
+describe('when logging all players out', () => {
+  let player: Player;
+  let player2: Player;
+  beforeEach(() => {
+    player = new Player(nanoid(), mock<TownEmitter>());
+    player.initializeArtAuctionAccount('player@gmail.com');
+
+    player2 = new Player(nanoid(), mock<TownEmitter>());
+    player2.initializeArtAuctionAccount('player2@gmail.com');
+  });
+  it('works with multiple players in the database', async () => {
+    await dao.addPlayer(player.email);
+    await dao.addArtworksToPlayer(player.email, [testArtwork, testArtwork2]);
+    await dao.updatePlayer(player.email, true, 1);
+
+    await dao.addPlayer(player2.email);
+    await dao.addArtworksToPlayer(player2.email, [testArtwork3]);
+    await dao.updatePlayer(player2.email, true, 10);
+
+    await dao.logOutAllPlayers();
+
+    const dbPlayer = await dao.getPlayer(player.email);
+    const dbPlayer2 = await dao.getPlayer(player2.email);
+
+    expect(dbPlayer.isLoggedIn).toBe(false);
+    expect(dbPlayer2.isLoggedIn).toBe(false);
+    await dao.removePlayer(player.email);
+    await dao.removePlayer(player2.email);
+  });
+  it('does not throw error when no players in database', async () => {
+    await dao.logOutAllPlayers();
   });
 });
 

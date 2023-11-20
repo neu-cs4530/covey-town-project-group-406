@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
+import AuctionHouseArea from '../components/Town/interactables/AuctionHouseArea';
 import ConversationArea from '../components/Town/interactables/ConversationArea';
 import GameArea from '../components/Town/interactables/GameArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
@@ -13,10 +14,11 @@ import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
+  Artwork,
   ChatMessage,
   CoveyTownSocket,
   GameState,
-  Interactable as InteractableAreaModel,
+  Interactable as InteractableArea,
   InteractableCommand,
   InteractableCommandBase,
   InteractableCommandResponse,
@@ -26,7 +28,13 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isTicTacToeArea, isViewingArea } from '../types/TypeUtils';
+import {
+  isAuctionHouseArea,
+  isConversationArea,
+  isTicTacToeArea,
+  isViewingArea,
+} from '../types/TypeUtils';
+import AuctionHouseAreaController from './interactable/AuctionHouseAreaController';
 import ConversationAreaController from './interactable/ConversationAreaController';
 import GameAreaController, { GameEventTypes } from './interactable/GameAreaController';
 import InteractableAreaController, {
@@ -100,6 +108,17 @@ export type TownEvents = {
    * @param obj the interactable that is being interacted with
    */
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
+
+  /**
+   * represents if a login was successful or not
+   * @param success status of login
+   * @returns true if the player logged in, false otherwise
+   */
+  loginStatus: (success: boolean) => void;
+
+  createUserStatus: (success: boolean) => void;
+
+  userLogoutStatus: (success: boolean) => void;
 };
 
 /**
@@ -143,7 +162,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableControllers: InteractableAreaController<
     BaseInteractableEventMap,
-    InteractableAreaModel
+    InteractableArea
   >[] = [];
 
   /**
@@ -312,6 +331,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return ret as ConversationAreaController[];
   }
 
+  public get auctionHouseAreas(): AuctionHouseAreaController[] {
+    const ret = this._interactableControllers.filter(
+      eachInteractable => eachInteractable instanceof AuctionHouseAreaController,
+    );
+    return ret as AuctionHouseAreaController[];
+  }
+
   public get interactableEmitter() {
     return this._interactableEmitter;
   }
@@ -434,10 +460,38 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           if (activeBefore !== activeNow) {
             this.emit('interactableAreasChanged');
           }
+          controller.emit('interactableAreaChanged', interactable);
         }
       } catch (err) {
         console.error('Error updating interactable', interactable);
         console.trace(err);
+      }
+    });
+
+    this._socket.on('auctionHouseLoginResponse', response => {
+      if (response.success) {
+        this.ourPlayer.artAuctionAccount = {
+          email: response.email,
+          wallet: {
+            money: response.money as number,
+            networth: 1,
+            artwork: response.artworks as Artwork[],
+          },
+        };
+      }
+      this.emit('loginStatus', response.success);
+    });
+
+    this._socket.on('auctionHouseCreateUserResponse', success => {
+      this.emit('createUserStatus', success);
+    });
+
+    this._socket.on('auctionHouseLogoutCommandResponse', success => {
+      if (success) {
+        this.ourPlayer.artAuctionAccount = undefined;
+        this.emit('userLogoutStatus', success);
+      } else {
+        this.emit('userLogoutStatus', success);
       }
     });
   }
@@ -513,6 +567,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
   }
 
+  public sendSignupCommand(email: string) {
+    this._socket.emit('auctionHouseCreateUserCommand', email, this.ourPlayer.id);
+  }
+
+  public sendLoginCommand(email: string) {
+    this._socket.emit('auctionHouseLoginCommand', email, this.ourPlayer.id);
+  }
+
+  public sendLogoutCommand(email: string) {
+    this._socket.emit('auctionHouseLogoutCommand', email, this.ourPlayer.id);
+  }
+
   /**
    * Update the settings of the current town. Sends the request to update the settings to the townService,
    * and does not update the local model. If the update is successful, then the townService will inform us
@@ -547,6 +613,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   async createConversationArea(newArea: { topic?: string; id: string; occupants: Array<string> }) {
     await this._townsService.createConversationArea(this.townID, this.sessionToken, newArea);
+  }
+
+  async createAuctionHouseArea(newArea: { id: string; occupants: Array<string> }) {
+    await this._townsService.createAuctionHouseArea(this.townID, this.sessionToken, newArea);
   }
 
   /**
@@ -605,6 +675,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this._interactableControllers.push(
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
+          } else if (isAuctionHouseArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new AuctionHouseAreaController(eachInteractable.id, eachInteractable.floors),
+            );
           }
         });
         this._userID = initialData.userID;
@@ -616,6 +690,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         reject(new Error('Invalid town ID'));
       });
     });
+  }
+
+  public getAuctionHouseAreaController(
+    auctionHouseArea: AuctionHouseArea,
+  ): AuctionHouseAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === auctionHouseArea.name,
+    );
+    if (existingController instanceof AuctionHouseAreaController) {
+      return existingController;
+    } else {
+      throw new Error(`No such auction house area controller ${existingController}`);
+    }
   }
 
   /**

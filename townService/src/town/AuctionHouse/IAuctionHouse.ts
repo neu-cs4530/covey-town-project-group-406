@@ -1,4 +1,4 @@
-import { InteractableType, Artwork, AuctionHouseModel } from '../../types/CoveyTownSocket';
+import { InteractableType, Artwork, AuctionHouseArea } from '../../types/CoveyTownSocket';
 import Player from '../../lib/Player';
 
 /**
@@ -6,6 +6,10 @@ import Player from '../../lib/Player';
  * This is the main interactable component we are implementing for covey.town
  */
 export default interface IAuctionHouse {
+  /**
+   * leaves an auction floor if they are an observer, or removes the auction floor if they are auctioneer
+   */
+  leaveAuctionFloor(player: Player, floorID: string): void;
   /**
    * This method sets the artworks in the auction house that are available to go on auction
    * @param artworks the artworks to set
@@ -53,5 +57,5 @@ export default interface IAuctionHouse {
   /**
    * Model to send to the frontend
    */
-  toModel(): AuctionHouseModel;
+  toModel(): AuctionHouseArea;
 }
