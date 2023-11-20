@@ -7,6 +7,10 @@ import Player from '../../lib/Player';
  */
 export default interface IAuctionHouse {
   /**
+   * leaves an auction floor if they are an observer, or removes the auction floor if they are auctioneer
+   */
+  leaveAuctionFloor(player: Player, floorID: string): void;
+  /**
    * This method sets the artworks in the auction house that are available to go on auction
    * @param artworks the artworks to set
    */

@@ -14,6 +14,7 @@ import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
+  Artwork,
   ChatMessage,
   CoveyTownSocket,
   GameState,
@@ -107,6 +108,17 @@ export type TownEvents = {
    * @param obj the interactable that is being interacted with
    */
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
+
+  /**
+   * represents if a login was successful or not
+   * @param success status of login
+   * @returns true if the player logged in, false otherwise
+   */
+  loginStatus: (success: boolean) => void;
+
+  createUserStatus: (success: boolean) => void;
+
+  userLogoutStatus: (success: boolean) => void;
 };
 
 /**
@@ -455,6 +467,33 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         console.trace(err);
       }
     });
+
+    this._socket.on('auctionHouseLoginResponse', response => {
+      if (response.success) {
+        this.ourPlayer.artAuctionAccount = {
+          email: response.email,
+          wallet: {
+            money: response.money as number,
+            networth: 1,
+            artwork: response.artworks as Artwork[],
+          },
+        };
+      }
+      this.emit('loginStatus', response.success);
+    });
+
+    this._socket.on('auctionHouseCreateUserResponse', success => {
+      this.emit('createUserStatus', success);
+    });
+
+    this._socket.on('auctionHouseLogoutCommandResponse', success => {
+      if (success) {
+        this.ourPlayer.artAuctionAccount = undefined;
+        this.emit('userLogoutStatus', success);
+      } else {
+        this.emit('userLogoutStatus', success);
+      }
+    });
   }
 
   /**
@@ -526,6 +565,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       this._socket.on('commandResponse', ackListener);
       this._socket.emit('interactableCommand', commandMessage);
     });
+  }
+
+  public sendSignupCommand(email: string) {
+    this._socket.emit('auctionHouseCreateUserCommand', email, this.ourPlayer.id);
+  }
+
+  public sendLoginCommand(email: string) {
+    this._socket.emit('auctionHouseLoginCommand', email, this.ourPlayer.id);
+  }
+
+  public sendLogoutCommand(email: string) {
+    this._socket.emit('auctionHouseLogoutCommand', email, this.ourPlayer.id);
   }
 
   /**

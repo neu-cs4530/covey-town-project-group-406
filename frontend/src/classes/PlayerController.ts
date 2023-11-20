@@ -19,7 +19,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private readonly _userName: string;
 
-  private readonly _artAuctionAccount: ArtAuctionAccount | undefined;
+  private _artAuctionAccount: ArtAuctionAccount | undefined;
 
   public gameObjects?: PlayerGameObjects;
 
@@ -39,6 +39,14 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   get location(): PlayerLocation {
     return this._location;
+  }
+
+  set artAuctionAccount(a: ArtAuctionAccount | undefined) {
+    this._artAuctionAccount = a;
+  }
+
+  get artAuctionAccount(): ArtAuctionAccount | undefined {
+    return this._artAuctionAccount;
   }
 
   get userName(): string {

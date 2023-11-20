@@ -3,10 +3,11 @@ import Player from '../../lib/Player';
 import { Player as PlayerModel, Artwork, AuctionFloorArea } from '../../types/CoveyTownSocket';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import IAuctionFloor, { Status, Bid } from './IAuctionFloor';
+import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
+// import singleton class
 
 export default class AuctionFloor extends EventEmitter implements IAuctionFloor {
-  // DAO instance
-  static DAO = new ArtworkDAO();
+  private _dao: ArtworkDAO;
 
   // The ID of this auction floor (unique using nanoid())
   private _id: string;
@@ -127,6 +128,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     this._observers = observers;
     this._bidders = bidders;
     this._minBid = minBid;
+    this._dao = SingletonArtworkDAO.instance();
   }
 
   private _emitAuctionEndEvent(): void {
@@ -152,11 +154,11 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   private async _giveArtworkToBuyer(): Promise<void> {
     if (this._currentBid) {
       const winner = this._currentBid.player;
-      if (winner !== undefined && this._currentBid.player?.email) {
+      if (winner !== undefined && this._currentBid.player.email) {
         const artwork = { ...this._artBeingAuctioned };
         artwork.isBeingAuctioned = false;
         await winner.addArtwork(artwork);
-        await AuctionFloor.DAO.addArtworksToPlayer(this._currentBid.player?.email, [
+        await this._dao.addArtworksToPlayer(this._currentBid.player?.email, [
           this.artBeingAuctioned,
         ]);
       }
@@ -166,7 +168,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
   private async _removeArtworkFromAuctioneer(): Promise<void> {
     if (this._auctioneer) {
       await this._auctioneer.removeArtwork(this._artBeingAuctioned);
-      await AuctionFloor.DAO.removeArtworkFromPlayerById(
+      await this._dao.removeArtworkFromPlayerById(
         this._auctioneer.email,
         this.artBeingAuctioned.id,
       );
@@ -182,11 +184,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     if (this._auctioneer && this._currentBid) {
       this._auctioneer.wallet.money += this._currentBid.bid;
       this._auctioneer.calculateNetWorth();
-      await AuctionFloor.DAO.updatePlayer(
-        this._auctioneer.email,
-        true,
-        this._auctioneer.wallet.money,
-      );
+      await this._dao.updatePlayer(this._auctioneer.email, true, this._auctioneer.wallet.money);
     }
   }
 
@@ -194,7 +192,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     if (this._currentBid !== undefined) {
       this._currentBid.player.wallet.money -= this._currentBid.bid;
       this._currentBid.player.calculateNetWorth();
-      await AuctionFloor.DAO.updatePlayer(
+      await this._dao.updatePlayer(
         this._currentBid.player.email,
         true,
         this._currentBid.player.wallet.money,
