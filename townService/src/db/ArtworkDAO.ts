@@ -1,5 +1,4 @@
 import { FieldValue } from 'firebase-admin/firestore';
-import { resolve6 } from 'dns';
 import { Artwork } from '../types/CoveyTownSocket';
 import IArtworkDAO from './IArtworkDAO';
 import SingletonDBConnection from './SingletonDBConnection';
