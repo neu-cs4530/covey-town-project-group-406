@@ -16,6 +16,7 @@ import InteractableArea from '../InteractableArea';
 import AuctionFloor from '../AuctionFloor/AuctionFloor';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
+import InvalidParametersError from '../../lib/InvalidParametersError';
 
 export default class AuctionHouse extends InteractableArea {
   private _auctionFloors: AuctionFloor[];
@@ -252,7 +253,21 @@ export default class AuctionHouse extends InteractableArea {
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    throw new Error('Method not implemented.');
+    if (command.type === 'JoinAuctionFloor') {
+      if (command.asBidder) {
+        this.joinFloorAsBidder(player, command.floorID);
+      } else {
+        this.joinFloorAsObserver(player, command.floorID);
+      }
+      this._emitAreaChanged();
+    } else if (command.type === 'LeaveAuctionFloor') {
+      this.leaveAuctionFloor(player, command.floorID);
+      this._emitAreaChanged();
+    } else if (command.type === 'MakeBid') {
+      this.makeBid(player, command.floorID, command.bid);
+      this._emitAreaChanged();
+    }
+    throw new InvalidParametersError('Unknown command type');
   }
 
   public static fromMapObject(

@@ -244,11 +244,25 @@ export type InteractableCommand =
   | JoinGameCommand
   | GameMoveCommand<TicTacToeMove>
   | LeaveGameCommand
-  | AuctionHouseLoginCommand;
+  | JoinAuctionFloor
+  | LeaveAuctionFloor
+  | MakeBid;
 
-export interface AuctionHouseLoginCommand {
-  type: "auctionHouseLogin";
-  player: Player;
+export interface JoinAuctionFloor {
+  type: "JoinAuctionFloor"
+  floorID: string;
+  asBidder: boolean;
+}
+
+export interface LeaveAuctionFloor {
+  type: "LeaveAuctionFloor"
+  floorID: string;
+}
+
+export interface MakeBid {
+  type: "MakeBid"
+  floorID: string
+  bid: number
 }
 
 export interface ViewingAreaUpdateCommand {
