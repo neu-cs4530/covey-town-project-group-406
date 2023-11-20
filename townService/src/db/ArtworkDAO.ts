@@ -10,7 +10,7 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   auctionHouseCollection = 'AuctionHouse';
 
-  INDEX_COLLECTION = 'index';
+  indexCollection = 'index';
 
   /**
    * Gets a specific artwork from a user
@@ -191,7 +191,7 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   private async _updateArtworkIDIndex(endIndex: number) {
     await db
-      .collection(this.INDEX_COLLECTION)
+      .collection(this.indexCollection)
       .doc('index')
       .set({ index: endIndex }, { merge: true });
   }
@@ -303,7 +303,7 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   public async getArtworkIndex(): Promise<number> {
     try {
-      const response = await db.collection(this.INDEX_COLLECTION).doc('index').get();
+      const response = await db.collection(this.indexCollection).doc('index').get();
       if (!response.exists) {
         throw new Error('index has not been added');
       }
