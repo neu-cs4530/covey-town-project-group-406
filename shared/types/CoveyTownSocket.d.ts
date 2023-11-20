@@ -54,10 +54,10 @@ export type AuctionFloorArea = {
   minBid: number;
   artBeingAuctioned: Artwork;
   timeLeft: number;
-  currentBid: { player: PlayerModel; bid: number } | undefined;
-  auctioneer: PlayerModel | undefined;
-  observers: PlayerModel[];
-  bidders: PlayerModel[];
+  currentBid: Bid | undefined;
+  auctioneer: Player | undefined;
+  observers: Player[];
+  bidders: Player[];
 };
 
 export type ArtAuctionAccount = {
