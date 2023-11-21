@@ -140,27 +140,28 @@ function ArtAuctionHouseArea({
     }
   };
 
-  const getCurrentBid = (floor: AuctionFloorArea) => {
-    if (floor.status === 'WAITING_TO_START') {
+  const getCurrentBid = () => {
+    const floor = getSelectedFloor();
+    if (floor?.status === 'WAITING_TO_START') {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Starting bid</strong>: ${floor.minBid.toLocaleString()}
+          <strong>Starting bid</strong>: ${floor?.minBid.toLocaleString()}
         </Typography>
       );
-    } else if (floor.status === 'IN_PROGRESS' && floor.currentBid !== undefined) {
+    } else if (floor?.status === 'IN_PROGRESS' && floor?.currentBid !== undefined) {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Current bid</strong>: ${floor.currentBid.bid.toLocaleString()}
+          <strong>Current bid</strong>: ${floor?.currentBid.bid.toLocaleString()}
           <br />
-          <strong>User</strong>: ${floor.currentBid.player}
+          <strong>User</strong>: ${floor?.currentBid.player.artAuctionAccount?.email}
         </Typography>
       );
     } else {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Winning bid</strong>: ${floor.currentBid?.bid.toLocaleString()}
+          <strong>Winning bid</strong>: ${floor?.currentBid?.bid.toLocaleString()}
           <br />
-          <strong>User</strong>: ${floor.currentBid?.player}
+          <strong>User</strong>: ${floor?.currentBid?.player.artAuctionAccount?.email}
         </Typography>
       );
     }
@@ -233,7 +234,7 @@ function ArtAuctionHouseArea({
                   ? selectedFloor.auctioneer.artAuctionAccount?.email
                   : 'Auction House'}
               </Typography>
-              {getCurrentBid(getSelectedFloor() as AuctionFloorArea)}
+              {getCurrentBid()}
               <Typography
                 variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
