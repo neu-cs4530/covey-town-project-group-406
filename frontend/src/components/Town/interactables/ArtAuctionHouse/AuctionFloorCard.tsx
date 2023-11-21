@@ -44,12 +44,14 @@ const AuctionFloorCard = ({
           </Typography>
           {getAuctionStatus()}
           <Button
+            style={{ marginTop: 20 }}
             onClick={async () => {
               await handleClickJoinObserver(floor);
             }}>
             Join as Observer
           </Button>
           <Button
+            style={{ marginTop: 20, marginLeft: 10 }}
             onClick={async () => {
               await handleClickJoinFloorBidder(floor);
             }}>
