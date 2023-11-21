@@ -3,6 +3,7 @@ import {
   AuctionHouseArea as AuctionHouseAreaModel,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
+import TownController from '../TownController';
 import InteractableAreaController, { BaseInteractableEventMap } from './InteractableAreaController';
 
 /**
@@ -10,11 +11,10 @@ import InteractableAreaController, { BaseInteractableEventMap } from './Interact
  * are only ever emitted to local components (not to the townService).
  */
 export type AuctionHouseAreaEvents = BaseInteractableEventMap & {
-  interactableAreaChanged: (model: AuctionHouseAreaModel) => void;
+  floorsChanged: (floors: AuctionFloorArea[]) => void;
+  floorJoined: (floor: AuctionFloorArea) => void;
+  floorLeft: (floor: AuctionFloorArea) => void;
 };
-
-// The special string that will be displayed when a auction house area does not have an artwork set
-// export const NO_ARTWORK_STRING = '(No artwork)';
 
 /**
  * A ConversationAreaController manages the local behavior of a conversation area in the frontend,
@@ -27,14 +27,17 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
 > {
   private _auctionFloors: AuctionFloorArea[];
 
+  private _townController: TownController;
+
   /**
    * Create a new ArtAuctionHouseAreaController
    * @param id
    * @param artwork
    */
-  constructor(id: string, auctionFloors: AuctionFloorArea[]) {
+  constructor(id: string, auctionFloors: AuctionFloorArea[], townController: TownController) {
     super(id);
     this._auctionFloors = auctionFloors;
+    this._townController = townController;
   }
 
   public isActive(): boolean {
@@ -55,8 +58,25 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     return this._auctionFloors;
   }
 
+  public async joinFloor(floor: AuctionFloorArea) {
+    const { floorJoined } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'JoinAuctionFloor',
+      floor: floor,
+    });
+    this.emit('floorJoined', floorJoined);
+  }
+
+  public async leaveFloor(floor: AuctionFloorArea) {
+    const { floorLeft } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'LeaveAuctionFloor',
+      floor: floor,
+    });
+    this.emit('floorLeft', floorLeft);
+  }
+
   protected _updateFrom(newModel: AuctionHouseAreaModel): void {
     this.auctionFloors = newModel.floors;
+    this.emit('floorsChanged', newModel.floors);
   }
 
   /**
@@ -88,10 +108,12 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
   static fromAuctionHouseAreaModel(
     auctionHouseAreaModel: AuctionHouseAreaModel,
     playerFinder: (playerIDs: string[]) => PlayerController[],
+    townController: TownController,
   ): AuctionHouseAreaController {
     const ret = new AuctionHouseAreaController(
       auctionHouseAreaModel.id,
       auctionHouseAreaModel.floors,
+      townController,
     );
     ret.occupants = playerFinder(auctionHouseAreaModel.occupants);
     return ret;

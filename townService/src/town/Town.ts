@@ -515,7 +515,7 @@ export default class Town {
       }
 
       await area.createNewAuctionFloorNonPlayer(10000);
-      await area.createNewAuctionFloorNonPlayer(5000);
+      await area.createNewAuctionFloorNonPlayer(19000);
     }
 
     // console.log(area.toModel())

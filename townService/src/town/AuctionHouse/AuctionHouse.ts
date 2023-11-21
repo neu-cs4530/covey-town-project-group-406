@@ -252,7 +252,29 @@ export default class AuctionHouse extends InteractableArea {
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    throw new Error('Method not implemented.');
+    if (command.type === 'JoinAuctionFloor') {
+      this.joinFloorAsObserver(player, command.floor.id);
+      this._emitAreaChanged();
+      const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
+      if (newFloor === undefined) {
+        throw new Error();
+      }
+
+      return { floorJoined: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
+    }
+
+    if (command.type === 'LeaveAuctionFloor') {
+      this.leaveAuctionFloor(player, command.floor.id);
+      this._emitAreaChanged();
+      const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
+      if (newFloor === undefined) {
+        throw new Error();
+      }
+
+      return { floorLeft: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
+    }
+
+    return undefined as InteractableCommandReturnType<CommandType>;
   }
 
   public static fromMapObject(
