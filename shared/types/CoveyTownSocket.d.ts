@@ -267,6 +267,7 @@ export interface LeaveGameCommand {
 export interface JoinAuctionFloorCommand {
   type: "JoinAuctionFloor";
   floor: AuctionFloorArea;
+  asBidder: boolean;
 }
 export interface LeaveAuctionFloorCommand {
   type: "LeaveAuctionFloor";

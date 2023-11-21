@@ -253,13 +253,16 @@ export default class AuctionHouse extends InteractableArea {
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinAuctionFloor') {
-      this.joinFloorAsObserver(player, command.floor.id);
+      if (command.asBidder) {
+        this.joinFloorAsBidder(player, command.floor.id);
+      } else {
+        this.joinFloorAsObserver(player, command.floor.id);
+      }
       this._emitAreaChanged();
       const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
       if (newFloor === undefined) {
         throw new Error();
       }
-
       return { floorJoined: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
     }
 

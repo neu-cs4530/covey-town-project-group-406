@@ -58,10 +58,11 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     return this._auctionFloors;
   }
 
-  public async joinFloor(floor: AuctionFloorArea) {
+  public async joinFloor(floor: AuctionFloorArea, asBidder: boolean) {
     const { floorJoined } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinAuctionFloor',
       floor: floor,
+      asBidder: asBidder,
     });
     this.emit('floorJoined', floorJoined);
   }

@@ -149,8 +149,8 @@ function ArtAuctionHouseArea({
     }
   };
 
-  const handleFloorSelect = async (floor: AuctionFloorArea) => {
-    await controller.joinFloor(floor);
+  const handleFloorSelect = async (floor: AuctionFloorArea, asBidder: boolean) => {
+    await controller.joinFloor(floor, asBidder);
   };
 
   const handleFloorUnselect = async (floor: AuctionFloorArea) => {
@@ -203,9 +203,7 @@ function ArtAuctionHouseArea({
                   {getAuctionStatus(selectedFloor)}
                 </div>
               </div>
-
               <Divider />
-
               <Typography
                 variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
@@ -214,16 +212,21 @@ function ArtAuctionHouseArea({
                   ? selectedFloor.auctioneer.artAuctionAccount?.email
                   : 'Auction House'}
               </Typography>
-
               {getCurrentBid(selectedFloor)}
-
               <Typography
                 variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
                 Users currently on the same floor
               </Typography>
+              observers
               <UnorderedList>
                 {getSelectedFloor()?.observers.map((o, idx) => (
+                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
+                ))}
+              </UnorderedList>
+              bidders
+              <UnorderedList>
+                {getSelectedFloor()?.bidders.map((o, idx) => (
                   <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
                 ))}
               </UnorderedList>
@@ -283,8 +286,11 @@ function ArtAuctionHouseArea({
                   <AuctionFloorCard
                     key={idx}
                     floor={floor}
-                    handleClick={async () => {
-                      await handleFloorSelect(floor);
+                    handleClickJoinObserver={async () => {
+                      await handleFloorSelect(floor, false);
+                    }}
+                    handleClickJoinFloorBidder={async () => {
+                      await handleFloorSelect(floor, true);
                     }}
                   />
                 ))}

@@ -1,14 +1,19 @@
 import React from 'react';
-import { Badge } from '@chakra-ui/react';
+import { Badge, Button } from '@chakra-ui/react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@material-ui/core';
 import { AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
 interface AuctionFloorCardProps {
   floor: AuctionFloorArea;
-  handleClick: (floor: AuctionFloorArea) => Promise<void>;
+  handleClickJoinObserver: (floor: AuctionFloorArea) => Promise<void>;
+  handleClickJoinFloorBidder: (floor: AuctionFloorArea) => Promise<void>;
 }
 
-const AuctionFloorCard = ({ floor, handleClick }: AuctionFloorCardProps) => {
+const AuctionFloorCard = ({
+  floor,
+  handleClickJoinObserver,
+  handleClickJoinFloorBidder,
+}: AuctionFloorCardProps) => {
   const artwork = floor.artBeingAuctioned;
 
   const getAuctionStatus = () => {
@@ -22,11 +27,7 @@ const AuctionFloorCard = ({ floor, handleClick }: AuctionFloorCardProps) => {
   };
 
   return (
-    <Card
-      style={{ maxWidth: 345 }}
-      onClick={async () => {
-        await handleClick(floor);
-      }}>
+    <Card style={{ maxWidth: 345 }}>
       <CardActionArea>
         <CardMedia
           component='img'
@@ -42,6 +43,18 @@ const AuctionFloorCard = ({ floor, handleClick }: AuctionFloorCardProps) => {
             {artwork.artist.name}
           </Typography>
           {getAuctionStatus()}
+          <Button
+            onClick={async () => {
+              await handleClickJoinObserver(floor);
+            }}>
+            Join as Observer
+          </Button>
+          <Button
+            onClick={async () => {
+              await handleClickJoinFloorBidder(floor);
+            }}>
+            Join as Bidder
+          </Button>
         </CardContent>
       </CardActionArea>
     </Card>
