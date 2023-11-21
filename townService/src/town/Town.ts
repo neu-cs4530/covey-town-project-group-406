@@ -513,10 +513,32 @@ export default class Town {
           },
         ]);
       }
-
-      await area.createNewAuctionFloorNonPlayer(10000);
-      await area.createNewAuctionFloorNonPlayer(19000);
+    } else if (!AuctionHouse.artworkToBeAuctioned.find(a => a.isBeingAuctioned === false)) {
+      await area.addArtworksToAuctionHouse([
+        {
+          description: 'A bouqet of colorful flowers painted by Clara Peters.',
+          id: 827660,
+          primaryImage: 'https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg',
+          purchasePrice: 10000,
+          department: 'European Paintings',
+          title: 'A Bouquet of Flowers',
+          artist: {
+            name: 'Clara Peeters',
+            biography: 'Flemish, Mechelen ca. 1587-after 1636 Ghent',
+            nationality: 'Flemish',
+            begin: '1582',
+            end: '1636',
+            gender: 'Female',
+            wikiUrl: 'https://www.wikidata.org/wiki/Q265398',
+          },
+          medium: 'Paintings',
+          isBeingAuctioned: false,
+          purchaseHistory: [],
+        },
+      ]);
     }
+    await area.createNewAuctionFloorNonPlayer(10000);
+    // await area.createNewAuctionFloorNonPlayer(19000);
 
     // console.log(area.toModel())
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
