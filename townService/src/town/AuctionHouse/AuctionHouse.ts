@@ -263,6 +263,10 @@ export default class AuctionHouse extends InteractableArea {
       if (newFloor === undefined) {
         throw new Error();
       }
+      if (newFloor.bidders.length >= 3) {
+        console.log('starting auction!');
+        newFloor.startAuction();
+      }
       return { floorJoined: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
     }
 

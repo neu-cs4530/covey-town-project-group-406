@@ -38,6 +38,17 @@ function ArtAuctionHouseArea({
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
       setFloors(newFloors);
+      for (const f of newFloors) {
+        console.log('we are on floor', selectedFloor?.id);
+        console.log('floor with id is now', f.id);
+        if (f.id === selectedFloor?.id) {
+          console.log('found floor');
+          if (f.timeLeft === 0) {
+            setSelectedFloor(undefined);
+            console.log('heyo');
+          }
+        }
+      }
     };
 
     const handleFloorJoined = (floor: AuctionFloorArea) => {
@@ -62,7 +73,7 @@ function ArtAuctionHouseArea({
       controller.removeListener('floorJoined', handleFloorJoined);
       controller.removeListener('floorLeft', handleFloorLeft);
     };
-  }, [controller, townController]);
+  }, [controller, townController, selectedFloor?.id]);
 
   // TODO
   const handleAuctionMyArtwork = () => {
@@ -230,6 +241,8 @@ function ArtAuctionHouseArea({
                   <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
                 ))}
               </UnorderedList>
+              time left
+              {getSelectedFloor()?.timeLeft}
             </div>
           </div>
         </div>
