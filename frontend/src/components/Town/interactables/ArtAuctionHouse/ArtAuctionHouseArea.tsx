@@ -10,8 +10,10 @@ import {
   Divider,
   Badge,
   Spinner,
+  useToast,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
+import { signOut } from 'firebase/auth';
 import React, { useCallback, useEffect, useState } from 'react';
 import AuctionHouseAreaController from '../../../../classes/interactable/AuctionHouseAreaController';
 import { useInteractable } from '../../../../classes/TownController';
@@ -21,12 +23,14 @@ import AuctionHouseAreaInteractable from '../AuctionHouseArea';
 import SignupSignIn from '../../../Login/ArtAuctionHouseLogin/SignupSignIn';
 import AuctionFloorCard from './AuctionFloorCard';
 import ArtworkDisplay from './ArtworkDisplay';
+import auth from '../../../../classes/FirestoreConfig';
 
 function ArtAuctionHouseArea({
   controller,
 }: {
   controller: AuctionHouseAreaController;
 }): JSX.Element {
+  const toast = useToast();
   const [floors, setFloors] = useState<AuctionFloorArea[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<AuctionFloorArea | undefined>();
   const townController = useTownController();
@@ -65,9 +69,37 @@ function ArtAuctionHouseArea({
     console.log('User wants to auction their artwork');
   };
 
-  // TODO
+  // logs the user out of the auction house
   const handleLogout = () => {
-    console.log('User logged out');
+    const email = townController.ourPlayer.artAuctionAccount?.email;
+    if (email !== undefined) {
+      townController.once('userLogoutStatus', success => {
+        if (success) {
+          toast({
+            title: 'Log out success!',
+            description: `You are no longer logged in as ${email}`,
+            status: 'info',
+          });
+        } else {
+          toast({
+            title: 'Log out failed',
+            description: `Logging out did not work!`,
+            status: 'error',
+          });
+        }
+      });
+      signOut(auth)
+        .then(() => {
+          townController.sendLogoutCommand(email);
+        })
+        .catch(error => {
+          toast({
+            title: 'Log out failed',
+            description: `${error}`,
+            status: 'error',
+          });
+        });
+    }
   };
 
   const getAuctionStatus = (floor: AuctionFloorArea) => {
