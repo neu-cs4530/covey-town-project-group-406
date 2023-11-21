@@ -246,7 +246,8 @@ export type InteractableCommand =
   | LeaveGameCommand
   | JoinAuctionFloorCommand
   | LeaveAuctionFloorCommand
-  | AuctionHouseLoginCommand;
+  | AuctionHouseLoginCommand
+  | MakeBid;
 
 export interface AuctionHouseLoginCommand {
   type: "auctionHouseLogin";
@@ -273,6 +274,12 @@ export interface LeaveAuctionFloorCommand {
   type: "LeaveAuctionFloor";
   floor: AuctionFloorArea;
 }
+
+export interface MakeBid {
+  type: "MakeBid";
+  floor: AuctionFloorArea;
+  bid: number;
+}
 export interface GameMoveCommand<MoveType> {
   type: "GameMove";
   gameID: GameInstanceID;
@@ -292,6 +299,8 @@ export type InteractableCommandReturnType<
   ? { floorJoined : AuctionFloorArea }
   : CommandType extends LeaveAuctionFloorCommand
   ? { floorLeft : AuctionFloorArea }
+  : CommandType extends MakeBid
+  ? { floor : AuctionFloorArea }
   : never;
 
 export type InteractableCommandResponse<MessageType> = {

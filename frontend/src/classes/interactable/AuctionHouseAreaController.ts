@@ -75,6 +75,14 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     this.emit('floorLeft', floorLeft);
   }
 
+  public async makeBid(floor: AuctionFloorArea, bid: number) {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'MakeBid',
+      floor: floor,
+      bid: bid,
+    });
+  }
+
   protected _updateFrom(newModel: AuctionHouseAreaModel): void {
     this.auctionFloors = newModel.floors;
     this.emit('floorsChanged', newModel.floors);

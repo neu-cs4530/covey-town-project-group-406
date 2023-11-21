@@ -280,6 +280,16 @@ export default class AuctionHouse extends InteractableArea {
       return { floorLeft: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
     }
 
+    if (command.type === 'MakeBid') {
+      this.makeBid(player, command.floor.id, command.bid);
+      this._emitAreaChanged();
+      const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
+      if (newFloor === undefined) {
+        throw new Error();
+      }
+      return { floor: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
+    }
+
     return undefined as InteractableCommandReturnType<CommandType>;
   }
 

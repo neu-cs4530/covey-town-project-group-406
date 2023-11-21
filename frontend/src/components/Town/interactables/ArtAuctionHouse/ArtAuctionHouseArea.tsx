@@ -43,6 +43,7 @@ function ArtAuctionHouseArea({
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
+      console.log(newFloors);
       setFloors(newFloors);
       for (const f of newFloors) {
         console.log('we are on floor', selectedFloor?.id);
@@ -173,6 +174,10 @@ function ArtAuctionHouseArea({
     await controller.leaveFloor(floor);
   };
 
+  const handleMakeBid = async (floor: AuctionFloorArea, bid: number) => {
+    await controller.makeBid(floor, bid);
+  };
+
   return (
     <div>
       <Typography variant='subtitle1' style={{ padding: 30, paddingTop: 15, fontWeight: 300 }}>
@@ -216,7 +221,7 @@ function ArtAuctionHouseArea({
                   Auction Space
                 </Typography>
                 <div style={{ display: 'inline', float: 'inline-end' }}>
-                  {getAuctionStatus(getSelectedFloor() as AuctionFloorArea)}
+                  {getAuctionStatus(selectedFloor)}
                 </div>
               </div>
               <Divider />
@@ -228,7 +233,7 @@ function ArtAuctionHouseArea({
                   ? selectedFloor.auctioneer.artAuctionAccount?.email
                   : 'Auction House'}
               </Typography>
-              {getCurrentBid(selectedFloor)}
+              {getCurrentBid(getSelectedFloor() as AuctionFloorArea)}
               <Typography
                 variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
@@ -260,7 +265,12 @@ function ArtAuctionHouseArea({
                   <NumberDecrementStepper />
                 </NumberInputStepper>
               </NumberInput>
-              <Button>Make Bid!</Button>
+              <Button
+                onClick={async () => {
+                  await handleMakeBid(selectedFloor, bidAmount);
+                }}>
+                Make Bid!
+              </Button>
             </div>
           </div>
         </div>
