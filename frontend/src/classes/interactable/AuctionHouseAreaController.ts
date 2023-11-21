@@ -1,5 +1,4 @@
 import {
-  Artwork,
   AuctionFloorArea,
   AuctionHouseArea as AuctionHouseAreaModel,
 } from '../../types/CoveyTownSocket';
@@ -12,7 +11,9 @@ import InteractableAreaController, { BaseInteractableEventMap } from './Interact
  * are only ever emitted to local components (not to the townService).
  */
 export type AuctionHouseAreaEvents = BaseInteractableEventMap & {
-  interactableAreaChanged: (model: AuctionHouseAreaModel) => void;
+  floorsChanged: (floors: AuctionFloorArea[]) => void;
+  floorJoined: (floor: AuctionFloorArea) => void;
+  floorLeft: (floor: AuctionFloorArea) => void;
 };
 
 /**
@@ -57,8 +58,25 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     return this._auctionFloors;
   }
 
+  public async joinFloor(floor: AuctionFloorArea) {
+    const { floorJoined } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'JoinAuctionFloor',
+      floor: floor,
+    });
+    this.emit('floorJoined', floorJoined);
+  }
+
+  public async leaveFloor(floor: AuctionFloorArea) {
+    const { floorLeft } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'LeaveAuctionFloor',
+      floor: floor,
+    });
+    this.emit('floorLeft', floorLeft);
+  }
+
   protected _updateFrom(newModel: AuctionHouseAreaModel): void {
     this.auctionFloors = newModel.floors;
+    this.emit('floorsChanged', newModel.floors);
   }
 
   /**

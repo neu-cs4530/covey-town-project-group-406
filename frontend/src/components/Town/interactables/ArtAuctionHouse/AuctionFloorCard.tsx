@@ -5,7 +5,7 @@ import { AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
 interface AuctionFloorCardProps {
   floor: AuctionFloorArea;
-  handleClick: (floor: AuctionFloorArea) => void;
+  handleClick: (floor: AuctionFloorArea) => Promise<void>;
 }
 
 const AuctionFloorCard = ({ floor, handleClick }: AuctionFloorCardProps) => {
@@ -22,7 +22,11 @@ const AuctionFloorCard = ({ floor, handleClick }: AuctionFloorCardProps) => {
   };
 
   return (
-    <Card style={{ maxWidth: 345 }} onClick={() => handleClick(floor)}>
+    <Card
+      style={{ maxWidth: 345 }}
+      onClick={async () => {
+        await handleClick(floor);
+      }}>
       <CardActionArea>
         <CardMedia
           component='img'

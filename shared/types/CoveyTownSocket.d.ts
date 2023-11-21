@@ -287,6 +287,10 @@ export type InteractableCommandReturnType<
   ? undefined
   : CommandType extends LeaveGameCommand
   ? undefined
+  : CommandType extends JoinAuctionFloorCommand
+  ? { floorJoined : AuctionFloorArea }
+  : CommandType extends LeaveAuctionFloorCommand
+  ? { floorLeft : AuctionFloorArea }
   : never;
 
 export type InteractableCommandResponse<MessageType> = {
