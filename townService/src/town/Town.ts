@@ -412,15 +412,14 @@ export default class Town {
       } catch (err) {
         const utils = new APIUtils();
         const index = await this._dao.getArtworkIndex();
-        const artworks = await utils.nextArtworks(index, index + 10);
-        await area.addArtworksToAuctionHouse(artworks, index);
+        const artworks = await utils.nextArtworks(index, index + 100);
+        await area.addArtworksToAuctionHouse(artworks, index + 100);
       }
 
       await area.createNewAuctionFloorNonPlayer(10000);
       await area.createNewAuctionFloorNonPlayer(5000);
     }
 
-    // console.log(area.toModel())
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }
