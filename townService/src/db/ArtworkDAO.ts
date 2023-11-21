@@ -306,7 +306,11 @@ export default class ArtworkDAO implements IArtworkDAO {
       if (!response.exists) {
         throw new Error('auction house not instantiated properly');
       }
-      return response.data()?.artworks;
+      const resp = response.data()?.artworks;
+      if (resp.length === 0) {
+        throw new Error('auction house has no artworks');
+      }
+      return resp;
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
