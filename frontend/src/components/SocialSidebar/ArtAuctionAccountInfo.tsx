@@ -18,6 +18,7 @@ type Props = {
   userMoney: number;
   userArtworks: Artwork[];
 };
+
 export default function ArtAuctionAccountInfo({
   userEmail,
   userMoney,
