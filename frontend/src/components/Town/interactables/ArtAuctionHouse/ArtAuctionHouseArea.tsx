@@ -330,7 +330,7 @@ export default function AuctionHouseAreaWrapper(): JSX.Element {
           townController.unPause();
         }}
         closeOnOverlayClick={false}
-        size='6xl'>
+        size={isLoggedIn ? '6xl' : 'xl'}>
         <ModalOverlay />
         <ModalContent>
           {isLoggedIn ? (
