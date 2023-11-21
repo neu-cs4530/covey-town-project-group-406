@@ -8,6 +8,22 @@ interface ArtworkDisplayProps {
 }
 
 const ArtworkDisplay = ({ artwork }: ArtworkDisplayProps) => {
+  const getArtistName = () => {
+    if (artwork.artist.wikiUrl !== undefined) {
+      return (
+        <a
+          href={artwork.artist.wikiUrl}
+          style={{ textDecoration: 'underline', color: 'teal' }}
+          target='_blank'
+          rel='noreferrer'>
+          {artwork.artist.name}
+        </a>
+      );
+    } else {
+      return artwork.artist.name;
+    }
+  };
+
   return (
     <div
       style={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
@@ -15,11 +31,20 @@ const ArtworkDisplay = ({ artwork }: ArtworkDisplayProps) => {
         {artwork.title}
       </Typography>
       <Typography variant='h6' style={{ fontWeight: 500 }}>
-        by {artwork.artist.name}
+        by {getArtistName()}
       </Typography>
       <div style={{ width: '95%', marginTop: 20 }}>
         <Image src={artwork.primaryImage} alt={artwork.title} />
       </div>
+      <Typography variant='subtitle1' style={{ marginTop: 15 }}>
+        <strong>Description</strong>: {artwork.description}
+      </Typography>
+      <Typography variant='subtitle1' style={{ marginTop: 5 }}>
+        <strong>Medium</strong>: {artwork.medium}
+      </Typography>
+      <Typography variant='subtitle1' style={{ marginTop: 5 }}>
+        <strong>The MET Museum Department</strong>: {artwork.department}
+      </Typography>
     </div>
   );
 };

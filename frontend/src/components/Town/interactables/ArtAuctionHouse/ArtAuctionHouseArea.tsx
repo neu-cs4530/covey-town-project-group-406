@@ -80,6 +80,32 @@ function ArtAuctionHouseArea({
     }
   };
 
+  const getCurrentBid = (floor: AuctionFloorArea) => {
+    if (floor.status === 'WAITING_TO_START') {
+      return (
+        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+          <strong>Starting bid</strong>: ${floor.minBid.toLocaleString()}
+        </Typography>
+      );
+    } else if (floor.status === 'IN_PROGRESS' && floor.currentBid !== undefined) {
+      return (
+        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+          <strong>Current bid</strong>: ${floor.currentBid.bid.toLocaleString()}
+          <br />
+          <strong>User</strong>: ${floor.currentBid.player}
+        </Typography>
+      );
+    } else {
+      return (
+        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+          <strong>Winning bid</strong>: ${floor.currentBid?.bid.toLocaleString()}
+          <br />
+          <strong>User</strong>: ${floor.currentBid?.player}
+        </Typography>
+      );
+    }
+  };
+
   const handleFloorSelect = async (floor: AuctionFloorArea) => {
     await controller.joinFloor(floor);
   };
@@ -92,9 +118,12 @@ function ArtAuctionHouseArea({
     <div>
       <Typography variant='subtitle1' style={{ padding: 30, paddingTop: 15, fontWeight: 300 }}>
         You are logged in as: {townController.ourPlayer.artAuctionAccount?.email}
+        <br />
+        You have a balance of: $
+        {townController.ourPlayer.artAuctionAccount?.wallet.money.toLocaleString()}
       </Typography>
       {selectedFloor !== undefined ? (
-        <div style={{ padding: 30, paddingTop: 15, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>
           <Button
             colorScheme='teal'
             size='md'
@@ -134,7 +163,20 @@ function ArtAuctionHouseArea({
 
               <Divider />
 
-              <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 15 }}>
+              <Typography
+                variant='subtitle1'
+                style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
+                <strong>Auctioneer</strong>:{' '}
+                {selectedFloor.auctioneer
+                  ? selectedFloor.auctioneer.artAuctionAccount?.email
+                  : 'Auction House'}
+              </Typography>
+
+              {getCurrentBid(selectedFloor)}
+
+              <Typography
+                variant='subtitle1'
+                style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
                 Users currently on the same floor
               </Typography>
               <UnorderedList>
