@@ -210,7 +210,7 @@ function ArtAuctionHouseArea({
                   Auction Space
                 </Typography>
                 <div style={{ display: 'inline', float: 'inline-end' }}>
-                  {getAuctionStatus(selectedFloor)}
+                  {getAuctionStatus(getSelectedFloor() as AuctionFloorArea)}
                 </div>
               </div>
               <Divider />
