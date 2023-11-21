@@ -102,6 +102,17 @@ function ArtAuctionHouseArea({
     }
   };
 
+  // gets the selected floor from all the floors
+  // USE THIS method when using updateFrom and handleCommand
+  const getSelectedFloor = (): AuctionFloorArea | undefined => {
+    if (selectedFloor !== undefined) {
+      const selFloor = floors.find(f => f.id === selectedFloor.id);
+      if (selFloor) {
+        return selFloor;
+      }
+    }
+  };
+
   const getAuctionStatus = (floor: AuctionFloorArea) => {
     if (floor.status === 'IN_PROGRESS') {
       return <Badge colorScheme='green'>Auction in progress</Badge>;
@@ -212,11 +223,9 @@ function ArtAuctionHouseArea({
                 Users currently on the same floor
               </Typography>
               <UnorderedList>
-                {floors
-                  .find(f => f.id === selectedFloor.id)
-                  ?.observers.map((o, idx) => (
-                    <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
-                  ))}
+                {getSelectedFloor()?.observers.map((o, idx) => (
+                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
+                ))}
               </UnorderedList>
             </div>
           </div>
