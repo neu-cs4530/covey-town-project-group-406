@@ -264,7 +264,6 @@ export default class AuctionHouse extends InteractableArea {
         throw new Error();
       }
       if (newFloor.bidders.length >= 3) {
-        console.log('starting auction!');
         newFloor.startAuction();
       }
       return { floorJoined: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;

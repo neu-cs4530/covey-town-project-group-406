@@ -143,7 +143,7 @@ export default class Town {
       } catch (err) {
         if (err instanceof Error) {
           // eslint-disable-next-line no-console
-          console.log(err.message);
+          // console.log(err.message);
         }
       }
     });

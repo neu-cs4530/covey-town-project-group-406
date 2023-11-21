@@ -45,7 +45,6 @@ function ArtAuctionHouseArea({
           console.log('found floor');
           if (f.timeLeft === 0) {
             setSelectedFloor(undefined);
-            console.log('heyo');
           }
         }
       }
