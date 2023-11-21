@@ -84,6 +84,7 @@ export default class AuctionHouse extends InteractableArea {
     await this._dao.addArtworksToAuctionHouse(artworks);
     const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
+    console.log(AuctionHouse.artworkToBeAuctioned);
   }
 
   public makeBid(player: Player, floorID: string, bid: number): void {

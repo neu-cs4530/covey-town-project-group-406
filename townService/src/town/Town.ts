@@ -513,10 +513,12 @@ export default class Town {
           },
         ]);
       }
-    } else if (!AuctionHouse.artworkToBeAuctioned.find(a => a.isBeingAuctioned === false)) {
+    } else if (
+      AuctionHouse.artworkToBeAuctioned.find(a => a.isBeingAuctioned === false) === undefined
+    ) {
       await area.addArtworksToAuctionHouse([
         {
-          description: 'A bouqet of colorful flowers painted by Clara Peters.',
+          description: 'dafsdfasdfasdfadsfadsfadsfadsfasdf',
           id: 827660,
           primaryImage: 'https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg',
           purchasePrice: 10000,
