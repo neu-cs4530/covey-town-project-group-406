@@ -418,6 +418,9 @@ export default class Town {
 
       await area.createNewAuctionFloorNonPlayer(10000);
       await area.createNewAuctionFloorNonPlayer(5000);
+      await area.createNewAuctionFloorNonPlayer(19000);
+      await area.createNewAuctionFloorNonPlayer(58000);
+      await area.createNewAuctionFloorNonPlayer(31200);
     }
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());

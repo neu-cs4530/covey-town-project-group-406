@@ -31,6 +31,7 @@ function AuctionHouseComponent({
     };
   }, [controller, townController]);
 
+  floors.map(f => console.log(f.artBeingAuctioned));
   return <div>Hello auction house! We have {floors.length} floors!</div>;
 }
 
