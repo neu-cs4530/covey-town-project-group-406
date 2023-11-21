@@ -11,6 +11,11 @@ import {
   Badge,
   Spinner,
   useToast,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
 import { signOut } from 'firebase/auth';
@@ -33,6 +38,7 @@ function ArtAuctionHouseArea({
   const toast = useToast();
   const [floors, setFloors] = useState<AuctionFloorArea[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<AuctionFloorArea | undefined>();
+  const [bidAmount, setBidAmount] = useState(0);
   const townController = useTownController();
 
   useEffect(() => {
@@ -240,8 +246,21 @@ function ArtAuctionHouseArea({
                   <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
                 ))}
               </UnorderedList>
-              time left
-              {getSelectedFloor()?.timeLeft}
+              <div>
+                time left
+                {getSelectedFloor()?.timeLeft}
+              </div>
+              <NumberInput
+                onChange={valueString => setBidAmount(Number(valueString))}
+                value={bidAmount}
+                max={townController.ourPlayer.artAuctionAccount?.wallet.money}>
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Button>Make Bid!</Button>
             </div>
           </div>
         </div>
