@@ -9,7 +9,7 @@ export default class APIUtils {
   constructor() {
     this._apiInstance = axios.create({
       baseURL: 'https://collectionapi.metmuseum.org/',
-      timeout: 5000,
+      timeout: 2147483647,
       headers: {},
     });
     this._artworkIds = [];
@@ -18,7 +18,7 @@ export default class APIUtils {
   async nextArtworks(startIndex: number, endIndex: number): Promise<Artwork[]> {
     const artworkList: Artwork[] = [];
     if (this._artworkIds.length === 0) {
-      this._getArtworkIDs();
+      await this._getArtworkIDs();
     }
     await Promise.all(
       this._artworkIds.slice(startIndex, endIndex).map(async objId => {
@@ -31,15 +31,26 @@ export default class APIUtils {
     return artworkList;
   }
 
-  private _getArtworkIDs() {
-    this._apiInstance
-      .get('public/collection/v1/search?hasImages=true&artistOrCulture=true&q=*')
-      .then(response => {
-        this._artworkIds = response.data.objectIDs;
-      })
-      .catch(error => {
-        throw new Error(error.message);
-      });
+  private async _getArtworkIDs() {
+    try {
+      const response = await this._apiInstance.get(
+        'public/collection/v1/search?hasImages=true&artistOrCulture=true&q=*',
+      );
+      this._artworkIds = response.data.objectIDs;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+      throw new Error('unable to get artwork IDs');
+    }
+    // this._apiInstance
+    //   .get('public/collection/v1/search?hasImages=true&artistOrCulture=true&q=*')
+    //   .then(response => {
+    //     this._artworkIds = response.data.objectIDs;
+    //   })
+    //   .catch(error => {
+    //     throw new Error(error.message);
+    //   });
   }
 
   async createArtwork(objectId: number): Promise<Artwork> {
