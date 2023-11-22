@@ -97,11 +97,13 @@ export default class AuctionHouse extends InteractableArea {
         if (floor.currentBid) {
           floor.currentBid.player = player;
           floor.currentBid.bid = bid;
+          floor.timeLeft += 5;
         } else {
           floor.currentBid = {
             player,
             bid,
           };
+          floor.timeLeft += 5;
         }
       }
     } else {
