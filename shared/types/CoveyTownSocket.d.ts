@@ -46,6 +46,7 @@ export interface Player {
 
 export interface AuctionHouseArea extends Interactable {
   floors: AuctionFloorArea[];
+  occupantsObj: Player[];
 }
 
 export type AuctionFloorArea = {

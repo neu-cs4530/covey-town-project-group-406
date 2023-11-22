@@ -86,6 +86,14 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
   protected _updateFrom(newModel: AuctionHouseAreaModel): void {
     this.auctionFloors = newModel.floors;
     this.emit('floorsChanged', newModel.floors);
+
+    /*const ourPlayer = newModel.occupantsObj.find(o => o.id === this._townController.ourPlayer.id);
+    if (ourPlayer) {
+      console.log('here!');
+      this._townController.ourPlayer.artAuctionAccount = ourPlayer.artAuctionAccount;
+    }*/
+    // check if the ourPlayer's artworks differ. If they do, assign nedw artworks
+    //if (this._townController.ourPlayer.artAuctionAccount?.wallet.artwork.length !=
   }
 
   /**
@@ -105,6 +113,7 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
       occupants: this.occupants.map(player => player.id),
       floors: this.auctionFloors,
       type: 'AuctionHouseArea',
+      occupantsObj: this.occupants.map(player => player.toPlayerModel()),
     };
   }
 

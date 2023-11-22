@@ -136,7 +136,7 @@ export class TownsController extends Controller {
   public async createAuctionHouseArea(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: Omit<Omit<AuctionHouseArea, 'floors'>, 'type'>,
+    @Body() requestBody: Omit<Omit<Omit<AuctionHouseArea, 'floors'>, 'type'>, 'occupantsObj'>,
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town?.getPlayerBySessionToken(sessionToken)) {

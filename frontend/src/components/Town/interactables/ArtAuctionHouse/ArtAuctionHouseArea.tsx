@@ -46,10 +46,19 @@ function ArtAuctionHouseArea({
       setFloors(newFloors);
       for (const f of newFloors) {
         if (f.id === selectedFloor?.id) {
-          console.log('found floor');
           if (f.timeLeft === 0) {
             setSelectedFloor(undefined);
           }
+          f.bidders.map(b => {
+            if (
+              b.id === townController.ourPlayer.id &&
+              townController.ourPlayer.artAuctionAccount?.wallet.artwork.length !==
+                b.artAuctionAccount?.wallet.artwork.length
+            ) {
+              console.log('we are here!!!');
+              townController.ourPlayer.artAuctionAccount = b.artAuctionAccount;
+            }
+          });
         }
       }
     };

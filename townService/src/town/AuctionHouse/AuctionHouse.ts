@@ -229,11 +229,13 @@ export default class AuctionHouse extends InteractableArea {
     for (const floor of this._auctionFloors) {
       floorArray.push(floor.toModel());
     }
+    const occupantsObj = this.occupants.map(o => o.toPlayerModel());
     return {
       id: this.id,
       occupants: this.occupantsByID,
       type: this.getType(),
       floors: floorArray,
+      occupantsObj,
     };
   }
 
