@@ -1,4 +1,5 @@
 import {
+  ArtAuctionAccount,
   AuctionFloorArea,
   AuctionHouseArea as AuctionHouseAreaModel,
 } from '../../types/CoveyTownSocket';
@@ -14,6 +15,7 @@ export type AuctionHouseAreaEvents = BaseInteractableEventMap & {
   floorsChanged: (floors: AuctionFloorArea[]) => void;
   floorJoined: (floor: AuctionFloorArea) => void;
   floorLeft: (floor: AuctionFloorArea) => void;
+  artAccountUpdated: (account: ArtAuctionAccount) => void;
 };
 
 /**
@@ -87,11 +89,14 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     this.auctionFloors = newModel.floors;
     this.emit('floorsChanged', newModel.floors);
 
-    /*const ourPlayer = newModel.occupantsObj.find(o => o.id === this._townController.ourPlayer.id);
+    const ourPlayer = newModel.occupantsObj.find(o => o.id === this._townController.ourPlayer.id);
     if (ourPlayer) {
-      console.log('here!');
       this._townController.ourPlayer.artAuctionAccount = ourPlayer.artAuctionAccount;
-    }*/
+      this._townController.emit(
+        'artAccountUpdated',
+        this._townController.ourPlayer.artAuctionAccount as ArtAuctionAccount,
+      );
+    }
     // check if the ourPlayer's artworks differ. If they do, assign nedw artworks
     //if (this._townController.ourPlayer.artAuctionAccount?.wallet.artwork.length !=
   }
