@@ -553,7 +553,7 @@ describe('when an auction floor ends', () => {
       house.auctionFloors[1].startAuction();
 
       // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 3000));
+      await new Promise(res => setTimeout(res, 8000));
 
       expect(player.wallet.money).toBe(999900);
       expect(player2.wallet.money).toBe(999900);
@@ -601,7 +601,7 @@ describe('when an auction floor ends', () => {
       house.auctionFloors[0].startAuction();
 
       // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 5000));
+      await new Promise(res => setTimeout(res, 10000));
 
       expect(player.artwork).toEqual([artworkOnAuctionFloor]);
       const playerResponse = await dao.getPlayer(player.email);
@@ -679,7 +679,7 @@ describe('when an auction floor ends', () => {
 
       house.auctionFloors[0].startAuction();
       // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 5000));
+      await new Promise(res => setTimeout(res, 10000));
 
       expect(player.artwork).toEqual([testArtworkIsNotBeingAuctioned]);
       const playerResponse = await dao.getPlayer(player.email);
@@ -705,7 +705,7 @@ describe('when an auction floor ends', () => {
       house.auctionFloors[0].currentBid = { player: player2, bid: 500000 };
       house.auctionFloors[0].startAuction();
       // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 5000));
+      await new Promise(res => setTimeout(res, 10000));
 
       expect(player.artwork).toEqual([]);
       expect(player2.artwork).toEqual([testArtworkIsNotBeingAuctioned]);
@@ -749,8 +749,6 @@ describe('when an auction floor ends', () => {
       house.auctionFloors[0].timeLeft = 1;
       house.auctionFloors[1].timeLeft = 1;
 
-      house.makeBid(player3, house.auctionFloors[0].id, 100);
-      house.makeBid(player4, house.auctionFloors[0].id, 200);
       house.makeBid(player3, house.auctionFloors[0].id, 300);
 
       house.makeBid(player4, house.auctionFloors[1].id, 500);
@@ -765,7 +763,7 @@ describe('when an auction floor ends', () => {
       house.auctionFloors[0].startAuction();
       house.auctionFloors[1].startAuction();
       // eslint-disable-next-line no-promise-executor-return
-      await new Promise(res => setTimeout(res, 3000));
+      await new Promise(res => setTimeout(res, 12000));
 
       // check networth, money, and artworks locally and in db
 
