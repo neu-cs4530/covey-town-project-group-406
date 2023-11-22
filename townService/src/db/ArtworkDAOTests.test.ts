@@ -330,8 +330,10 @@ describe('when removing artwork from the auction house', () => {
     it('adds the first artwork from the API response', async () => {
       const validArtID = 188005;
       const utils = new APIUtils();
-      const artwork1: Artwork = await utils.createArtwork(validArtID);
-      await dao.addArtworksToAuctionHouse([artwork1], 1);
+      const artwork1 = await utils.createArtwork(validArtID);
+      if (artwork1) {
+        await dao.addArtworksToAuctionHouse([artwork1], 1);
+      }
       const auctionHouseArtworksResponse = await dao.getAllAuctionHouseArtworks();
       const indexResponse = await dao.getArtworkIndex();
       expect(auctionHouseArtworksResponse).toContainEqual(artwork1);
