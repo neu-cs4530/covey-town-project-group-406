@@ -23,7 +23,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import AuctionHouseAreaController from '../../../../classes/interactable/AuctionHouseAreaController';
 import { useInteractable } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { AuctionFloorArea } from '../../../../types/CoveyTownSocket';
+import { ArtAuctionAccount, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 import AuctionHouseAreaInteractable from '../AuctionHouseArea';
 import SignupSignIn from '../../../Login/ArtAuctionHouseLogin/SignupSignIn';
 import AuctionFloorCard from './AuctionFloorCard';
@@ -36,10 +36,13 @@ function ArtAuctionHouseArea({
   controller: AuctionHouseAreaController;
 }): JSX.Element {
   const toast = useToast();
+  const townController = useTownController();
   const [floors, setFloors] = useState<AuctionFloorArea[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<AuctionFloorArea | undefined>();
   const [bidAmount, setBidAmount] = useState(0);
-  const townController = useTownController();
+  const [userMoney, setUserMoney] = useState(
+    townController.ourPlayer.artAuctionAccount?.wallet.money as number,
+  );
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
@@ -71,9 +74,15 @@ function ArtAuctionHouseArea({
       setSelectedFloor(undefined);
     };
 
+    const handleArtAccountUpdated = (account: ArtAuctionAccount) => {
+      setUserMoney(account.wallet.money);
+    };
+
     controller.addListener('floorsChanged', handleFloorsChanged);
     controller.addListener('floorJoined', handleFloorJoined);
     controller.addListener('floorLeft', handleFloorLeft);
+
+    townController.addListener('artAccountUpdated', handleArtAccountUpdated);
 
     townController.createAuctionHouseArea({
       id: 'Art Auction House',
@@ -84,6 +93,7 @@ function ArtAuctionHouseArea({
       controller.removeListener('floorsChanged', handleFloorsChanged);
       controller.removeListener('floorJoined', handleFloorJoined);
       controller.removeListener('floorLeft', handleFloorLeft);
+      townController.removeListener('artAccountUpdated', handleArtAccountUpdated);
     };
   }, [controller, townController, selectedFloor?.id]);
 
@@ -190,8 +200,7 @@ function ArtAuctionHouseArea({
       <Typography variant='subtitle1' style={{ padding: 30, paddingTop: 15, fontWeight: 300 }}>
         You are logged in as: {townController.ourPlayer.artAuctionAccount?.email}
         <br />
-        You have a balance of: $
-        {townController.ourPlayer.artAuctionAccount?.wallet.money.toLocaleString()}
+        You have a balance of: ${userMoney}
       </Typography>
       {selectedFloor !== undefined ? (
         <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>
@@ -265,7 +274,7 @@ function ArtAuctionHouseArea({
               <NumberInput
                 onChange={valueString => setBidAmount(Number(valueString))}
                 value={bidAmount}
-                max={townController.ourPlayer.artAuctionAccount?.wallet.money}>
+                max={userMoney}>
                 <NumberInputField />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
