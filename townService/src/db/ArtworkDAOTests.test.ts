@@ -333,13 +333,13 @@ describe('when removing artwork from the auction house', () => {
       const artwork1 = await utils.createArtwork(validArtID);
       if (artwork1) {
         await dao.addArtworksToAuctionHouse([artwork1], 1);
+        const auctionHouseArtworksResponse = await dao.getAllAuctionHouseArtworks();
+        const indexResponse = await dao.getArtworkIndex();
+        expect(auctionHouseArtworksResponse).toContainEqual(artwork1);
+        expect(indexResponse).toBe(1);
+        await dao.removeAuctionHouse();
+        await dao.removeArtworkIDList();
       }
-      const auctionHouseArtworksResponse = await dao.getAllAuctionHouseArtworks();
-      const indexResponse = await dao.getArtworkIndex();
-      expect(auctionHouseArtworksResponse).toContainEqual(artwork1);
-      expect(indexResponse).toContainEqual(1);
-      await dao.removeAuctionHouse();
-      await dao.removeArtworkIDList();
     });
   });
 });
