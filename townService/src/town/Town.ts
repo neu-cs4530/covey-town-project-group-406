@@ -26,7 +26,6 @@ import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
 import ArtworkDAO from '../db/ArtworkDAO';
 import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
-import APIUtils from '../api/APIUtils';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
