@@ -200,6 +200,13 @@ function ArtAuctionHouseArea({
     await controller.leaveFloor(floor);
   };
 
+  const weAreBidder = () => {
+    if (selectedFloor?.bidders.find(b => b.id === townController.ourPlayer.id) !== undefined) {
+      return true;
+    }
+    return false;
+  };
+
   const handleMakeBid = async (floor: AuctionFloorArea, bid: number) => {
     if (canBid) {
       if (floor.currentBid?.bid !== undefined && floor.currentBid.bid >= bid) {
@@ -303,22 +310,28 @@ function ArtAuctionHouseArea({
                   <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
                 ))}
               </UnorderedList>
-              <NumberInput
-                onChange={valueString => setBidAmount(Number(valueString))}
-                value={bidAmount}
-                max={userMoney}>
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-              <Button
-                onClick={async () => {
-                  await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
-                }}>
-                Make Bid!
-              </Button>
+              {weAreBidder() ? (
+                <div>
+                  <NumberInput
+                    onChange={valueString => setBidAmount(Number(valueString))}
+                    value={bidAmount}
+                    max={userMoney}>
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <Button
+                    onClick={async () => {
+                      await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
+                    }}>
+                    Make Bid!
+                  </Button>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         </div>
