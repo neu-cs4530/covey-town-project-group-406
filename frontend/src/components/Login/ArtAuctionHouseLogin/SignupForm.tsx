@@ -10,6 +10,7 @@ export default function SignupForm(): JSX.Element {
   const townController = useTownController();
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
 
   const sendLoginCommand = (e: string, p: string) => {
     createUserWithEmailAndPassword(auth, e, p)
@@ -45,6 +46,18 @@ export default function SignupForm(): JSX.Element {
       });
   };
 
+  const sendSignUpCommand = (e: string, p: string, cp: string) => {
+    if (p !== cp) {
+      toast({
+        title: "Your passwords don't match!",
+        description: `please try again with the same passwords.`,
+        status: 'info',
+      });
+    } else {
+      sendLoginCommand(e, p);
+    }
+  };
+
   return (
     <Box>
       <Heading as='h2' fontSize='xl' style={{ marginTop: 10, marginBottom: 10 }}>
@@ -53,7 +66,7 @@ export default function SignupForm(): JSX.Element {
       <Box className='input-container'>
         <label>Email </label>
         <Input
-          style={{ backgroundColor: 'lightblue' }}
+          style={{ backgroundColor: 'navajowhite' }}
           type='text'
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -62,17 +75,27 @@ export default function SignupForm(): JSX.Element {
       <Box className='input-container'>
         <label>Password </label>
         <Input
-          style={{ backgroundColor: 'lightblue' }}
+          style={{ backgroundColor: 'navajowhite' }}
           type='password'
           value={pass}
           onChange={e => setPass(e.target.value)}
+        />
+      </Box>
+      <Box className='input-container'>
+        <label>Confirm Password </label>
+        <Input
+          style={{ backgroundColor: 'navajowhite' }}
+          type='password'
+          value={confirmPass}
+          onChange={e => setConfirmPass(e.target.value)}
         />
       </Box>
       <Box className='button-container'>
         <Button
           onClick={() => {
             if (!townController.ourPlayer?.artAuctionAccount) {
-              sendLoginCommand(email, pass);
+              sendSignUpCommand(email, pass, confirmPass);
+              // sendLoginCommand(email, pass);
             } else {
               toast({
                 title: 'login failed',
@@ -81,7 +104,13 @@ export default function SignupForm(): JSX.Element {
               });
             }
           }}
-          style={{ width: '100%', marginTop: 10, marginBottom: 10 }}>
+          style={{
+            width: '100%',
+            marginTop: 10,
+            marginBottom: 10,
+            border: '1px solid',
+            borderColor: 'darkGrey',
+          }}>
           Submit
         </Button>
       </Box>
