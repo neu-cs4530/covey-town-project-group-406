@@ -40,6 +40,7 @@ function ArtAuctionHouseArea({
   const [floors, setFloors] = useState<AuctionFloorArea[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<AuctionFloorArea | undefined>();
   const [bidAmount, setBidAmount] = useState(0);
+  const [canBid, setCanBid] = useState(false);
   const [userMoney, setUserMoney] = useState(
     townController.ourPlayer.artAuctionAccount?.wallet.money as number,
   );
@@ -49,8 +50,12 @@ function ArtAuctionHouseArea({
       setFloors(newFloors);
       for (const f of newFloors) {
         if (f.id === selectedFloor?.id) {
+          if (f.status !== 'WAITING_TO_START') {
+            setCanBid(true);
+          }
           if (f.timeLeft === 0) {
             setSelectedFloor(undefined);
+            setCanBid(false);
           }
           f.bidders.map(b => {
             if (
@@ -192,7 +197,15 @@ function ArtAuctionHouseArea({
   };
 
   const handleMakeBid = async (floor: AuctionFloorArea, bid: number) => {
-    await controller.makeBid(floor, bid);
+    if (canBid) {
+      await controller.makeBid(floor, bid);
+    } else {
+      toast({
+        title: 'cannot bid',
+        description: `auction has not started`,
+        status: 'info',
+      });
+    }
   };
 
   return (
@@ -237,7 +250,7 @@ function ArtAuctionHouseArea({
                   Auction Space
                 </Typography>
                 <div style={{ display: 'inline', float: 'inline-end' }}>
-                  {getAuctionStatus(selectedFloor)}
+                  {getAuctionStatus(getSelectedFloor() as AuctionFloorArea)}
                 </div>
               </div>
               <Divider />
