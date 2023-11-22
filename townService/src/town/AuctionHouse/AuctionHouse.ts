@@ -16,11 +16,14 @@ import InteractableArea from '../InteractableArea';
 import AuctionFloor from '../AuctionFloor/AuctionFloor';
 import ArtworkDAO from '../../db/ArtworkDAO';
 import SingletonArtworkDAO from '../../db/SingletonArtworkDAO';
+import APIUtils from '../../api/APIUtils';
 
 export default class AuctionHouse extends InteractableArea {
   private _auctionFloors: AuctionFloor[];
 
   private _dao: ArtworkDAO;
+
+  private _apiUtils: APIUtils;
 
   static artworkToBeAuctioned: Artwork[] = [];
 
@@ -36,6 +39,7 @@ export default class AuctionHouse extends InteractableArea {
     super(id, coordinates, townEmitter);
     this._auctionFloors = [];
     this._dao = SingletonArtworkDAO.instance();
+    this._apiUtils = new APIUtils();
   }
 
   public async leaveAuctionFloor(player: Player, floorID: string): Promise<void> {
@@ -80,8 +84,8 @@ export default class AuctionHouse extends InteractableArea {
     throw new Error('no floor with ID found');
   }
 
-  public async addArtworksToAuctionHouse(artworks: Artwork[]) {
-    await this._dao.addArtworksToAuctionHouse(artworks);
+  public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
+    await this._dao.addArtworksToAuctionHouse(artworks, endIndex);
     const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
   }
@@ -112,9 +116,16 @@ export default class AuctionHouse extends InteractableArea {
   }
 
   public async createNewAuctionFloorNonPlayer(minBid: number): Promise<void> {
-    const artworkToAuction = AuctionHouse.artworkToBeAuctioned.find(
+    let artworkToAuction = AuctionHouse.artworkToBeAuctioned.find(
       artwork => artwork.isBeingAuctioned === false,
     );
+    while (!artworkToAuction) {
+      // eslint-disable-next-line no-await-in-loop
+      await this.addNewArtworksToAuctionHouse(30);
+      artworkToAuction = AuctionHouse.artworkToBeAuctioned.find(
+        artwork => artwork.isBeingAuctioned === false,
+      );
+    }
     if (artworkToAuction) {
       artworkToAuction.isBeingAuctioned = true;
       await this._dao.updateAuctionHouseArtworkByID(artworkToAuction);
@@ -136,6 +147,12 @@ export default class AuctionHouse extends InteractableArea {
       });
       this._auctionFloors.push(floor);
     }
+  }
+
+  public async addNewArtworksToAuctionHouse(numArtworks: number) {
+    const index = await this._dao.getArtworkIndex();
+    const artworks = await this._apiUtils.nextArtworks(index, index + numArtworks);
+    await this.addArtworksToAuctionHouse(artworks, index + numArtworks);
   }
 
   private async _deleteAuctionFloor(floorID: string): Promise<void> {

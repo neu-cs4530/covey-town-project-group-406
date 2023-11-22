@@ -52,7 +52,7 @@ describe('when adding artworks to the auction house', () => {
   it('updates the static array and database properly', async () => {
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
 
-    await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+    await house.addArtworksToAuctionHouse([testArtwork, testArtwork2], 0);
     const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
     const artworkIDs = await dao.getAllArtworkIDs();
     expect(auctionHouseArtworks).toContainEqual(testArtwork);
@@ -91,7 +91,7 @@ describe('when making a bid', () => {
     await dao.addPlayer(player.email);
 
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.addArtworksToAuctionHouse([testArtwork], 0);
     await house.createNewAuctionFloorNonPlayer(1);
     house.makeBid(player, house.auctionFloors[0].id, 10);
     expect(house.auctionFloors[0].currentBid?.player).toEqual(player);
@@ -106,7 +106,7 @@ describe('when making a bid', () => {
     await dao.addPlayer(player.email);
 
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.addArtworksToAuctionHouse([testArtwork], 0);
     await house.createNewAuctionFloorNonPlayer(100);
     house.makeBid(player, house.auctionFloors[0].id, 10);
     expect(house.auctionFloors[0].currentBid?.player).toEqual(undefined);
@@ -125,7 +125,7 @@ describe('when making a bid', () => {
     await dao.addPlayer(player2.email);
 
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.addArtworksToAuctionHouse([testArtwork], 0);
     await house.createNewAuctionFloorNonPlayer(0);
     house.auctionFloors[0].currentBid = { player: player2, bid: 1000 };
     house.makeBid(player, house.auctionFloors[0].id, 10);
@@ -138,6 +138,7 @@ describe('when making a bid', () => {
   });
 });
 describe('when creating a new auction floor', () => {
+  jest.setTimeout(50000);
   let testArtwork: Artwork;
   let testArtworkIsBeingAuctioned: Artwork;
   let testArtwork2: Artwork;
@@ -190,7 +191,7 @@ describe('when creating a new auction floor', () => {
   });
   it('creates a non-player floor correctly', async () => {
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.addArtworksToAuctionHouse([testArtwork], 0);
     await house.createNewAuctionFloorNonPlayer(1);
     expect(house.auctionFloors).toHaveLength(1);
     expect(house.auctionFloors[0].artBeingAuctioned).toEqual(testArtworkIsBeingAuctioned);
@@ -203,7 +204,7 @@ describe('when creating a new auction floor', () => {
   });
   it('creates two non-player floors back to back correctly', async () => {
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+    await house.addArtworksToAuctionHouse([testArtwork, testArtwork2], 0);
     const floorTwoArtwork = { ...AuctionHouse.artworkToBeAuctioned[1] };
     floorTwoArtwork.isBeingAuctioned = true;
     await house.createNewAuctionFloorNonPlayer(1);
@@ -235,6 +236,32 @@ describe('when creating a new auction floor', () => {
     expect(artworks[0].isBeingAuctioned).toBe(true);
     await dao.removePlayer(player.email);
   });
+  it('adds new artworks to the auction house db if there are none in the db', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.createNewAuctionFloorNonPlayer(1);
+    expect(house.auctionFloors.length).toBeLessThanOrEqual(30);
+    expect(house.auctionFloors[0].artBeingAuctioned.isBeingAuctioned).toBe(true);
+    const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
+    expect(auctionHouseArtworks.length).toBeLessThanOrEqual(30);
+    const artworkBeingAuctioned = auctionHouseArtworks.find(a => a.isBeingAuctioned === true);
+    expect(artworkBeingAuctioned?.isBeingAuctioned).toBe(true);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
+  it('adds new artworks to the auction house db if there are none available for auction', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.addArtworksToAuctionHouse([testArtworkIsBeingAuctioned], 0);
+    await house.createNewAuctionFloorNonPlayer(1);
+    expect(house.auctionFloors.length).toBeLessThanOrEqual(30);
+    expect(house.auctionFloors[0].artBeingAuctioned.isBeingAuctioned).toBe(true);
+    const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
+    expect(auctionHouseArtworks.length).toBeLessThanOrEqual(30);
+    expect(auctionHouseArtworks[0].isBeingAuctioned).toBe(true);
+    const artworkBeingAuctioned = auctionHouseArtworks.find(a => a.isBeingAuctioned === true);
+    expect(artworkBeingAuctioned?.isBeingAuctioned).toBe(true);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
 });
 
 describe('when joining an auction floor', () => {
@@ -258,7 +285,7 @@ describe('when joining an auction floor', () => {
   });
   it('joins properly as an observer', async () => {
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.addArtworksToAuctionHouse([testArtwork], 0);
     await house.createNewAuctionFloorNonPlayer(1);
     const player = new Player(nanoid(), mock<TownEmitter>());
 
@@ -270,7 +297,7 @@ describe('when joining an auction floor', () => {
   });
   it('joins properly as a bidder', async () => {
     const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-    await house.addArtworksToAuctionHouse([testArtwork]);
+    await house.addArtworksToAuctionHouse([testArtwork], 0);
     await house.createNewAuctionFloorNonPlayer(1);
     const player = new Player(nanoid(), mock<TownEmitter>());
 
@@ -495,7 +522,7 @@ describe('when an auction floor ends', () => {
     });
     it('does not give artwork to anyone, and reset floor with same artwork when no bid', async () => {
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-      await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+      await house.addArtworksToAuctionHouse([testArtwork, testArtwork2], 0);
       await house.createNewAuctionFloorNonPlayer(1);
       const artworkBeingAuctioned = { ...AuctionHouse.artworkToBeAuctioned[0] };
 
@@ -524,12 +551,10 @@ describe('when an auction floor ends', () => {
 
       AuctionHouse.artworkToBeAuctioned = [];
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-      await house.addArtworksToAuctionHouse([
-        testArtwork,
-        testArtwork2,
-        testArtwork3,
-        testArtwork4,
-      ]);
+      await house.addArtworksToAuctionHouse(
+        [testArtwork, testArtwork2, testArtwork3, testArtwork4],
+        0,
+      );
       await house.createNewAuctionFloorNonPlayer(1);
       await house.createNewAuctionFloorNonPlayer(1);
 
@@ -587,7 +612,7 @@ describe('when an auction floor ends', () => {
 
       AuctionHouse.artworkToBeAuctioned = [];
       const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
-      await house.addArtworksToAuctionHouse([testArtwork, testArtwork2]);
+      await house.addArtworksToAuctionHouse([testArtwork, testArtwork2], 0);
       await house.createNewAuctionFloorNonPlayer(1);
 
       const artworkOnAuctionFloor = { ...AuctionHouse.artworkToBeAuctioned[0] };

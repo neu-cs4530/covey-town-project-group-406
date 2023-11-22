@@ -8,8 +8,9 @@ export default interface IArtworkDAO {
    * Assumes artworks provided are unique amongst eachother
    * Creates collection if not already created
    * @param artworks: The artworks to add
+   * @param endIndex: The index of the last artwork in the list
    */
-  addArtworksToAuctionHouse(artworks: Artwork[]): Promise<void>;
+  addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number): Promise<void>;
   /**
    * Adds a player to the database and defaults their values
    * @param email their email to add

@@ -20,6 +20,7 @@ export default class SingletonDBConnection {
         }),
       });
       SingletonDBConnection._db = getFirestore();
+      SingletonDBConnection._db.settings({ ignoreUndefinedProperties: true });
     }
     return SingletonDBConnection._db;
   }
