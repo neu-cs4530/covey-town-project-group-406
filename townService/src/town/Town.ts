@@ -409,116 +409,13 @@ export default class Town {
           AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
         }
       } catch (err) {
-        await area.addArtworksToAuctionHouse([
-          {
-            description: 'A bouqet of colorful flowers painted by Clara Peters.',
-            id: 827660,
-            primaryImage: 'https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg',
-            purchasePrice: 10000,
-            department: 'European Paintings',
-            title: 'A Bouquet of Flowers',
-            artist: {
-              name: 'Clara Peeters',
-              biography: 'Flemish, Mechelen ca. 1587-after 1636 Ghent',
-              nationality: 'Flemish',
-              begin: '1582',
-              end: '1636',
-              gender: 'Female',
-              wikiUrl: 'https://www.wikidata.org/wiki/Q265398',
-            },
-            medium: 'Paintings',
-            isBeingAuctioned: false,
-            purchaseHistory: [],
-          },
-          {
-            description: 'An oil painting of a young flower girl.',
-            id: 11207,
-            primaryImage: 'https://images.metmuseum.org/CRDImages/ad/original/DT2784.jpg',
-            purchasePrice: 19000,
-            department: 'The American Wing',
-            title: 'The Flower Girl',
-            culture: 'American',
-            artist: {
-              name: 'Charles Cromwell Ingham',
-              biography: 'American (born Ireland), Dublin 1786-1863 New York',
-              nationality: 'American, born Ireland',
-              begin: '1786',
-              end: '1863',
-              wikiUrl: 'https://www.wikidata.org/wiki/Q5076001',
-            },
-            medium: 'Oil on canvas',
-            isBeingAuctioned: false,
-            purchaseHistory: [],
-          },
-          {
-            description: 'An oil painting of the winter storms.',
-            id: 11130,
-            primaryImage: 'https://images.metmuseum.org/CRDImages/ad/original/DT1545.jpg',
-            purchasePrice: 58000,
-            department: 'The American Wing',
-            title: 'Northeaster',
-            culture: 'American',
-            artist: {
-              name: 'Winslow Homer',
-              biography: 'American, Boston, Massachusetts 1836-1910 Prouts Neck, Maine',
-              nationality: 'American',
-              begin: '1836',
-              end: '1910',
-              wikiUrl: 'https://www.wikidata.org/wiki/Q344838',
-            },
-            medium: 'Oil on canvas',
-            isBeingAuctioned: false,
-            purchaseHistory: [],
-          },
-          {
-            description:
-              'An oil painting of cupid singing. The art reflects the embrace of music as a model for art that appeals directly to the emotions.',
-            id: 435826,
-            primaryImage: 'https://images.metmuseum.org/CRDImages/ep/original/DP323394.jpg',
-            purchasePrice: 20000,
-            department: 'European Paintings',
-            title: 'The Love Song',
-            artist: {
-              name: 'Sir Edward Burne-Jones',
-              biography: 'British, Birmingham 1833-1898 Fulham',
-              nationality: 'British',
-              begin: '1833',
-              end: '1898',
-              wikiUrl: 'https://www.wikidata.org/wiki/Q216406',
-            },
-            medium: 'Oil on canvas',
-            isBeingAuctioned: false,
-            purchaseHistory: [],
-          },
-          {
-            description:
-              'An oil painting of the fish market which represents a new kind of scene of everyday life.',
-            id: 679844,
-            primaryImage: 'https://images.metmuseum.org/CRDImages/ep/original/DP375107.jpg',
-            purchasePrice: 10000,
-            department: 'European Paintings',
-            title: 'Fish Market',
-            culture: 'American',
-            artist: {
-              name: 'Joachim Beuckelaer',
-              biography: 'Netherlandish, Antwerp 1533–1575 Antwerp',
-              nationality: 'Netherlandish',
-              begin: '1533',
-              end: '1574',
-              wikiUrl: 'https://www.wikidata.org/wiki/Q533314',
-            },
-            medium: 'Oil on Baltic oak',
-            isBeingAuctioned: false,
-            purchaseHistory: [],
-          },
-        ]);
+        area.addNewArtworksToAuctionHouse(100);
       }
 
       await area.createNewAuctionFloorNonPlayer(10000);
       await area.createNewAuctionFloorNonPlayer(19000);
     }
 
-    // console.log(area.toModel())
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }

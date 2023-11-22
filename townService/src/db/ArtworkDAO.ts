@@ -10,6 +10,8 @@ export default class ArtworkDAO implements IArtworkDAO {
 
   auctionHouseCollection = 'AuctionHouse';
 
+  indexCollection = 'index';
+
   private _db: FirebaseFirestore.Firestore;
 
   public constructor() {
@@ -199,11 +201,20 @@ export default class ArtworkDAO implements IArtworkDAO {
     return true;
   }
 
+  private async _updateArtworkIDIndex(endIndex: number) {
+    await this._db
+      .collection(this.indexCollection)
+      .doc('index')
+      .set({ index: endIndex }, { merge: true });
+  }
+
   /**
    * Adds multiple artworks to the auction house
+   * Takes in the list of artworks and the index number of the last artwork
    * */
-  public async addArtworksToAuctionHouse(artworks: Artwork[]) {
+  public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
     await Promise.all(artworks.map(async artwork => this._addArtworkToAuctionHouse(artwork)));
+    await this._updateArtworkIDIndex(endIndex);
   }
 
   /**
@@ -312,6 +323,22 @@ export default class ArtworkDAO implements IArtworkDAO {
         throw new Error(err.message);
       }
       throw new Error('Error getting auction house Artworks');
+    }
+  }
+
+  public async getArtworkIndex(): Promise<number> {
+    try {
+      let response = await this._db.collection(this.indexCollection).doc('index').get();
+      if (!response.exists) {
+        this._updateArtworkIDIndex(0);
+        response = await this._db.collection(this.indexCollection).doc('index').get();
+      }
+      return response.data()?.index;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+      throw new Error('Error getting artwork index');
     }
   }
 
