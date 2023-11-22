@@ -172,6 +172,8 @@ function ArtAuctionHouseArea({
     } else if (floor?.status === 'IN_PROGRESS' && floor?.currentBid !== undefined) {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
+          <br />
           <strong>Current bid</strong>: ${floor?.currentBid.bid.toLocaleString()}
           <br />
           <strong>User</strong>: ${floor?.currentBid.player.artAuctionAccount?.email}
@@ -180,6 +182,8 @@ function ArtAuctionHouseArea({
     } else {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
+          <br />
           <strong>Winning bid</strong>: ${floor?.currentBid?.bid.toLocaleString()}
           <br />
           <strong>User</strong>: ${floor?.currentBid?.player.artAuctionAccount?.email}
@@ -198,6 +202,20 @@ function ArtAuctionHouseArea({
 
   const handleMakeBid = async (floor: AuctionFloorArea, bid: number) => {
     if (canBid) {
+      if (floor.currentBid?.bid !== undefined && floor.currentBid.bid >= bid) {
+        toast({
+          title: 'cannot bid',
+          description: `you must bid higher than the current bid`,
+          status: 'info',
+        });
+      } else if (floor.minBid >= bid) {
+        toast({
+          title: 'cannot bid',
+          description: `you must bid higher than the minimum starting bid`,
+          status: 'info',
+        });
+      }
+
       await controller.makeBid(floor, bid);
     } else {
       toast({
@@ -256,6 +274,11 @@ function ArtAuctionHouseArea({
               <Divider />
               <Typography
                 variant='subtitle1'
+                style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
+                <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
+              </Typography>
+              <Typography
+                variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
                 <strong>Auctioneer</strong>:{' '}
                 {selectedFloor.auctioneer
@@ -280,10 +303,6 @@ function ArtAuctionHouseArea({
                   <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
                 ))}
               </UnorderedList>
-              <div>
-                time left
-                {getSelectedFloor()?.timeLeft}
-              </div>
               <NumberInput
                 onChange={valueString => setBidAmount(Number(valueString))}
                 value={bidAmount}
@@ -296,7 +315,7 @@ function ArtAuctionHouseArea({
               </NumberInput>
               <Button
                 onClick={async () => {
-                  await handleMakeBid(selectedFloor, bidAmount);
+                  await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
                 }}>
                 Make Bid!
               </Button>
