@@ -138,6 +138,7 @@ describe('when making a bid', () => {
   });
 });
 describe('when creating a new auction floor', () => {
+  jest.setTimeout(50000);
   let testArtwork: Artwork;
   let testArtworkIsBeingAuctioned: Artwork;
   let testArtwork2: Artwork;
@@ -234,6 +235,32 @@ describe('when creating a new auction floor', () => {
     expect(artworks).toHaveLength(1);
     expect(artworks[0].isBeingAuctioned).toBe(true);
     await dao.removePlayer(player.email);
+  });
+  it('adds new artworks to the auction house db if there are none in the db', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.createNewAuctionFloorNonPlayer(1);
+    expect(house.auctionFloors.length).toBeLessThanOrEqual(30);
+    expect(house.auctionFloors[0].artBeingAuctioned.isBeingAuctioned).toBe(true);
+    const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
+    expect(auctionHouseArtworks.length).toBeLessThanOrEqual(30);
+    const artworkBeingAuctioned = auctionHouseArtworks.find(a => a.isBeingAuctioned === true);
+    expect(artworkBeingAuctioned?.isBeingAuctioned).toBe(true);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
+  });
+  it('adds new artworks to the auction house db if there are none available for auction', async () => {
+    const house = new AuctionHouse(nanoid(), testAreaBox, mock<TownEmitter>());
+    await house.addArtworksToAuctionHouse([testArtworkIsBeingAuctioned], 0);
+    await house.createNewAuctionFloorNonPlayer(1);
+    expect(house.auctionFloors.length).toBeLessThanOrEqual(30);
+    expect(house.auctionFloors[0].artBeingAuctioned.isBeingAuctioned).toBe(true);
+    const auctionHouseArtworks = await dao.getAllAuctionHouseArtworks();
+    expect(auctionHouseArtworks.length).toBeLessThanOrEqual(30);
+    expect(auctionHouseArtworks[0].isBeingAuctioned).toBe(true);
+    const artworkBeingAuctioned = auctionHouseArtworks.find(a => a.isBeingAuctioned === true);
+    expect(artworkBeingAuctioned?.isBeingAuctioned).toBe(true);
+    await dao.removeAuctionHouse();
+    await dao.removeArtworkIDList();
   });
 });
 

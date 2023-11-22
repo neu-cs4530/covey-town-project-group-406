@@ -24,7 +24,9 @@ export default class APIUtils {
       this._artworkIds.slice(startIndex, endIndex).map(async objId => {
         const artwork = await this.createArtwork(objId);
         if (this.validArtwork(artwork)) {
-          artworkList.push(artwork);
+          if (artwork !== undefined) {
+            artworkList.push(artwork);
+          }
         }
       }),
     );
@@ -43,23 +45,15 @@ export default class APIUtils {
       }
       throw new Error('unable to get artwork IDs');
     }
-    // this._apiInstance
-    //   .get('public/collection/v1/search?hasImages=true&artistOrCulture=true&q=*')
-    //   .then(response => {
-    //     this._artworkIds = response.data.objectIDs;
-    //   })
-    //   .catch(error => {
-    //     throw new Error(error.message);
-    //   });
   }
 
-  async createArtwork(objectId: number): Promise<Artwork> {
+  async createArtwork(objectId: number): Promise<Artwork | undefined> {
     let responseData = null;
     try {
       const response = await this._apiInstance.get(`public/collection/v1/objects/${objectId}`);
       responseData = response.data;
     } catch (error) {
-      throw new Error("objectID doesn't exist");
+      return undefined;
     }
 
     const { title } = responseData;
@@ -97,7 +91,10 @@ export default class APIUtils {
     return artwork;
   }
 
-  validArtwork(artwork: Artwork): boolean {
+  validArtwork(artwork: Artwork | undefined): boolean {
+    if (artwork === undefined) {
+      return false;
+    }
     return (
       artwork.primaryImage !== '' &&
       artwork.department !== '' &&

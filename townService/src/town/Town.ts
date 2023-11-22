@@ -410,10 +410,7 @@ export default class Town {
           AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
         }
       } catch (err) {
-        const utils = new APIUtils();
-        const index = await this._dao.getArtworkIndex();
-        const artworks = await utils.nextArtworks(index, index + 100);
-        await area.addArtworksToAuctionHouse(artworks, index + 100);
+        area.addNewArtworksToAuctionHouse(100);
       }
 
       await area.createNewAuctionFloorNonPlayer(10000);
