@@ -170,9 +170,14 @@ export default class ArtworkDAO implements IArtworkDAO {
     await this._db
       .collection(this.artworkIDsCollection)
       .doc('artworks')
-      .update({
-        artworkIDs: FieldValue.arrayUnion(id),
-      });
+      .set(
+        {
+          artworkIDs: FieldValue.arrayUnion(id),
+        },
+        {
+          merge: true,
+        },
+      );
   }
 
   private _areAnyOfArtworksAreInCirculation(allArtworkIDs: number[], artworks: Artwork[]): boolean {
