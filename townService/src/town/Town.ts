@@ -410,14 +410,19 @@ export default class Town {
       } catch (err) {
         area.addNewArtworksToAuctionHouse(5);
       }
-    
     }
-    
+
+    const floorPromises = [];
+
     if (area.auctionFloors.length < 5) {
       for (let i = area.auctionFloors.length; i < 5; i++) {
-        await area.createNewAuctionFloorNonPlayer(Math.floor(Math.random() * 50000)%100);
+        floorPromises.push(
+          area.createNewAuctionFloorNonPlayer(Math.floor(Math.random() * 50000) % 100),
+        );
       }
     }
+
+    await Promise.all(floorPromises);
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
