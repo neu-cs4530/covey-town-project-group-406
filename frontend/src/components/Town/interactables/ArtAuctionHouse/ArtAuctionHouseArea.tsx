@@ -238,7 +238,7 @@ function ArtAuctionHouseArea({
       <Typography variant='subtitle1' style={{ padding: 30, paddingTop: 15, fontWeight: 300 }}>
         You are logged in as: {townController.ourPlayer.artAuctionAccount?.email}
         <br />
-        You have a balance of: ${userMoney}
+        You have a balance of: ${userMoney.toLocaleString()}
       </Typography>
       {selectedFloor !== undefined ? (
         <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>

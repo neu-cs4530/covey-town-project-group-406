@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge, Button } from '@chakra-ui/react';
-import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@material-ui/core';
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, Typography } from '@material-ui/core';
 import { AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
 interface AuctionFloorCardProps {
@@ -28,35 +28,39 @@ const AuctionFloorCard = ({
 
   return (
     <Card style={{ maxWidth: 345 }}>
-      <CardActionArea>
+      <CardActionArea style={{height: '100%', display:'flex', flexDirection:'column', justifyContent:'flex-start'}}>
         <CardMedia
           component='img'
-          height='140'
+          height='200'
           image={artwork.primaryImage}
           alt={artwork.description}
+          style={{minHeight:200, maxHeight:200, overflow:'hidden'}}
         />
-        <CardContent>
+        <CardContent style={{height:'100%', display:'flex', flexDirection:'column'}}>
           <Typography gutterBottom variant='h5' component='div' style={{ fontWeight: 700 }}>
             {artwork.title}
           </Typography>
           <Typography gutterBottom variant='subtitle1' component='div' style={{ fontWeight: 500 }}>
             {artwork.artist.name}
           </Typography>
-          {getAuctionStatus()}
-          <Button
-            style={{ marginTop: 20 }}
-            onClick={async () => {
-              await handleClickJoinObserver(floor);
-            }}>
-            Join as Observer
-          </Button>
-          <Button
-            style={{ marginTop: 20, marginLeft: 10 }}
-            onClick={async () => {
-              await handleClickJoinFloorBidder(floor);
-            }}>
-            Join as Bidder
-          </Button>
+          <div>
+            {getAuctionStatus()}
+          </div>
+          <div style={{display: 'flex', gap: 10, marginTop: 20, flexGrow:1, alignItems:'end'}}>
+            <Button
+              onClick={async () => {
+                await handleClickJoinObserver(floor);
+              }}>
+              Join as Observer
+            </Button>
+            <Button
+              style={{backgroundColor: 'lightblue'}}
+              onClick={async () => {
+                await handleClickJoinFloorBidder(floor);
+              }}>
+              Join as Bidder
+            </Button>
+          </div>
         </CardContent>
       </CardActionArea>
     </Card>
