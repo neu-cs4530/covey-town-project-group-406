@@ -221,6 +221,7 @@ export default class AuctionFloor extends EventEmitter implements IAuctionFloor 
     const x = setInterval(() => {
       this._decreaseAuctionTimeLeft();
       if (this._timeLeft <= 0) {
+        // this.emit('timeDecreased', this._timeLeft);
         clearInterval(x);
         this._endAuction();
       }

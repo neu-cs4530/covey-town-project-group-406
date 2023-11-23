@@ -14,6 +14,7 @@ import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
+  ArtAuctionAccount,
   Artwork,
   ChatMessage,
   CoveyTownSocket,
@@ -119,6 +120,8 @@ export type TownEvents = {
   createUserStatus: (success: boolean) => void;
 
   userLogoutStatus: (success: boolean) => void;
+
+  artAccountUpdated: (account: ArtAuctionAccount) => void;
 };
 
 /**

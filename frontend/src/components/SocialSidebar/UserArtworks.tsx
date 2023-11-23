@@ -14,7 +14,7 @@ export default function UserArtworks({ userArtworks }: Props): JSX.Element {
               title: {artwork.title}
             </Heading>
             <Heading as='h3' fontSize='m'>
-              artist: {artwork.artist}
+              artist: {artwork.artist.name}
             </Heading>
             <Image src={artwork.primaryImage} alt='not found'></Image>
           </Box>

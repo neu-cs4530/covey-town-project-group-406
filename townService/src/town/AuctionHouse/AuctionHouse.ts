@@ -101,11 +101,13 @@ export default class AuctionHouse extends InteractableArea {
         if (floor.currentBid) {
           floor.currentBid.player = player;
           floor.currentBid.bid = bid;
+          floor.timeLeft += 5;
         } else {
           floor.currentBid = {
             player,
             bid,
           };
+          floor.timeLeft += 5;
         }
       }
     } else {
@@ -246,11 +248,13 @@ export default class AuctionHouse extends InteractableArea {
     for (const floor of this._auctionFloors) {
       floorArray.push(floor.toModel());
     }
+    const occupantsObj = this.occupants.map(o => o.toPlayerModel());
     return {
       id: this.id,
       occupants: this.occupantsByID,
       type: this.getType(),
       floors: floorArray,
+      occupantsObj,
     };
   }
 
@@ -270,13 +274,19 @@ export default class AuctionHouse extends InteractableArea {
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinAuctionFloor') {
-      this.joinFloorAsObserver(player, command.floor.id);
+      if (command.asBidder) {
+        this.joinFloorAsBidder(player, command.floor.id);
+      } else {
+        this.joinFloorAsObserver(player, command.floor.id);
+      }
       this._emitAreaChanged();
       const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
       if (newFloor === undefined) {
         throw new Error();
       }
-
+      if (newFloor.bidders.length >= 3) {
+        newFloor.startAuction();
+      }
       return { floorJoined: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
     }
 
@@ -289,6 +299,16 @@ export default class AuctionHouse extends InteractableArea {
       }
 
       return { floorLeft: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
+    }
+
+    if (command.type === 'MakeBid') {
+      this.makeBid(player, command.floor.id, command.bid);
+      this._emitAreaChanged();
+      const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
+      if (newFloor === undefined) {
+        throw new Error();
+      }
+      return { floor: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
     }
 
     return undefined as InteractableCommandReturnType<CommandType>;

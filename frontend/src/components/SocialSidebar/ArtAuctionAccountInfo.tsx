@@ -12,12 +12,14 @@ import {
 } from '@chakra-ui/react';
 import { Artwork } from '../../types/CoveyTownSocket';
 import UserArtworks from './UserArtworks';
+import { useInteractable } from '../../classes/TownController';
 
 type Props = {
   userEmail: string;
   userMoney: number;
   userArtworks: Artwork[];
 };
+
 export default function ArtAuctionAccountInfo({
   userEmail,
   userMoney,
@@ -64,6 +66,10 @@ export function ArtAuctionAccountInfoWrapper(): JSX.Element {
         setUserArtworks(townController.ourPlayer.artAuctionAccount.wallet.artwork);
       }
     }
+  });
+  townController.addListener('artAccountUpdated', account => {
+    setUserArtworks(account.wallet.artwork);
+    setUserMoney(account.wallet.money);
   });
 
   return (

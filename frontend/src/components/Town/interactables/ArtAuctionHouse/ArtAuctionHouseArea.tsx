@@ -11,6 +11,11 @@ import {
   Badge,
   Spinner,
   useToast,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
 import { signOut } from 'firebase/auth';
@@ -18,7 +23,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import AuctionHouseAreaController from '../../../../classes/interactable/AuctionHouseAreaController';
 import { useInteractable } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { AuctionFloorArea } from '../../../../types/CoveyTownSocket';
+import { ArtAuctionAccount, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 import AuctionHouseAreaInteractable from '../AuctionHouseArea';
 import SignupSignIn from '../../../Login/ArtAuctionHouseLogin/SignupSignIn';
 import AuctionFloorCard from './AuctionFloorCard';
@@ -31,13 +36,39 @@ function ArtAuctionHouseArea({
   controller: AuctionHouseAreaController;
 }): JSX.Element {
   const toast = useToast();
+  const townController = useTownController();
   const [floors, setFloors] = useState<AuctionFloorArea[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<AuctionFloorArea | undefined>();
-  const townController = useTownController();
+  const [bidAmount, setBidAmount] = useState(0);
+  const [canBid, setCanBid] = useState(false);
+  const [userMoney, setUserMoney] = useState(
+    townController.ourPlayer.artAuctionAccount?.wallet.money as number,
+  );
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
       setFloors(newFloors);
+      for (const f of newFloors) {
+        if (f.id === selectedFloor?.id) {
+          if (f.status !== 'WAITING_TO_START') {
+            setCanBid(true);
+          }
+          if (f.timeLeft === 0) {
+            setSelectedFloor(undefined);
+            setCanBid(false);
+          }
+          f.bidders.map(b => {
+            if (
+              b.id === townController.ourPlayer.id &&
+              townController.ourPlayer.artAuctionAccount?.wallet.artwork.length !==
+                b.artAuctionAccount?.wallet.artwork.length
+            ) {
+              console.log('we are here!!!');
+              townController.ourPlayer.artAuctionAccount = b.artAuctionAccount;
+            }
+          });
+        }
+      }
     };
 
     const handleFloorJoined = (floor: AuctionFloorArea) => {
@@ -48,9 +79,15 @@ function ArtAuctionHouseArea({
       setSelectedFloor(undefined);
     };
 
+    const handleArtAccountUpdated = (account: ArtAuctionAccount) => {
+      setUserMoney(account.wallet.money);
+    };
+
     controller.addListener('floorsChanged', handleFloorsChanged);
     controller.addListener('floorJoined', handleFloorJoined);
     controller.addListener('floorLeft', handleFloorLeft);
+
+    townController.addListener('artAccountUpdated', handleArtAccountUpdated);
 
     townController.createAuctionHouseArea({
       id: 'Art Auction House',
@@ -61,8 +98,9 @@ function ArtAuctionHouseArea({
       controller.removeListener('floorsChanged', handleFloorsChanged);
       controller.removeListener('floorJoined', handleFloorJoined);
       controller.removeListener('floorLeft', handleFloorLeft);
+      townController.removeListener('artAccountUpdated', handleArtAccountUpdated);
     };
-  }, [controller, townController]);
+  }, [controller, townController, selectedFloor?.id]);
 
   // TODO
   const handleAuctionMyArtwork = () => {
@@ -123,38 +161,76 @@ function ArtAuctionHouseArea({
     }
   };
 
-  const getCurrentBid = (floor: AuctionFloorArea) => {
-    if (floor.status === 'WAITING_TO_START') {
+  const getCurrentBid = () => {
+    const floor = getSelectedFloor();
+    if (floor?.status === 'WAITING_TO_START') {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Starting bid</strong>: ${floor.minBid.toLocaleString()}
+          <strong>Starting bid</strong>: ${floor?.minBid.toLocaleString()}
         </Typography>
       );
-    } else if (floor.status === 'IN_PROGRESS' && floor.currentBid !== undefined) {
+    } else if (floor?.status === 'IN_PROGRESS' && floor?.currentBid !== undefined) {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Current bid</strong>: ${floor.currentBid.bid.toLocaleString()}
+          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
           <br />
-          <strong>User</strong>: ${floor.currentBid.player}
+          <strong>Current bid</strong>: ${floor?.currentBid.bid.toLocaleString()}
+          <br />
+          <strong>User</strong>: ${floor?.currentBid.player.artAuctionAccount?.email}
         </Typography>
       );
     } else {
       return (
         <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Winning bid</strong>: ${floor.currentBid?.bid.toLocaleString()}
+          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
           <br />
-          <strong>User</strong>: ${floor.currentBid?.player}
+          <strong>Winning bid</strong>: ${floor?.currentBid?.bid.toLocaleString()}
+          <br />
+          <strong>User</strong>: ${floor?.currentBid?.player.artAuctionAccount?.email}
         </Typography>
       );
     }
   };
 
-  const handleFloorSelect = async (floor: AuctionFloorArea) => {
-    await controller.joinFloor(floor);
+  const handleFloorSelect = async (floor: AuctionFloorArea, asBidder: boolean) => {
+    await controller.joinFloor(floor, asBidder);
   };
 
   const handleFloorUnselect = async (floor: AuctionFloorArea) => {
     await controller.leaveFloor(floor);
+  };
+
+  const weAreBidder = () => {
+    if (selectedFloor?.bidders.find(b => b.id === townController.ourPlayer.id) !== undefined) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleMakeBid = async (floor: AuctionFloorArea, bid: number) => {
+    if (canBid) {
+      if (floor.currentBid?.bid !== undefined && floor.currentBid.bid >= bid) {
+        toast({
+          title: 'cannot bid',
+          description: `you must bid higher than the current bid`,
+          status: 'info',
+        });
+      } else if (floor.minBid >= bid) {
+        toast({
+          title: 'cannot bid',
+          description: `you must bid higher than the minimum starting bid`,
+          status: 'info',
+        });
+      }
+
+      await controller.makeBid(floor, bid);
+    } else {
+      toast({
+        title: 'cannot bid',
+        description: `auction has not started`,
+        status: 'info',
+      });
+    }
   };
 
   return (
@@ -162,8 +238,7 @@ function ArtAuctionHouseArea({
       <Typography variant='subtitle1' style={{ padding: 30, paddingTop: 15, fontWeight: 300 }}>
         You are logged in as: {townController.ourPlayer.artAuctionAccount?.email}
         <br />
-        You have a balance of: $
-        {townController.ourPlayer.artAuctionAccount?.wallet.money.toLocaleString()}
+        You have a balance of: ${userMoney}
       </Typography>
       {selectedFloor !== undefined ? (
         <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>
@@ -200,12 +275,15 @@ function ArtAuctionHouseArea({
                   Auction Space
                 </Typography>
                 <div style={{ display: 'inline', float: 'inline-end' }}>
-                  {getAuctionStatus(selectedFloor)}
+                  {getAuctionStatus(getSelectedFloor() as AuctionFloorArea)}
                 </div>
               </div>
-
               <Divider />
-
+              <Typography
+                variant='subtitle1'
+                style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
+                <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
+              </Typography>
               <Typography
                 variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
@@ -214,19 +292,46 @@ function ArtAuctionHouseArea({
                   ? selectedFloor.auctioneer.artAuctionAccount?.email
                   : 'Auction House'}
               </Typography>
-
-              {getCurrentBid(selectedFloor)}
-
+              {getCurrentBid()}
               <Typography
                 variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
                 Users currently on the same floor
               </Typography>
+              observers
               <UnorderedList>
                 {getSelectedFloor()?.observers.map((o, idx) => (
                   <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
                 ))}
               </UnorderedList>
+              bidders
+              <UnorderedList>
+                {getSelectedFloor()?.bidders.map((o, idx) => (
+                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
+                ))}
+              </UnorderedList>
+              {weAreBidder() ? (
+                <div>
+                  <NumberInput
+                    onChange={valueString => setBidAmount(Number(valueString))}
+                    value={bidAmount}
+                    max={userMoney}>
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <Button
+                    onClick={async () => {
+                      await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
+                    }}>
+                    Make Bid!
+                  </Button>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         </div>
@@ -283,8 +388,11 @@ function ArtAuctionHouseArea({
                   <AuctionFloorCard
                     key={idx}
                     floor={floor}
-                    handleClick={async () => {
-                      await handleFloorSelect(floor);
+                    handleClickJoinObserver={async () => {
+                      await handleFloorSelect(floor, false);
+                    }}
+                    handleClickJoinFloorBidder={async () => {
+                      await handleFloorSelect(floor, true);
                     }}
                   />
                 ))}
