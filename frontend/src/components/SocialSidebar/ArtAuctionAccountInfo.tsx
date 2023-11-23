@@ -12,7 +12,6 @@ import {
 } from '@chakra-ui/react';
 import { Artwork } from '../../types/CoveyTownSocket';
 import UserArtworks from './UserArtworks';
-import { useInteractable } from '../../classes/TownController';
 
 type Props = {
   userEmail: string;

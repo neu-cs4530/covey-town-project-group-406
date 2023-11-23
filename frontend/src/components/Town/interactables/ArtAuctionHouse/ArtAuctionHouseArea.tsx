@@ -5,17 +5,8 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  UnorderedList,
-  ListItem,
-  Divider,
-  Badge,
   Spinner,
   useToast,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
 import { signOut } from 'firebase/auth';
@@ -29,6 +20,7 @@ import SignupSignIn from '../../../Login/ArtAuctionHouseLogin/SignupSignIn';
 import AuctionFloorCard from './AuctionFloorCard';
 import ArtworkDisplay from './ArtworkDisplay';
 import auth from '../../../../classes/FirestoreConfig';
+import ArtworkAuctionSpace from './ArtworkAuctionSpace';
 
 function ArtAuctionHouseArea({
   controller,
@@ -63,7 +55,6 @@ function ArtAuctionHouseArea({
               townController.ourPlayer.artAuctionAccount?.wallet.artwork.length !==
                 b.artAuctionAccount?.wallet.artwork.length
             ) {
-              console.log('we are here!!!');
               townController.ourPlayer.artAuctionAccount = b.artAuctionAccount;
             }
           });
@@ -86,7 +77,6 @@ function ArtAuctionHouseArea({
     controller.addListener('floorsChanged', handleFloorsChanged);
     controller.addListener('floorJoined', handleFloorJoined);
     controller.addListener('floorLeft', handleFloorLeft);
-
     townController.addListener('artAccountUpdated', handleArtAccountUpdated);
 
     townController.createAuctionHouseArea({
@@ -120,8 +110,8 @@ function ArtAuctionHouseArea({
           });
         } else {
           toast({
-            title: 'Log out failed',
-            description: `Logging out did not work!`,
+            title: 'Log out failed.',
+            description: `We were not able to log you out. Please try again.`,
             status: 'error',
           });
         }
@@ -151,47 +141,6 @@ function ArtAuctionHouseArea({
     }
   };
 
-  const getAuctionStatus = (floor: AuctionFloorArea) => {
-    if (floor.status === 'IN_PROGRESS') {
-      return <Badge colorScheme='green'>Auction in progress</Badge>;
-    } else if (floor.status === 'WAITING_TO_START') {
-      return <Badge colorScheme='purple'>Waiting to start the auction</Badge>;
-    } else {
-      return <Badge colorScheme='red'>Auction ended</Badge>;
-    }
-  };
-
-  const getCurrentBid = () => {
-    const floor = getSelectedFloor();
-    if (floor?.status === 'WAITING_TO_START') {
-      return (
-        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Starting bid</strong>: ${floor?.minBid.toLocaleString()}
-        </Typography>
-      );
-    } else if (floor?.status === 'IN_PROGRESS' && floor?.currentBid !== undefined) {
-      return (
-        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
-          <br />
-          <strong>Current bid</strong>: ${floor?.currentBid.bid.toLocaleString()}
-          <br />
-          <strong>User</strong>: ${floor?.currentBid.player.artAuctionAccount?.email}
-        </Typography>
-      );
-    } else {
-      return (
-        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
-          <br />
-          <strong>Winning bid</strong>: ${floor?.currentBid?.bid.toLocaleString()}
-          <br />
-          <strong>User</strong>: ${floor?.currentBid?.player.artAuctionAccount?.email}
-        </Typography>
-      );
-    }
-  };
-
   const handleFloorSelect = async (floor: AuctionFloorArea, asBidder: boolean) => {
     await controller.joinFloor(floor, asBidder);
   };
@@ -211,23 +160,24 @@ function ArtAuctionHouseArea({
     if (canBid) {
       if (floor.currentBid?.bid !== undefined && floor.currentBid.bid >= bid) {
         toast({
-          title: 'cannot bid',
-          description: `you must bid higher than the current bid`,
+          title: 'Could not make the bid',
+          description: `You must place a bid higher than the current bid.`,
           status: 'info',
         });
       } else if (floor.minBid >= bid) {
         toast({
-          title: 'cannot bid',
-          description: `you must bid higher than the minimum starting bid`,
+          title: 'Could not make the bid',
+          description: `You must place a bid higher than the minimum starting bid.`,
           status: 'info',
         });
       }
 
       await controller.makeBid(floor, bid);
+      setBidAmount(0);
     } else {
       toast({
-        title: 'cannot bid',
-        description: `auction has not started`,
+        title: 'Could not make the bid',
+        description: `The auction has not started! Please wait till the auction begins.`,
         status: 'info',
       });
     }
@@ -238,7 +188,7 @@ function ArtAuctionHouseArea({
       <Typography variant='subtitle1' style={{ padding: 30, paddingTop: 15, fontWeight: 300 }}>
         You are logged in as: {townController.ourPlayer.artAuctionAccount?.email}
         <br />
-        You have a balance of: ${userMoney}
+        You have a balance of: ${userMoney.toLocaleString()}
       </Typography>
       {selectedFloor !== undefined ? (
         <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>
@@ -251,7 +201,6 @@ function ArtAuctionHouseArea({
             }}>
             Back
           </Button>
-
           <div
             style={{
               width: '100%',
@@ -269,69 +218,17 @@ function ArtAuctionHouseArea({
               }}>
               <ArtworkDisplay artwork={selectedFloor.artBeingAuctioned} />
             </div>
+
             <div style={{ width: '50%' }}>
-              <div>
-                <Typography variant='h4' style={{ display: 'inline', fontWeight: 700 }}>
-                  Auction Space
-                </Typography>
-                <div style={{ display: 'inline', float: 'inline-end' }}>
-                  {getAuctionStatus(getSelectedFloor() as AuctionFloorArea)}
-                </div>
-              </div>
-              <Divider />
-              <Typography
-                variant='subtitle1'
-                style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
-                <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
-              </Typography>
-              <Typography
-                variant='subtitle1'
-                style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
-                <strong>Auctioneer</strong>:{' '}
-                {selectedFloor.auctioneer
-                  ? selectedFloor.auctioneer.artAuctionAccount?.email
-                  : 'Auction House'}
-              </Typography>
-              {getCurrentBid()}
-              <Typography
-                variant='subtitle1'
-                style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
-                Users currently on the same floor
-              </Typography>
-              observers
-              <UnorderedList>
-                {getSelectedFloor()?.observers.map((o, idx) => (
-                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
-                ))}
-              </UnorderedList>
-              bidders
-              <UnorderedList>
-                {getSelectedFloor()?.bidders.map((o, idx) => (
-                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
-                ))}
-              </UnorderedList>
-              {weAreBidder() ? (
-                <div>
-                  <NumberInput
-                    onChange={valueString => setBidAmount(Number(valueString))}
-                    value={bidAmount}
-                    max={userMoney}>
-                    <NumberInputField />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                  <Button
-                    onClick={async () => {
-                      await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
-                    }}>
-                    Make Bid!
-                  </Button>
-                </div>
-              ) : (
-                <></>
-              )}
+              <ArtworkAuctionSpace
+                selectedFloor={selectedFloor}
+                bidAmount={bidAmount}
+                userMoney={userMoney}
+                getSelectedFloor={getSelectedFloor}
+                handleMakeBid={handleMakeBid}
+                setBidAmount={setBidAmount}
+                weAreBidder={weAreBidder}
+              />
             </div>
           </div>
         </div>
