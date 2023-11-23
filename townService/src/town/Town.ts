@@ -417,7 +417,9 @@ export default class Town {
     if (area.auctionFloors.length < 5) {
       for (let i = area.auctionFloors.length; i < 5; i++) {
         floorPromises.push(
-          area.createNewAuctionFloorNonPlayer(Math.floor(Math.random() * 50000) % 100),
+          area.createNewAuctionFloorNonPlayer(
+            Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
+          ),
         );
       }
     }
