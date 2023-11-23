@@ -411,9 +411,11 @@ export default class Town {
         area.addNewArtworksToAuctionHouse(100);
       }
 
-      await area.createNewAuctionFloorNonPlayer(10000);
-      await area.createNewAuctionFloorNonPlayer(19000);
+      // await area.createNewAuctionFloorNonPlayer(10000);
+      // await area.createNewAuctionFloorNonPlayer(19000);
     }
+    await area.createNewAuctionFloorNonPlayer(10000);
+    await area.createNewAuctionFloorNonPlayer(19000);
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
