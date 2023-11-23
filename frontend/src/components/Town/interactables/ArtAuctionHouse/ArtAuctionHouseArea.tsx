@@ -151,7 +151,7 @@ function ArtAuctionHouseArea({
     }
   };
 
-  const getAuctionStatus = (floor: AuctionFloorArea) => {
+  const getAuctionStatusBadge = (floor: AuctionFloorArea) => {
     if (floor.status === 'IN_PROGRESS') {
       return <Badge colorScheme='green'>Auction in progress</Badge>;
     } else if (floor.status === 'WAITING_TO_START') {
@@ -169,26 +169,38 @@ function ArtAuctionHouseArea({
           <strong>Starting bid</strong>: ${floor?.minBid.toLocaleString()}
         </Typography>
       );
-    } else if (floor?.status === 'IN_PROGRESS' && floor?.currentBid !== undefined) {
-      return (
-        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
-          <br />
-          <strong>Current bid</strong>: ${floor?.currentBid.bid.toLocaleString()}
-          <br />
-          <strong>User</strong>: ${floor?.currentBid.player.artAuctionAccount?.email}
-        </Typography>
-      );
+    } else if (floor?.status === 'IN_PROGRESS') {
+      if (floor !== undefined && floor.currentBid !== undefined) {
+        return (
+          <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+            <strong>Current bid</strong>: ${floor.currentBid.bid.toLocaleString()}
+            <br />
+            <strong>User</strong>: {floor?.currentBid.player.artAuctionAccount?.email}
+          </Typography>
+        );
+      } else {
+        return (
+          <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+            <strong>Starting Bid: ${floor.minBid.toLocaleString()}</strong>
+          </Typography>
+        );
+      }
     } else {
-      return (
-        <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
-          <strong>Minimum Starting Bid: ${floor?.minBid.toLocaleString()}</strong>
-          <br />
-          <strong>Winning bid</strong>: ${floor?.currentBid?.bid.toLocaleString()}
-          <br />
-          <strong>User</strong>: ${floor?.currentBid?.player.artAuctionAccount?.email}
-        </Typography>
-      );
+      if (floor !== undefined && floor.currentBid !== undefined) {
+        return (
+          <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+            <strong>Winning bid</strong>: ${floor.currentBid?.bid.toLocaleString()}
+            <br />
+            <strong>User</strong>: {floor.currentBid.player.artAuctionAccount?.email}
+          </Typography>
+        );
+      } else {
+        return (
+          <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 24 }}>
+            <strong>Auction ended</strong>
+          </Typography>
+        );
+      }
     }
   };
 
@@ -275,15 +287,10 @@ function ArtAuctionHouseArea({
                   Auction Space
                 </Typography>
                 <div style={{ display: 'inline', float: 'inline-end' }}>
-                  {getAuctionStatus(getSelectedFloor() as AuctionFloorArea)}
+                  {getAuctionStatusBadge(getSelectedFloor() as AuctionFloorArea)}
                 </div>
               </div>
               <Divider />
-              <Typography
-                variant='subtitle1'
-                style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
-                <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
-              </Typography>
               <Typography
                 variant='subtitle1'
                 style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
@@ -292,26 +299,18 @@ function ArtAuctionHouseArea({
                   ? selectedFloor.auctioneer.artAuctionAccount?.email
                   : 'Auction House'}
               </Typography>
+
               {getCurrentBid()}
-              <Typography
-                variant='subtitle1'
-                style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
-                Users currently on the same floor
-              </Typography>
-              observers
-              <UnorderedList>
-                {getSelectedFloor()?.observers.map((o, idx) => (
-                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
-                ))}
-              </UnorderedList>
-              bidders
-              <UnorderedList>
-                {getSelectedFloor()?.bidders.map((o, idx) => (
-                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
-                ))}
-              </UnorderedList>
+
+              <Divider />
+
               {weAreBidder() ? (
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+                  <Typography
+                    variant='subtitle1'
+                    style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
+                    <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
+                  </Typography>
                   <NumberInput
                     onChange={valueString => setBidAmount(Number(valueString))}
                     value={bidAmount}
@@ -328,10 +327,51 @@ function ArtAuctionHouseArea({
                     }}>
                     Make Bid!
                   </Button>
+
+                  <Divider />
                 </div>
               ) : (
                 <></>
               )}
+
+              <div style={{ display: 'flex', flexDirection: 'row', gap: 5, width: '100%' }}>
+                <div style={{ width: '50%' }}>
+                  <Typography
+                    variant='subtitle1'
+                    style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
+                    <strong>Observers</strong>
+                  </Typography>
+                  {getSelectedFloor()?.observers.length === 0 ? (
+                    <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 16 }}>
+                      There are no current observers.
+                    </Typography>
+                  ) : (
+                    <UnorderedList>
+                      {getSelectedFloor()?.observers.map((o, idx) => (
+                        <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
+                      ))}
+                    </UnorderedList>
+                  )}
+                </div>
+                <div style={{ width: '50%' }}>
+                  <Typography
+                    variant='subtitle1'
+                    style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
+                    <strong>Bidders</strong>
+                  </Typography>
+                  {getSelectedFloor()?.bidders.length === 0 ? (
+                    <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 16 }}>
+                      There are no current bidders.
+                    </Typography>
+                  ) : (
+                    <UnorderedList>
+                      {getSelectedFloor()?.bidders.map((o, idx) => (
+                        <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
+                      ))}
+                    </UnorderedList>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
