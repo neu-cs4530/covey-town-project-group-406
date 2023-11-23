@@ -201,7 +201,6 @@ function ArtAuctionHouseArea({
             }}>
             Back
           </Button>
-
           <div
             style={{
               width: '100%',
