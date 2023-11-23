@@ -408,14 +408,16 @@ export default class Town {
           AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
         }
       } catch (err) {
-        area.addNewArtworksToAuctionHouse(100);
+        area.addNewArtworksToAuctionHouse(5);
       }
-
-      // await area.createNewAuctionFloorNonPlayer(10000);
-      // await area.createNewAuctionFloorNonPlayer(19000);
+    
     }
-    await area.createNewAuctionFloorNonPlayer(10000);
-    await area.createNewAuctionFloorNonPlayer(19000);
+    
+    if (area.auctionFloors.length < 5) {
+      for (let i = area.auctionFloors.length; i < 5; i++) {
+        await area.createNewAuctionFloorNonPlayer(Math.floor(Math.random() * 50000)%100);
+      }
+    }
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
