@@ -57,7 +57,9 @@ export default class AuctionHouse extends InteractableArea {
         }
       } else if (floor.auctioneer?.id === player.id) {
         // shut down the auction floor, make it so that the artwork is not being auctioned
+        player.removeArtwork(floor.artBeingAuctioned);
         floor.artBeingAuctioned.isBeingAuctioned = false;
+        player.addArtwork(floor.artBeingAuctioned);
         await this._dao.updatePlayerArtworkById(player.email, floor.artBeingAuctioned);
         this.auctionFloors = this.auctionFloors.filter(f => f.id !== floorID);
       }
@@ -226,8 +228,10 @@ export default class AuctionHouse extends InteractableArea {
     if (!playerHasArtwork || artwork.isBeingAuctioned) {
       throw new Error('player does not have artwork with id');
     }
-
+    player.removeArtwork(artwork);
     artwork.isBeingAuctioned = true;
+    player.addArtwork(artwork);
+
     await this._dao.updatePlayerArtworkById(player.email, artwork);
     const floor = new AuctionFloor(nanoid(), artwork, 30, undefined, [], [], minBid, player);
     floor.on('auctionEnded', f => {
@@ -325,9 +329,10 @@ export default class AuctionHouse extends InteractableArea {
     }
 
     if (command.type === 'TakeDownOurAuction') {
-      // TODO
-      this._emitAreaChanged();
-      return undefined as InteractableCommandReturnType<CommandType>;
+      this.leaveAuctionFloor(player, command.floor.id).then(() => {
+        this._emitAreaChanged();
+        return undefined as InteractableCommandReturnType<CommandType>;
+      });
     }
 
     return undefined as InteractableCommandReturnType<CommandType>;

@@ -111,6 +111,7 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     const ourPlayer = newModel.occupantsObj.find(o => o.id === this._townController.ourPlayer.id);
     if (ourPlayer) {
       this._townController.ourPlayer.artAuctionAccount = ourPlayer.artAuctionAccount;
+      console.log(ourPlayer);
 
       this._townController.emit(
         'artAccountUpdated',
