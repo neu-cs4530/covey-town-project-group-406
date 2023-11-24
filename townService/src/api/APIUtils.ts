@@ -25,8 +25,13 @@ export default class APIUtils {
     if (this._artworkIds.length === 0) {
       await this._getArtworkIDs();
     }
-    const allArtworksAddedIds = await this._dao.getAllArtworkIDs();
-
+    let allArtworksAddedIds: number[] = [];
+    try {
+      allArtworksAddedIds = await this._dao.getAllArtworkIDs();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log('no ids found');
+    }
     await Promise.all(
       this._artworkIds.slice(startIndex, endIndex).map(async objId => {
         const artwork = await this.createArtwork(objId);

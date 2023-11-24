@@ -311,7 +311,7 @@ export default class ArtworkDAO implements IArtworkDAO {
   public async getAllArtworkIDs(): Promise<number[]> {
     const ref = await this._db.collection(this.artworkIDsCollection).doc('artworks').get();
     if (!ref.exists) {
-      return [];
+      throw new Error('artwork ids collection not instantiated properly');
     }
     return ref.data()?.artworkIDs;
   }
