@@ -383,6 +383,7 @@ export default class Town {
   }
 
   public async addAuctionHouseArea(interactable: Interactable): Promise<boolean> {
+    console.log('called here');
     const area = this._interactables.find(
       eachArea => eachArea.id === interactable.id,
     ) as AuctionHouse;
