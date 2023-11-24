@@ -8,8 +8,6 @@ export default class APIUtils {
 
   private _artworkIds: number[];
 
-  private _dao: ArtworkDAO;
-
   constructor() {
     this._apiInstance = axios.create({
       baseURL: 'https://collectionapi.metmuseum.org/',
@@ -17,7 +15,6 @@ export default class APIUtils {
       headers: {},
     });
     this._artworkIds = [];
-    this._dao = SingletonArtworkDAO.instance();
   }
 
   async nextArtworks(startIndex: number, endIndex: number): Promise<Artwork[]> {
@@ -25,13 +22,7 @@ export default class APIUtils {
     if (this._artworkIds.length === 0) {
       await this._getArtworkIDs();
     }
-    let allArtworksAddedIds: number[] = [];
-    try {
-      allArtworksAddedIds = await this._dao.getAllArtworkIDs();
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log('no ids found');
-    }
+
     await Promise.all(
       this._artworkIds.slice(startIndex, endIndex).map(async objId => {
         const artwork = await this.createArtwork(objId);
@@ -46,19 +37,7 @@ export default class APIUtils {
     // loop through and add the artworks, keep track of ids added
     // if id has been added, dont add it
 
-    const uniqueArtworkList: Artwork[] = [];
-    const uniqueIds: Set<number> = new Set<number>();
-    for (const id of allArtworksAddedIds) {
-      uniqueIds.add(id);
-    }
-
-    for (const artwork of artworkList) {
-      if (!uniqueIds.has(artwork.id)) {
-        uniqueArtworkList.push({ ...artwork });
-      }
-    }
-
-    return uniqueArtworkList;
+    return artworkList;
   }
 
   private async _getArtworkIDs() {
