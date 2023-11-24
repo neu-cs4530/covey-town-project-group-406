@@ -22,9 +22,13 @@ export default class APIUtils {
 
   async nextArtworks(startIndex: number, endIndex: number): Promise<Artwork[]> {
     const artworkList: Artwork[] = [];
-    if (this._artworkIds.length === 0) {
+    while (this._artworkIds.length === 0) {
+      // eslint-disable-next-line no-await-in-loop
       await this._getArtworkIDs();
     }
+    /* if (this._artworkIds.length === 0) {
+      await this._getArtworkIDs();
+    } */
 
     const rawArtworks = await Promise.all(
       this._artworkIds.slice(startIndex, endIndex).map(async objId => this.createArtwork(objId)),
