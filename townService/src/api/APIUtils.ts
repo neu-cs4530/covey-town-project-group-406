@@ -1,10 +1,14 @@
 import axios, { AxiosInstance } from 'axios';
 import { Artwork, ArtistInfo } from '../types/CoveyTownSocket';
+import ArtworkDAO from '../db/ArtworkDAO';
+import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
 
 export default class APIUtils {
   private _apiInstance: AxiosInstance;
 
   private _artworkIds: number[];
+
+  private _dao: ArtworkDAO;
 
   constructor() {
     this._apiInstance = axios.create({
@@ -13,6 +17,7 @@ export default class APIUtils {
       headers: {},
     });
     this._artworkIds = [];
+    this._dao = SingletonArtworkDAO.instance();
   }
 
   async nextArtworks(startIndex: number, endIndex: number): Promise<Artwork[]> {
@@ -20,6 +25,8 @@ export default class APIUtils {
     if (this._artworkIds.length === 0) {
       await this._getArtworkIDs();
     }
+    const allArtworksAddedIds = await this._dao.getAllArtworkIDs();
+
     await Promise.all(
       this._artworkIds.slice(startIndex, endIndex).map(async objId => {
         const artwork = await this.createArtwork(objId);
@@ -30,7 +37,23 @@ export default class APIUtils {
         }
       }),
     );
-    return artworkList;
+
+    // loop through and add the artworks, keep track of ids added
+    // if id has been added, dont add it
+
+    const uniqueArtworkList: Artwork[] = [];
+    const uniqueIds: Set<number> = new Set<number>();
+    for (const id of allArtworksAddedIds) {
+      uniqueIds.add(id);
+    }
+
+    for (const artwork of artworkList) {
+      if (!uniqueIds.has(artwork.id)) {
+        uniqueArtworkList.push({ ...artwork });
+      }
+    }
+
+    return uniqueArtworkList;
   }
 
   private async _getArtworkIDs() {

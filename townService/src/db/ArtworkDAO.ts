@@ -82,7 +82,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       const artworksOfPlayer = await this._getAllOfPlayersArtwork(email);
       if (!this._areArtworksUnique(artworksOfPlayer, [artwork])) {
         // TODO - Uncomment
-        // throw new Error('duplicate artwork added');
+        throw new Error('duplicate artwork added');
       }
 
       await this._db
@@ -139,7 +139,9 @@ export default class ArtworkDAO implements IArtworkDAO {
       const allArtworks: number[] = allArtworkIDsCollection.data()?.artworkIDs;
       if (this._areAnyOfArtworksAreInCirculation(allArtworks, [artwork])) {
         // TODO - Uncomment
-        // throw new Error('duplicate artowrk in circulation');
+        throw new Error(
+          `duplicate artowrk in circulation when adding artwork with id ${artwork.id}`,
+        );
       }
 
       await this._db
@@ -309,7 +311,7 @@ export default class ArtworkDAO implements IArtworkDAO {
   public async getAllArtworkIDs(): Promise<number[]> {
     const ref = await this._db.collection(this.artworkIDsCollection).doc('artworks').get();
     if (!ref.exists) {
-      throw new Error('artwork ids collection not instantiated properly');
+      return [];
     }
     return ref.data()?.artworkIDs;
   }

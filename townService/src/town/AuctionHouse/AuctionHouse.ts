@@ -317,12 +317,6 @@ export default class AuctionHouse extends InteractableArea {
 
     if (command.type === 'AuctionOurArtwork') {
       this.createNewAuctionFloorPlayer(player, command.artwork, command.bid).then(() => {
-        for (const o of this.occupants) {
-          const art = o.artwork.find(a => a.id === command.artwork.id);
-          if (art) {
-            art.isBeingAuctioned = true;
-          }
-        }
         this._emitAreaChanged();
         return undefined as InteractableCommandReturnType<CommandType>;
       });
