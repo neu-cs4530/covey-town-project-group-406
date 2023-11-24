@@ -52,6 +52,7 @@ export default class AuctionHouse extends InteractableArea {
     // remove all of the floors where this person is the auctioneer
     for (const f of this.auctionFloors) {
       if (f.auctioneer?.id === player.id) {
+        f.artBeingAuctioned.isBeingAuctioned = false;
         this._deleteAuctionFloor(f.id);
       }
     }
