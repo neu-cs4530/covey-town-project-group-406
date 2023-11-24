@@ -1,7 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
 import { Artwork, ArtistInfo } from '../types/CoveyTownSocket';
-import ArtworkDAO from '../db/ArtworkDAO';
-import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
 
 export default class APIUtils {
   private _apiInstance: AxiosInstance;
