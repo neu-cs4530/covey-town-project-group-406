@@ -144,9 +144,6 @@ export default class Town {
           isBeingAuctioned: false,
         }));
         await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money, newArtworks);
-        for (let i = 0; i < newPlayer.artwork.length; i++) {
-          newPlayer.artwork[i].isBeingAuctioned = false;
-        }
       } catch (err) {
         if (err instanceof Error) {
           // eslint-disable-next-line no-console

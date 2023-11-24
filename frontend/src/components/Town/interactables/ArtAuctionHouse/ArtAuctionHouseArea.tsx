@@ -78,6 +78,13 @@ function ArtAuctionHouseArea({
       setUserArtwork([...account.wallet.artwork]);
     };
 
+    const handleFloorTakenDown = (floorID: string) => {
+      if (selectedFloor?.id === floorID) {
+        setSelectedFloor(undefined);
+      }
+    };
+
+    controller.addListener('floorTakenDown', handleFloorTakenDown);
     controller.addListener('floorsChanged', handleFloorsChanged);
     controller.addListener('floorJoined', handleFloorJoined);
     controller.addListener('floorLeft', handleFloorLeft);
@@ -92,6 +99,7 @@ function ArtAuctionHouseArea({
       controller.removeListener('floorsChanged', handleFloorsChanged);
       controller.removeListener('floorJoined', handleFloorJoined);
       controller.removeListener('floorLeft', handleFloorLeft);
+      controller.removeListener('floorTakenDown', handleFloorTakenDown);
       townController.removeListener('artAccountUpdated', handleArtAccountUpdated);
     };
   }, [controller, townController, selectedFloor?.id]);

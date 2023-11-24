@@ -17,6 +17,7 @@ export type AuctionHouseAreaEvents = BaseInteractableEventMap & {
   floorJoined: (floor: AuctionFloorArea) => void;
   floorLeft: (floor: AuctionFloorArea) => void;
   artAccountUpdated: (account: ArtAuctionAccount) => void;
+  floorTakenDown: (floorID: string) => void;
 };
 
 /**
@@ -101,6 +102,7 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
         type: 'TakeDownOurAuction',
         floor: floor,
       });
+      this.emit('floorTakenDown', floor.id);
     }
   }
 
