@@ -70,6 +70,9 @@ export default class AuctionHouse extends InteractableArea {
     for (const floor of this._auctionFloors) {
       floor.bidders = floor.bidders.filter(b => b.id !== player.id);
       floor.observers = floor.observers.filter(o => o.id !== player.id);
+      if (floor.auctioneer?.id === player.id) {
+        this._deleteAuctionFloor(floor.id);
+      }
     }
     this._emitAreaChanged();
   }
