@@ -65,7 +65,9 @@ const AuctionOurArtworkArea = ({
                     Remove
                   </Button>
                 ) : (
-                  <Button onClick={async () => handleAdd(a, startingPrice(a.id))}>Add</Button>
+                  <Button onClick={async () => handleAdd(a, startingPrices.get(a.id) as number)}>
+                    Add
+                  </Button>
                 )}
               </div>
               <div style={{ minWidth: 150, maxWidth: 150 }}>

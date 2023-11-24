@@ -139,7 +139,11 @@ export default class Town {
       this._connectedSockets.delete(socket);
       try {
         const playerFromDB = await this._dao.getPlayer(newPlayer.email);
-        await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money);
+        const newArtworks = playerFromDB.artworks.map(artwork => ({
+          ...artwork,
+          isBeingAuctioned: false,
+        }));
+        await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money, newArtworks);
       } catch (err) {
         if (err instanceof Error) {
           // eslint-disable-next-line no-console
@@ -349,6 +353,9 @@ export default class Town {
     );
     if (area) {
       area.remove(player);
+      if (area instanceof AuctionHouse) {
+        area.removePlayerOnDisconnect(player);
+      }
     }
   }
 

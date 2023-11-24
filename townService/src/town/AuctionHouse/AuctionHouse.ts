@@ -42,6 +42,21 @@ export default class AuctionHouse extends InteractableArea {
     this._apiUtils = new APIUtils();
   }
 
+  public async removePlayerOnDisconnect(player: Player) {
+    const floor = this.auctionFloors.find(
+      f => f.observers.find(p => p.id === player.id) || f.bidders.find(p => p.id === player.id),
+    );
+    if (floor) {
+      this.leaveAuctionFloor(player, floor.id);
+    }
+    // remove all of the floors where this person is the auctioneer
+    for (const f of this.auctionFloors) {
+      if (f.auctioneer?.id === player.id) {
+        this._deleteAuctionFloor(f.id);
+      }
+    }
+  }
+
   public async leaveAuctionFloor(player: Player, floorID: string): Promise<void> {
     const floor = this.auctionFloors.find(f => f.id === floorID);
     if (floor) {
