@@ -287,9 +287,17 @@ export default class ArtworkDAO implements IArtworkDAO {
   /**
    * updates a player with the corresponding fields
    */
-  public async updatePlayer(email: string, isLoggedIn: boolean, money: number) {
+  public async updatePlayer(
+    email: string,
+    isLoggedIn: boolean,
+    money: number,
+    artworks?: Artwork[],
+  ) {
     try {
       await this._db.collection(this.userCollection).doc(email).update({ isLoggedIn, money });
+      if (artworks) {
+        await this._db.collection(this.userCollection).doc(email).update({ artworks });
+      }
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
