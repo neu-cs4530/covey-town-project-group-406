@@ -27,6 +27,8 @@ export default class AuctionHouse extends InteractableArea {
 
   static artworkToBeAuctioned: Artwork[] = [];
 
+  static hasBeenInstantiated = false;
+
   set auctionFloors(af: AuctionFloor[]) {
     this._auctionFloors = af;
   }

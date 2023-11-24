@@ -397,6 +397,7 @@ export default class Town {
       return false;
     }
     area.addPlayersWithinBounds(this._players);
+
     if (AuctionHouse.artworkToBeAuctioned.length === 0) {
       const results = [];
       try {
