@@ -1,5 +1,6 @@
 import {
   ArtAuctionAccount,
+  Artwork,
   AuctionFloorArea,
   AuctionHouseArea as AuctionHouseAreaModel,
 } from '../../types/CoveyTownSocket';
@@ -85,6 +86,24 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     });
   }
 
+  public async auctionOurArtwork(artwork: Artwork, bid: number) {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'AuctionOurArtwork',
+      artwork: artwork,
+      bid: bid,
+    });
+  }
+
+  public async takeDownAuction(artwork: Artwork) {
+    const floor = this._auctionFloors.find(af => af.artBeingAuctioned.id === artwork.id);
+    if (floor !== undefined) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'TakeDownOurAuction',
+        floor: floor,
+      });
+    }
+  }
+
   protected _updateFrom(newModel: AuctionHouseAreaModel): void {
     this.auctionFloors = newModel.floors;
     this.emit('floorsChanged', newModel.floors);
@@ -92,6 +111,7 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     const ourPlayer = newModel.occupantsObj.find(o => o.id === this._townController.ourPlayer.id);
     if (ourPlayer) {
       this._townController.ourPlayer.artAuctionAccount = ourPlayer.artAuctionAccount;
+
       this._townController.emit(
         'artAccountUpdated',
         this._townController.ourPlayer.artAuctionAccount as ArtAuctionAccount,

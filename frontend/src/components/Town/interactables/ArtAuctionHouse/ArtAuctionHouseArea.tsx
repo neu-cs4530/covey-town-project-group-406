@@ -14,13 +14,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import AuctionHouseAreaController from '../../../../classes/interactable/AuctionHouseAreaController';
 import { useInteractable } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { ArtAuctionAccount, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
+import { ArtAuctionAccount, Artwork, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 import AuctionHouseAreaInteractable from '../AuctionHouseArea';
 import SignupSignIn from '../../../Login/ArtAuctionHouseLogin/SignupSignIn';
 import AuctionFloorCard from './AuctionFloorCard';
 import ArtworkDisplay from './ArtworkDisplay';
 import auth from '../../../../classes/FirestoreConfig';
 import ArtworkAuctionSpace from './ArtworkAuctionSpace';
+import AuctionOurArtworkArea from './AuctionOurArtworkArea';
 
 function ArtAuctionHouseArea({
   controller,
@@ -36,6 +37,8 @@ function ArtAuctionHouseArea({
   const [userMoney, setUserMoney] = useState(
     townController.ourPlayer.artAuctionAccount?.wallet.money as number,
   );
+  const [isAuctioningArtwork, setIsAuctioningArtwork] = useState(false);
+  const [userArtwork, setUserArtwork] = useState<Artwork[]>([]);
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
@@ -72,6 +75,7 @@ function ArtAuctionHouseArea({
 
     const handleArtAccountUpdated = (account: ArtAuctionAccount) => {
       setUserMoney(account.wallet.money);
+      setUserArtwork([...account.wallet.artwork]);
     };
 
     controller.addListener('floorsChanged', handleFloorsChanged);
@@ -92,9 +96,16 @@ function ArtAuctionHouseArea({
     };
   }, [controller, townController, selectedFloor?.id]);
 
-  // TODO
   const handleAuctionMyArtwork = () => {
-    console.log('User wants to auction their artwork');
+    setIsAuctioningArtwork(true);
+  };
+
+  const handlePutForAuction = async (a: Artwork, bid: number) => {
+    await controller.auctionOurArtwork(a, bid);
+  };
+
+  const handleTakeDownAuction = async (a: Artwork) => {
+    await controller.takeDownAuction(a);
   };
 
   // logs the user out of the auction house
@@ -190,7 +201,42 @@ function ArtAuctionHouseArea({
         <br />
         You have a balance of: ${userMoney.toLocaleString()}
       </Typography>
-      {selectedFloor !== undefined ? (
+
+      {isAuctioningArtwork ? (
+        <div
+          style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <Typography variant='h5' style={{ fontWeight: 700 }}>
+            Choose your artwork to auction
+          </Typography>
+
+          <Button
+            colorScheme='teal'
+            size='md'
+            width={200}
+            onClick={() => setIsAuctioningArtwork(false)}>
+            Back to Auction House
+          </Button>
+
+          {townController.ourPlayer.artAuctionAccount?.wallet.artwork.length === 0 ? (
+            <div>
+              <Typography>
+                You do not own any artwork. Try bidding for an artwork in the Art Auction house!
+              </Typography>
+            </div>
+          ) : (
+            townController.ourPlayer.artAuctionAccount && (
+              <div>
+                <AuctionOurArtworkArea
+                  artworks={userArtwork}
+                  auctionFloors={floors}
+                  handlePutForAuction={handlePutForAuction}
+                  handleTakeDownAuction={handleTakeDownAuction}
+                />
+              </div>
+            )
+          )}
+        </div>
+      ) : selectedFloor !== undefined ? (
         <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>
           <Button
             colorScheme='teal'
@@ -285,12 +331,16 @@ function ArtAuctionHouseArea({
                   <AuctionFloorCard
                     key={idx}
                     floor={floor}
+                    weAreOwner={
+                      userArtwork.find(a => a.id === floor.artBeingAuctioned.id) !== undefined
+                    }
                     handleClickJoinObserver={async () => {
                       await handleFloorSelect(floor, false);
                     }}
                     handleClickJoinFloorBidder={async () => {
                       await handleFloorSelect(floor, true);
                     }}
+                    handleTakeDownAuction={handleTakeDownAuction}
                   />
                 ))}
               </div>
