@@ -25,13 +25,13 @@ export default class APIUtils {
     if (this._artworkIds.length === 0) {
       await this._getArtworkIDs();
     }
-    let allArtworksAddedIds: number[] = [];
+    /* let allArtworks: Artwork[] = [];
     try {
-      allArtworksAddedIds = await this._dao.getAllArtworkIDs();
+      allArtworks = await this._dao.getAllAuctionHouseArtworks();
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log('no ids found');
-    }
+    } */
     await Promise.all(
       this._artworkIds.slice(startIndex, endIndex).map(async objId => {
         const artwork = await this.createArtwork(objId);
@@ -46,19 +46,18 @@ export default class APIUtils {
     // loop through and add the artworks, keep track of ids added
     // if id has been added, dont add it
 
-    const uniqueArtworkList: Artwork[] = [];
-    const uniqueIds: Set<number> = new Set<number>();
-    for (const id of allArtworksAddedIds) {
-      uniqueIds.add(id);
-    }
+    /* const uniqueArtworkList: Artwork[] = [];
 
     for (const artwork of artworkList) {
-      if (!uniqueIds.has(artwork.id)) {
-        uniqueArtworkList.push({ ...artwork });
+      for (const art of allArtworks) {
+        if (artwork.id !== art.id && artwork.description !== art.description) {
+          uniqueArtworkList.push(artwork);
+        }
       }
     }
 
-    return uniqueArtworkList;
+    return uniqueArtworkList; */
+    return artworkList;
   }
 
   private async _getArtworkIDs() {
