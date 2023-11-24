@@ -15,7 +15,7 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
-import React from 'react';
+import React, { useState } from 'react';
 import { Artwork, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
 interface AuctionOurArtworkAreaProps {
@@ -31,6 +31,7 @@ const AuctionOurArtworkArea = ({
   handlePutForAuction,
   handleTakeDownAuction,
 }: AuctionOurArtworkAreaProps) => {
+  const [startingPrice, setStartingPrice] = useState(0);
   const handleAdd = async (artwork: Artwork, bid: number) => {
     await handlePutForAuction(artwork, bid);
   };
@@ -62,7 +63,9 @@ const AuctionOurArtworkArea = ({
                 )}
               </div>
               <div style={{ minWidth: 150, maxWidth: 150 }}>
-                <NumberInput value={a.purchasePrice}>
+                <NumberInput
+                  onChange={valueString => setStartingPrice(Number(valueString))}
+                  value={startingPrice}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
