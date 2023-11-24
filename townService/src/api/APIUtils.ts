@@ -22,29 +22,30 @@ export default class APIUtils {
 
   async nextArtworks(startIndex: number, endIndex: number): Promise<Artwork[]> {
     const artworkList: Artwork[] = [];
-    while (this._artworkIds.length === 0) {
+    while (artworkList.length === 0) {
+      console.log('loop 1');
       // eslint-disable-next-line no-await-in-loop
       await this._getArtworkIDs();
-    }
-    /* if (this._artworkIds.length === 0) {
+      /* if (this._artworkIds.length === 0) {
       await this._getArtworkIDs();
     } */
 
-    const rawArtworks = await Promise.all(
-      this._artworkIds.slice(startIndex, endIndex).map(async objId => this.createArtwork(objId)),
-    );
+      // eslint-disable-next-line no-await-in-loop
+      const rawArtworks = await Promise.all(
+        this._artworkIds.slice(startIndex, endIndex).map(async objId => this.createArtwork(objId)),
+      );
 
-    for (const artwork of rawArtworks) {
-      if (
-        this.validArtwork(artwork) &&
-        artwork !== undefined &&
-        artworkList.find(a => a.id === artwork.id) === undefined
-      ) {
-        artworkList.push(artwork);
+      for (const artwork of rawArtworks) {
+        if (
+          this.validArtwork(artwork) &&
+          artwork !== undefined &&
+          artworkList.find(a => a.id === artwork.id) === undefined
+        ) {
+          artworkList.push(artwork);
+        }
       }
     }
 
-    console.log(artworkList);
     return artworkList;
   }
 
