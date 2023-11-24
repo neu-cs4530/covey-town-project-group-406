@@ -407,7 +407,7 @@ export default class Town {
           AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
         }
       } catch (err) {
-        area.addNewArtworksToAuctionHouse(5);
+        await area.addNewArtworksToAuctionHouse(5);
       }
     }
 
