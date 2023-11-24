@@ -31,7 +31,11 @@ export default class APIUtils {
     );
 
     for (const artwork of rawArtworks) {
-      if (this.validArtwork(artwork) && artwork !== undefined) {
+      if (
+        this.validArtwork(artwork) &&
+        artwork !== undefined &&
+        artworkList.find(a => a.id === artwork.id) === undefined
+      ) {
         artworkList.push(artwork);
       }
     }
