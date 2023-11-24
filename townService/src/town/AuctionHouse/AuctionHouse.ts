@@ -288,14 +288,14 @@ export default class AuctionHouse extends InteractableArea {
       if (newFloor === undefined) {
         throw new Error();
       }
-      if (newFloor.bidders.length >= 3) {
+      if (newFloor.bidders.length >= 3 && newFloor.status !== 'IN_PROGRESS') {
         newFloor.startAuction();
       }
       return { floorJoined: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
     }
 
     if (command.type === 'LeaveAuctionFloor') {
-      this.leaveAuctionFloor(player, command.floor.id);
+      this.leaveAuctionFloor(player, command.floor.id).then();
       this._emitAreaChanged();
       const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
       if (newFloor === undefined) {
