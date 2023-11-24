@@ -411,20 +411,14 @@ export default class Town {
       }
     }
 
-    const floorPromises = [];
-
     if (area.auctionFloors.length < 5) {
       for (let i = area.auctionFloors.length; i < 5; i++) {
-        floorPromises.push(
-          // eslint-disable-next-line no-await-in-loop
-          await area.createNewAuctionFloorNonPlayer(
-            Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
-          ),
+        // eslint-disable-next-line no-await-in-loop
+        await area.createNewAuctionFloorNonPlayer(
+          Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
         );
       }
     }
-
-    await Promise.all(floorPromises);
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
