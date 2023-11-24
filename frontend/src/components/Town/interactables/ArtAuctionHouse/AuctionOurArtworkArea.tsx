@@ -31,7 +31,13 @@ const AuctionOurArtworkArea = ({
   handlePutForAuction,
   handleTakeDownAuction,
 }: AuctionOurArtworkAreaProps) => {
+  const initState: Map<number, number> = new Map();
   const [startingPrice, setStartingPrice] = useState(0);
+
+  artworks.forEach(artwork => initState.set(artwork.id, artwork.purchasePrice));
+
+  const [startingPrices, setStartingPrices] = useState(initState);
+
   const handleAdd = async (artwork: Artwork, bid: number) => {
     await handlePutForAuction(artwork, bid);
   };
@@ -59,13 +65,16 @@ const AuctionOurArtworkArea = ({
                     Remove
                   </Button>
                 ) : (
-                  <Button onClick={async () => handleAdd(a, startingPrice)}>Add</Button>
+                  <Button onClick={async () => handleAdd(a, startingPrice(a.id))}>Add</Button>
                 )}
               </div>
               <div style={{ minWidth: 150, maxWidth: 150 }}>
                 <NumberInput
-                  onChange={valueString => setStartingPrice(Number(valueString))}
-                  value={startingPrice}>
+                  onChange={valueString => {
+                    startingPrices.set(a.id, Number(valueString));
+                    setStartingPrices(new Map(startingPrices));
+                  }}
+                  value={startingPrices.get(a.id)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
