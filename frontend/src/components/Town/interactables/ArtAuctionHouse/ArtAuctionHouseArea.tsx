@@ -42,6 +42,9 @@ function ArtAuctionHouseArea({
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
+      if (newFloors.find(f => f.id === selectedFloor?.id) === undefined) {
+        setSelectedFloor(undefined);
+      }
       setFloors(newFloors);
       for (const f of newFloors) {
         if (f.id === selectedFloor?.id) {
