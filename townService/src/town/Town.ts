@@ -383,7 +383,6 @@ export default class Town {
   }
 
   public async addAuctionHouseArea(interactable: Interactable): Promise<boolean> {
-    console.log('called here');
     const area = this._interactables.find(
       eachArea => eachArea.id === interactable.id,
     ) as AuctionHouse;
@@ -395,6 +394,7 @@ export default class Town {
       const results = [];
       try {
         const artworks = await this._dao.getAllAuctionHouseArtworks();
+        console.log('shoulnd  be here ');
         for (const artwork of artworks) {
           results.push(
             this._dao.updateAuctionHouseArtworkByID({
@@ -408,15 +408,18 @@ export default class Town {
           AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
         }
       } catch (err) {
+        console.log('here');
         await area.addNewArtworksToAuctionHouse(5);
       }
     }
 
-    for (let i = 0; i < 5; i++) {
-      // eslint-disable-next-line no-await-in-loop
-      await area.createNewAuctionFloorNonPlayer(
-        Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
-      );
+    if (area.auctionFloors.length < 5) {
+      for (let i = area.auctionFloors.length; i < 5; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        await area.createNewAuctionFloorNonPlayer(
+          Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
+        );
+      }
     }
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
