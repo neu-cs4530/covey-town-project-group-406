@@ -23,6 +23,10 @@ import auth from '../../../../classes/FirestoreConfig';
 import ArtworkAuctionSpace from './ArtworkAuctionSpace';
 import AuctionOurArtworkArea from './AuctionOurArtworkArea';
 
+export interface AuctionArtwork extends Artwork {
+  startingBid: number;
+}
+
 function ArtAuctionHouseArea({
   controller,
 }: {
@@ -38,7 +42,7 @@ function ArtAuctionHouseArea({
     townController.ourPlayer.artAuctionAccount?.wallet.money as number,
   );
   const [isAuctioningArtwork, setIsAuctioningArtwork] = useState(false);
-  const [userArtwork, setUserArtwork] = useState<Artwork[]>([]);
+  const [userArtwork, setUserArtwork] = useState<AuctionArtwork[]>([]);
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
@@ -75,7 +79,16 @@ function ArtAuctionHouseArea({
 
     const handleArtAccountUpdated = (account: ArtAuctionAccount) => {
       setUserMoney(account.wallet.money);
-      setUserArtwork([...account.wallet.artwork]);
+      setUserArtwork([
+        ...account.wallet.artwork.map(a => {
+          const aFloor = floors.find(f => f.artBeingAuctioned.id === a.id);
+          let bidPrice = a.purchasePrice;
+          if (aFloor) {
+            bidPrice = aFloor.minBid;
+          }
+          return { ...a, startingBid: a.isBeingAuctioned ? bidPrice : a.purchasePrice };
+        }),
+      ]);
     };
 
     controller.addListener('floorsChanged', handleFloorsChanged);
@@ -94,17 +107,17 @@ function ArtAuctionHouseArea({
       controller.removeListener('floorLeft', handleFloorLeft);
       townController.removeListener('artAccountUpdated', handleArtAccountUpdated);
     };
-  }, [controller, townController, selectedFloor?.id]);
+  }, [controller, townController, selectedFloor?.id, floors]);
 
   const handleAuctionMyArtwork = () => {
     setIsAuctioningArtwork(true);
   };
 
-  const handlePutForAuction = async (a: Artwork, bid: number) => {
+  const handlePutForAuction = async (a: Omit<AuctionArtwork, 'startingBid'>, bid: number) => {
     await controller.auctionOurArtwork(a, bid);
   };
 
-  const handleTakeDownAuction = async (a: Artwork) => {
+  const handleTakeDownAuction = async (a: Omit<AuctionArtwork, 'startingBid'>) => {
     await controller.takeDownAuction(a);
   };
 
@@ -228,6 +241,7 @@ function ArtAuctionHouseArea({
               <div>
                 <AuctionOurArtworkArea
                   artworks={userArtwork}
+                  setArtworks={setUserArtwork}
                   auctionFloors={floors}
                   handlePutForAuction={handlePutForAuction}
                   handleTakeDownAuction={handleTakeDownAuction}

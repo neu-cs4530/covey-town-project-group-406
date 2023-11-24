@@ -15,11 +15,13 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
-import React, { useState } from 'react';
+import React from 'react';
 import { Artwork, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
+import { AuctionArtwork } from './ArtAuctionHouseArea';
 
 interface AuctionOurArtworkAreaProps {
-  artworks: Artwork[];
+  artworks: AuctionArtwork[];
+  setArtworks: React.Dispatch<React.SetStateAction<AuctionArtwork[]>>;
   auctionFloors: AuctionFloorArea[];
   handlePutForAuction: (a: Artwork, bid: number) => Promise<void>;
   handleTakeDownAuction: (a: Artwork) => Promise<void>;
@@ -27,16 +29,18 @@ interface AuctionOurArtworkAreaProps {
 
 const AuctionOurArtworkArea = ({
   artworks,
+  setArtworks,
   auctionFloors,
   handlePutForAuction,
   handleTakeDownAuction,
 }: AuctionOurArtworkAreaProps) => {
-  const [startingPrice, setStartingPrice] = useState(0);
-  const handleAdd = async (artwork: Artwork, bid: number) => {
+  // const [ourArtworks, setOurArtworks] = useState<AuctionArtwork[]>(artworks.map(a => {return {...a, startingBid:a.purchasePrice}}))
+
+  const handleAdd = async (artwork: AuctionArtwork, bid: number) => {
     await handlePutForAuction(artwork, bid);
   };
 
-  const handleRemove = async (artwork: Artwork) => {
+  const handleRemove = async (artwork: AuctionArtwork) => {
     await handleTakeDownAuction(artwork);
   };
 
@@ -59,13 +63,19 @@ const AuctionOurArtworkArea = ({
                     Remove
                   </Button>
                 ) : (
-                  <Button onClick={async () => handleAdd(a, a.purchasePrice)}>Add</Button>
+                  <Button onClick={async () => handleAdd(a, a.startingBid)}>Add</Button>
                 )}
               </div>
               <div style={{ minWidth: 150, maxWidth: 150 }}>
                 <NumberInput
-                  onChange={valueString => setStartingPrice(Number(valueString))}
-                  value={startingPrice}>
+                  value={a.startingBid}
+                  onChange={e =>
+                    setArtworks([
+                      ...artworks.map(oa =>
+                        oa.id === a.id ? { ...oa, startingBid: parseInt(e) } : oa,
+                      ),
+                    ])
+                  }>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />

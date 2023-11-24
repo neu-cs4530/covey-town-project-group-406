@@ -124,7 +124,7 @@ export default class ArtworkDAO implements IArtworkDAO {
         .doc('artworks')
         .get();
 
-      if (!auctionHouseCollection) {
+      if (!auctionHouseCollection.exists) {
         await this._db
           .collection(this.auctionHouseCollection)
           .doc('artworks')
@@ -139,9 +139,9 @@ export default class ArtworkDAO implements IArtworkDAO {
       const allArtworks: number[] = allArtworkIDsCollection.data()?.artworkIDs;
       if (this._areAnyOfArtworksAreInCirculation(allArtworks, [artwork])) {
         // TODO - Uncomment
-        throw new Error(
-          `duplicate artowrk in circulation when adding artwork with id ${artwork.id}`,
-        );
+        // throw new Error(
+        //  `duplicate artowrk in circulation when adding artwork with id ${artwork.id}`,
+        // );
       }
 
       await this._db
