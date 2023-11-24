@@ -26,17 +26,17 @@ export default class APIUtils {
       await this._getArtworkIDs();
     }
 
-    await Promise.all(
-      this._artworkIds.slice(startIndex, endIndex).map(async objId => {
-        const artwork = await this.createArtwork(objId);
-        if (this.validArtwork(artwork)) {
-          if (artwork !== undefined) {
-            artworkList.push(artwork);
-          }
-        }
-      }),
+    const rawArtworks = await Promise.all(
+      this._artworkIds.slice(startIndex, endIndex).map(async objId => this.createArtwork(objId)),
     );
 
+    for (const artwork of rawArtworks) {
+      if (this.validArtwork(artwork) && artwork !== undefined) {
+        artworkList.push(artwork);
+      }
+    }
+
+    console.log(artworkList);
     return artworkList;
   }
 
