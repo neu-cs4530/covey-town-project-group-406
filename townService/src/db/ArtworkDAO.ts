@@ -210,7 +210,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       await this._db.collection(this.auctionHouseCollection).doc('artworks').set({ artworks: [] });
     }
 
-    await Promise.all(artworks.map(artwork => this._addArtworkToAuctionHouse(artwork)));
+    await Promise.all(artworks.map(async artwork => this._addArtworkToAuctionHouse(artwork)));
     await this._updateArtworkIDIndex(endIndex);
   }
 
