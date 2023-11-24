@@ -354,7 +354,6 @@ export default class Town {
     if (area) {
       area.remove(player);
       if (area instanceof AuctionHouse) {
-        console.log('certain type');
         area.removePlayerOnDisconnectAndEmitAreaChanged(player);
       }
     }
