@@ -222,7 +222,10 @@ export default class ArtworkDAO implements IArtworkDAO {
    * Takes in the list of artworks and the index number of the last artwork
    * */
   public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
-    await Promise.all(artworks.map(async artwork => this._addArtworkToAuctionHouse(artwork)));
+    for (const artwork of artworks) {
+      // eslint-disable-next-line no-await-in-loop
+      await this._addArtworkToAuctionHouse(artwork);
+    }
     await this._updateArtworkIDIndex(endIndex);
   }
 
