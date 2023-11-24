@@ -32,6 +32,8 @@ import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
  * can occur (e.g. joining a town, moving, leaving a town)
  */
 export default class Town {
+  static blocked = false;
+
   get capacity(): number {
     return this._capacity;
   }
@@ -397,35 +399,38 @@ export default class Town {
       return false;
     }
     area.addPlayersWithinBounds(this._players);
+    if (!Town.blocked) {
+      Town.blocked = true;
+      if (AuctionHouse.artworkToBeAuctioned.length === 0) {
+        const results = [];
+        try {
+          const artworks = await this._dao.getAllAuctionHouseArtworks();
+          for (const artwork of artworks) {
+            results.push(
+              this._dao.updateAuctionHouseArtworkByID({
+                ...artwork,
+                isBeingAuctioned: false,
+              }),
+            );
+          }
+          await Promise.all(results);
+          for (const artwork of artworks) {
+            AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
+          }
+        } catch (err) {
+          await area.addNewArtworksToAuctionHouse(5);
+        }
+      }
 
-    if (AuctionHouse.artworkToBeAuctioned.length === 0) {
-      const results = [];
-      try {
-        const artworks = await this._dao.getAllAuctionHouseArtworks();
-        for (const artwork of artworks) {
-          results.push(
-            this._dao.updateAuctionHouseArtworkByID({
-              ...artwork,
-              isBeingAuctioned: false,
-            }),
+      if (area.auctionFloors.length < 5) {
+        for (let i = area.auctionFloors.length; i < 5; i++) {
+          // eslint-disable-next-line no-await-in-loop
+          await area.createNewAuctionFloorNonPlayer(
+            Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
           );
         }
-        await Promise.all(results);
-        for (const artwork of artworks) {
-          AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
-        }
-      } catch (err) {
-        await area.addNewArtworksToAuctionHouse(5);
       }
-    }
-
-    if (area.auctionFloors.length < 5) {
-      for (let i = area.auctionFloors.length; i < 5; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        await area.createNewAuctionFloorNonPlayer(
-          Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
-        );
-      }
+      Town.blocked = false;
     }
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
