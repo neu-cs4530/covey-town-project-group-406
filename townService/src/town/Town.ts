@@ -547,9 +547,9 @@ export default class Town {
         item => interactableIDs.indexOf(item) !== interactableIDs.lastIndexOf(item),
       )
     ) {
-      throw new Error(
-        `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`,
-      );
+      // throw new Error(
+      //   `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`,
+      // );
     }
     // Make sure that there are no overlapping objects
     for (const interactable of this._interactables) {
