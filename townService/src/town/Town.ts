@@ -411,13 +411,11 @@ export default class Town {
       }
     }
 
-    if (area.auctionFloors.length < 5) {
-      for (let i = area.auctionFloors.length; i < 5; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        await area.createNewAuctionFloorNonPlayer(
-          Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
-        );
-      }
+    for (let i = 0; i < 5; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await area.createNewAuctionFloorNonPlayer(
+        Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
+      );
     }
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
