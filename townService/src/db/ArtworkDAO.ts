@@ -102,37 +102,8 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   private async _addArtworkToAuctionHouse(artwork: Artwork): Promise<void> {
     try {
-      let allArtworkIDsCollection = await this._db
+      const allArtworkIDsCollection = await this._db
         .collection(this.artworkIDsCollection)
-        .doc('artworks')
-        .get();
-
-      if (!allArtworkIDsCollection.exists) {
-        await this._db
-          .collection(this.artworkIDsCollection)
-          .doc('artworks')
-          .set({ artworkIDs: [] });
-      }
-
-      allArtworkIDsCollection = await this._db
-        .collection(this.artworkIDsCollection)
-        .doc('artworks')
-        .get();
-
-      let auctionHouseCollection = await this._db
-        .collection(this.auctionHouseCollection)
-        .doc('artworks')
-        .get();
-
-      if (!auctionHouseCollection.exists) {
-        await this._db
-          .collection(this.auctionHouseCollection)
-          .doc('artworks')
-          .set({ artworks: [] });
-      }
-
-      auctionHouseCollection = await this._db
-        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .get();
 
@@ -222,10 +193,24 @@ export default class ArtworkDAO implements IArtworkDAO {
    * Takes in the list of artworks and the index number of the last artwork
    * */
   public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
-    for (const artwork of artworks) {
-      // eslint-disable-next-line no-await-in-loop
-      await this._addArtworkToAuctionHouse(artwork);
+    const allArtworkIDsCollection = await this._db
+      .collection(this.artworkIDsCollection)
+      .doc('artworks')
+      .get();
+
+    if (!allArtworkIDsCollection.exists) {
+      await this._db.collection(this.artworkIDsCollection).doc('artworks').set({ artworkIDs: [] });
     }
+    const auctionHouseCollection = await this._db
+      .collection(this.auctionHouseCollection)
+      .doc('artworks')
+      .get();
+
+    if (!auctionHouseCollection.exists) {
+      await this._db.collection(this.auctionHouseCollection).doc('artworks').set({ artworks: [] });
+    }
+
+    await Promise.all(artworks.map(artwork => this._addArtworkToAuctionHouse(artwork)));
     await this._updateArtworkIDIndex(endIndex);
   }
 
