@@ -124,7 +124,7 @@ export default class ArtworkDAO implements IArtworkDAO {
         .doc('artworks')
         .get();
 
-      if (!auctionHouseCollection) {
+      if (!auctionHouseCollection.exists) {
         await this._db
           .collection(this.auctionHouseCollection)
           .doc('artworks')
