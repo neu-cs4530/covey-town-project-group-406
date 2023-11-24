@@ -296,7 +296,10 @@ export default class ArtworkDAO implements IArtworkDAO {
     try {
       await this._db.collection(this.userCollection).doc(email).update({ isLoggedIn, money });
       if (artworks) {
-        await this._db.collection(this.userCollection).doc(email).update({ artworks });
+        await this._db
+          .collection(this.userCollection)
+          .doc(email)
+          .set({ artworks }, { merge: true });
       }
     } catch (err) {
       if (err instanceof Error) {

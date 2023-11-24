@@ -32,7 +32,6 @@ const AuctionOurArtworkArea = ({
   handleTakeDownAuction,
 }: AuctionOurArtworkAreaProps) => {
   const initState: Map<number, number> = new Map();
-  const [startingPrice, setStartingPrice] = useState(0);
 
   artworks.forEach(artwork => initState.set(artwork.id, artwork.purchasePrice));
 

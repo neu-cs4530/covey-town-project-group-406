@@ -135,8 +135,6 @@ export default class Town {
     // clean up our listener adapter, and then let the CoveyTownController know that the
     // player's session is disconnected
     socket.on('disconnect', async () => {
-      this._removePlayer(newPlayer);
-      this._connectedSockets.delete(socket);
       try {
         const playerFromDB = await this._dao.getPlayer(newPlayer.email);
         const newArtworks = playerFromDB.artworks.map(artwork => ({
@@ -144,6 +142,11 @@ export default class Town {
           isBeingAuctioned: false,
         }));
         await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money, newArtworks);
+        for (let i = 0; i < newPlayer.artwork.length; i++) {
+          newPlayer.artwork[i].isBeingAuctioned = false;
+        }
+        this._removePlayer(newPlayer);
+        this._connectedSockets.delete(socket);
       } catch (err) {
         if (err instanceof Error) {
           // eslint-disable-next-line no-console
