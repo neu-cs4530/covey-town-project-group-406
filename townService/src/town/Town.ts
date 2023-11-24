@@ -144,6 +144,9 @@ export default class Town {
           isBeingAuctioned: false,
         }));
         await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money, newPlayerArtworks);
+        // update players artwork to be not being sold
+        // remove player from all auction floors
+        // remove their floor if they are auctioneer as well
       } catch (err) {
         if (err instanceof Error) {
           // eslint-disable-next-line no-console
