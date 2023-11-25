@@ -32,6 +32,8 @@ import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
  * can occur (e.g. joining a town, moving, leaving a town)
  */
 export default class Town {
+  static blocked = false;
+
   get capacity(): number {
     return this._capacity;
   }
@@ -139,7 +141,11 @@ export default class Town {
       this._connectedSockets.delete(socket);
       try {
         const playerFromDB = await this._dao.getPlayer(newPlayer.email);
-        await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money);
+        const newArtworks = playerFromDB.artworks.map(artwork => ({
+          ...artwork,
+          isBeingAuctioned: false,
+        }));
+        await this._dao.updatePlayer(newPlayer.email, false, playerFromDB.money, newArtworks);
       } catch (err) {
         if (err instanceof Error) {
           // eslint-disable-next-line no-console
@@ -232,11 +238,20 @@ export default class Town {
       try {
         const dbPlayer = await this._dao.getPlayer(email);
         await this._dao.updatePlayer(email, false, dbPlayer.money);
+
+        // get the auction house area, then call removePlayerOnDisconnect
+        for (const interactable of this.interactables) {
+          if (interactable.occupants.find(o => o.id === playerID)) {
+            (interactable as AuctionHouse).removePlayerOnDisconnect(newPlayer);
+          }
+        }
+
         for (const player of this.players) {
           if (player.id === playerID) {
             player.uninitializeArtAuctionAccount();
           }
         }
+
         socket.emit('auctionHouseLogoutCommandResponse', true);
       } catch (err) {
         socket.emit('auctionHouseLogoutCommandResponse', false);
@@ -349,6 +364,9 @@ export default class Town {
     );
     if (area) {
       area.remove(player);
+      if (area instanceof AuctionHouse) {
+        area.removePlayerOnDisconnect(player);
+      }
     }
   }
 
@@ -382,7 +400,6 @@ export default class Town {
     return true;
   }
 
-  // TODO - refactor this method once API is setup
   public async addAuctionHouseArea(interactable: Interactable): Promise<boolean> {
     const area = this._interactables.find(
       eachArea => eachArea.id === interactable.id,
@@ -391,40 +408,39 @@ export default class Town {
       return false;
     }
     area.addPlayersWithinBounds(this._players);
-    if (AuctionHouse.artworkToBeAuctioned.length === 0) {
-      const results = [];
-      try {
-        const artworks = await this._dao.getAllAuctionHouseArtworks();
-        for (const artwork of artworks) {
-          results.push(
-            this._dao.updateAuctionHouseArtworkByID({
-              ...artwork,
-              isBeingAuctioned: false,
-            }),
+    if (!Town.blocked) {
+      Town.blocked = true;
+      if (AuctionHouse.artworkToBeAuctioned.length === 0) {
+        const results = [];
+        try {
+          const artworks = await this._dao.getAllAuctionHouseArtworks();
+          for (const artwork of artworks) {
+            results.push(
+              this._dao.updateAuctionHouseArtworkByID({
+                ...artwork,
+                isBeingAuctioned: false,
+              }),
+            );
+          }
+          await Promise.all(results);
+          for (const artwork of artworks) {
+            AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
+          }
+        } catch (err) {
+          await area.addNewArtworksToAuctionHouse(5);
+        }
+      }
+
+      if (area.auctionFloors.length < 5) {
+        for (let i = area.auctionFloors.length; i < 5; i++) {
+          // eslint-disable-next-line no-await-in-loop
+          await area.createNewAuctionFloorNonPlayer(
+            Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
           );
         }
-        await Promise.all(results);
-        for (const artwork of artworks) {
-          AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
-        }
-      } catch (err) {
-        area.addNewArtworksToAuctionHouse(5);
       }
+      Town.blocked = false;
     }
-
-    const floorPromises = [];
-
-    if (area.auctionFloors.length < 5) {
-      for (let i = area.auctionFloors.length; i < 5; i++) {
-        floorPromises.push(
-          area.createNewAuctionFloorNonPlayer(
-            Math.round((Math.random() * (50000 - 10000) + 10000) / 100) * 100,
-          ),
-        );
-      }
-    }
-
-    await Promise.all(floorPromises);
 
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;

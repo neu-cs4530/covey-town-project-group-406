@@ -81,6 +81,7 @@ export default class ArtworkDAO implements IArtworkDAO {
       // Ensure that the player does not have the artwork being added to their account
       const artworksOfPlayer = await this._getAllOfPlayersArtwork(email);
       if (!this._areArtworksUnique(artworksOfPlayer, [artwork])) {
+        // TODO - Uncomment
         throw new Error('duplicate artwork added');
       }
 
@@ -101,43 +102,17 @@ export default class ArtworkDAO implements IArtworkDAO {
    */
   private async _addArtworkToAuctionHouse(artwork: Artwork): Promise<void> {
     try {
-      let allArtworkIDsCollection = await this._db
+      const allArtworkIDsCollection = await this._db
         .collection(this.artworkIDsCollection)
-        .doc('artworks')
-        .get();
-
-      if (!allArtworkIDsCollection.exists) {
-        await this._db
-          .collection(this.artworkIDsCollection)
-          .doc('artworks')
-          .set({ artworkIDs: [] });
-      }
-
-      allArtworkIDsCollection = await this._db
-        .collection(this.artworkIDsCollection)
-        .doc('artworks')
-        .get();
-
-      let auctionHouseCollection = await this._db
-        .collection(this.auctionHouseCollection)
-        .doc('artworks')
-        .get();
-
-      if (!auctionHouseCollection) {
-        await this._db
-          .collection(this.auctionHouseCollection)
-          .doc('artworks')
-          .set({ artworks: [] });
-      }
-
-      auctionHouseCollection = await this._db
-        .collection(this.auctionHouseCollection)
         .doc('artworks')
         .get();
 
       const allArtworks: number[] = allArtworkIDsCollection.data()?.artworkIDs;
       if (this._areAnyOfArtworksAreInCirculation(allArtworks, [artwork])) {
-        throw new Error('duplicate artowrk in circulation');
+        // TODO - Uncomment
+        throw new Error(
+          `duplicate artowrk in circulation when adding artwork with id ${artwork.id}`,
+        );
       }
 
       await this._db
@@ -218,6 +193,23 @@ export default class ArtworkDAO implements IArtworkDAO {
    * Takes in the list of artworks and the index number of the last artwork
    * */
   public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
+    const allArtworkIDsCollection = await this._db
+      .collection(this.artworkIDsCollection)
+      .doc('artworks')
+      .get();
+
+    if (!allArtworkIDsCollection.exists) {
+      await this._db.collection(this.artworkIDsCollection).doc('artworks').set({ artworkIDs: [] });
+    }
+    const auctionHouseCollection = await this._db
+      .collection(this.auctionHouseCollection)
+      .doc('artworks')
+      .get();
+
+    if (!auctionHouseCollection.exists) {
+      await this._db.collection(this.auctionHouseCollection).doc('artworks').set({ artworks: [] });
+    }
+
     await Promise.all(artworks.map(async artwork => this._addArtworkToAuctionHouse(artwork)));
     await this._updateArtworkIDIndex(endIndex);
   }
@@ -283,9 +275,20 @@ export default class ArtworkDAO implements IArtworkDAO {
   /**
    * updates a player with the corresponding fields
    */
-  public async updatePlayer(email: string, isLoggedIn: boolean, money: number) {
+  public async updatePlayer(
+    email: string,
+    isLoggedIn: boolean,
+    money: number,
+    artworks?: Artwork[],
+  ) {
     try {
       await this._db.collection(this.userCollection).doc(email).update({ isLoggedIn, money });
+      if (artworks) {
+        await this._db
+          .collection(this.userCollection)
+          .doc(email)
+          .set({ artworks }, { merge: true });
+      }
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);

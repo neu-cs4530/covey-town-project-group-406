@@ -1,18 +1,22 @@
 import React from 'react';
 import { Badge, Button } from '@chakra-ui/react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@material-ui/core';
-import { AuctionFloorArea } from '../../../../types/CoveyTownSocket';
+import { Artwork, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
 interface AuctionFloorCardProps {
   floor: AuctionFloorArea;
+  weAreOwner: boolean;
   handleClickJoinObserver: (floor: AuctionFloorArea) => Promise<void>;
   handleClickJoinFloorBidder: (floor: AuctionFloorArea) => Promise<void>;
+  handleTakeDownAuction: (artwork: Artwork) => Promise<void>;
 }
 
 const AuctionFloorCard = ({
   floor,
+  weAreOwner,
   handleClickJoinObserver,
   handleClickJoinFloorBidder,
+  handleTakeDownAuction,
 }: AuctionFloorCardProps) => {
   const artwork = floor.artBeingAuctioned;
 
@@ -27,7 +31,7 @@ const AuctionFloorCard = ({
   };
 
   return (
-    <Card style={{ maxWidth: 345 }}>
+    <Card style={{ maxWidth: 345, minWidth: 345 }}>
       <CardActionArea
         style={{
           height: '100%',
@@ -42,7 +46,8 @@ const AuctionFloorCard = ({
           alt={artwork.description}
           style={{ minHeight: 200, maxHeight: 200, overflow: 'hidden' }}
         />
-        <CardContent style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <CardContent
+          style={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
           <Typography gutterBottom variant='h5' component='div' style={{ fontWeight: 700 }}>
             {artwork.title}
           </Typography>
@@ -57,13 +62,24 @@ const AuctionFloorCard = ({
               }}>
               Join as Observer
             </Button>
-            <Button
-              style={{ backgroundColor: 'lightblue' }}
-              onClick={async () => {
-                await handleClickJoinFloorBidder(floor);
-              }}>
-              Join as Bidder
-            </Button>
+            {weAreOwner ? (
+              <Button
+                style={{ backgroundColor: 'pink' }}
+                disabled={floor.status !== 'WAITING_TO_START'}
+                onClick={async () => {
+                  await handleTakeDownAuction(floor.artBeingAuctioned);
+                }}>
+                Take down Auction
+              </Button>
+            ) : (
+              <Button
+                style={{ backgroundColor: 'lightblue' }}
+                onClick={async () => {
+                  await handleClickJoinFloorBidder(floor);
+                }}>
+                Join as Bidder
+              </Button>
+            )}
           </div>
         </CardContent>
       </CardActionArea>

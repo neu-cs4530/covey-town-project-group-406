@@ -86,89 +86,93 @@ const ArtworkAuctionSpace = ({
     }
   };
 
-  return (
-    <div>
+  if (selectedFloor) {
+    return (
       <div>
-        <Typography variant='h4' style={{ display: 'inline', fontWeight: 700 }}>
-          Auction Space
+        <div>
+          <Typography variant='h4' style={{ display: 'inline', fontWeight: 700 }}>
+            Auction Space
+          </Typography>
+          <div style={{ display: 'inline', float: 'inline-end' }}>
+            {getAuctionStatusBadge(getSelectedFloor() as AuctionFloorArea)}
+          </div>
+        </div>
+        <Divider />
+        <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
+          <strong>Auctioneer</strong>:{' '}
+          {selectedFloor.auctioneer
+            ? selectedFloor.auctioneer.artAuctionAccount?.email
+            : 'Auction House'}
         </Typography>
-        <div style={{ display: 'inline', float: 'inline-end' }}>
-          {getAuctionStatusBadge(getSelectedFloor() as AuctionFloorArea)}
+
+        {getCurrentBid()}
+
+        <Divider />
+
+        {weAreBidder() && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+            <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
+              <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
+            </Typography>
+            <NumberInput
+              onChange={valueString => setBidAmount(Number(valueString))}
+              value={bidAmount}
+              max={userMoney}>
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+            <Button
+              onClick={async () => {
+                await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
+              }}>
+              Make Bid!
+            </Button>
+            <Divider />
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 5, width: '100%' }}>
+          <div style={{ width: '50%' }}>
+            <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
+              <strong>Observers</strong>
+            </Typography>
+            {getSelectedFloor()?.observers.length === 0 ? (
+              <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 16 }}>
+                There are no current observers.
+              </Typography>
+            ) : (
+              <UnorderedList>
+                {getSelectedFloor()?.observers.map((o, idx) => (
+                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
+                ))}
+              </UnorderedList>
+            )}
+          </div>
+          <div style={{ width: '50%' }}>
+            <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
+              <strong>Bidders</strong>
+            </Typography>
+            {getSelectedFloor()?.bidders.length === 0 ? (
+              <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 16 }}>
+                There are no current bidders.
+              </Typography>
+            ) : (
+              <UnorderedList>
+                {getSelectedFloor()?.bidders.map((o, idx) => (
+                  <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
+                ))}
+              </UnorderedList>
+            )}
+          </div>
         </div>
       </div>
-      <Divider />
-      <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 15, fontSize: 24 }}>
-        <strong>Auctioneer</strong>:{' '}
-        {selectedFloor.auctioneer
-          ? selectedFloor.auctioneer.artAuctionAccount?.email
-          : 'Auction House'}
-      </Typography>
-
-      {getCurrentBid()}
-
-      <Divider />
-
-      {weAreBidder() && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
-          <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
-            <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
-          </Typography>
-          <NumberInput
-            onChange={valueString => setBidAmount(Number(valueString))}
-            value={bidAmount}
-            max={userMoney}>
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Button
-            onClick={async () => {
-              await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
-            }}>
-            Make Bid!
-          </Button>
-          <Divider />
-        </div>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 5, width: '100%' }}>
-        <div style={{ width: '50%' }}>
-          <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
-            <strong>Observers</strong>
-          </Typography>
-          {getSelectedFloor()?.observers.length === 0 ? (
-            <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 16 }}>
-              There are no current observers.
-            </Typography>
-          ) : (
-            <UnorderedList>
-              {getSelectedFloor()?.observers.map((o, idx) => (
-                <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
-              ))}
-            </UnorderedList>
-          )}
-        </div>
-        <div style={{ width: '50%' }}>
-          <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 18 }}>
-            <strong>Bidders</strong>
-          </Typography>
-          {getSelectedFloor()?.bidders.length === 0 ? (
-            <Typography variant='subtitle1' style={{ fontWeight: 400, fontSize: 16 }}>
-              There are no current bidders.
-            </Typography>
-          ) : (
-            <UnorderedList>
-              {getSelectedFloor()?.bidders.map((o, idx) => (
-                <ListItem key={idx}>{o.artAuctionAccount?.email}</ListItem>
-              ))}
-            </UnorderedList>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+    );
+  } else {
+    return <></>;
+  }
 };
 
 export default ArtworkAuctionSpace;

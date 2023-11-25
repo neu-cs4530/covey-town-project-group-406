@@ -27,6 +27,8 @@ export default class AuctionHouse extends InteractableArea {
 
   static artworkToBeAuctioned: Artwork[] = [];
 
+  static hasBeenInstantiated = false;
+
   set auctionFloors(af: AuctionFloor[]) {
     this._auctionFloors = af;
   }
@@ -40,6 +42,22 @@ export default class AuctionHouse extends InteractableArea {
     this._auctionFloors = [];
     this._dao = SingletonArtworkDAO.instance();
     this._apiUtils = new APIUtils();
+  }
+
+  public async removePlayerOnDisconnect(player: Player) {
+    const floor = this.auctionFloors.find(
+      f => f.observers.find(p => p.id === player.id) || f.bidders.find(p => p.id === player.id),
+    );
+    if (floor) {
+      this.leaveAuctionFloor(player, floor.id);
+    }
+    // remove all of the floors where this person is the auctioneer
+    for (const f of this.auctionFloors) {
+      if (f.auctioneer?.id === player.id) {
+        f.artBeingAuctioned.isBeingAuctioned = false;
+        this._deleteAuctionFloor(f.id);
+      }
+    }
   }
 
   public async leaveAuctionFloor(player: Player, floorID: string): Promise<void> {
@@ -57,7 +75,9 @@ export default class AuctionHouse extends InteractableArea {
         }
       } else if (floor.auctioneer?.id === player.id) {
         // shut down the auction floor, make it so that the artwork is not being auctioned
+        player.removeArtwork(floor.artBeingAuctioned);
         floor.artBeingAuctioned.isBeingAuctioned = false;
+        player.addArtwork(floor.artBeingAuctioned);
         await this._dao.updatePlayerArtworkById(player.email, floor.artBeingAuctioned);
         this.auctionFloors = this.auctionFloors.filter(f => f.id !== floorID);
       }
@@ -88,6 +108,17 @@ export default class AuctionHouse extends InteractableArea {
     await this._dao.addArtworksToAuctionHouse(artworks, endIndex);
     const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
+
+    // filter the list at all costs
+    const descSet: Set<string> = new Set();
+    const filteredArtworkToBeAuctioned: Artwork[] = [];
+    for (const art of AuctionHouse.artworkToBeAuctioned) {
+      if (!descSet.has(art.description)) {
+        descSet.add(art.description);
+        filteredArtworkToBeAuctioned.push({ ...art });
+      }
+    }
+    AuctionHouse.artworkToBeAuctioned = filteredArtworkToBeAuctioned;
   }
 
   public makeBid(player: Player, floorID: string, bid: number): void {
@@ -226,8 +257,10 @@ export default class AuctionHouse extends InteractableArea {
     if (!playerHasArtwork || artwork.isBeingAuctioned) {
       throw new Error('player does not have artwork with id');
     }
-
+    player.removeArtwork(artwork);
     artwork.isBeingAuctioned = true;
+    player.addArtwork(artwork);
+
     await this._dao.updatePlayerArtworkById(player.email, artwork);
     const floor = new AuctionFloor(nanoid(), artwork, 30, undefined, [], [], minBid, player);
     floor.on('auctionEnded', f => {
@@ -284,14 +317,14 @@ export default class AuctionHouse extends InteractableArea {
       if (newFloor === undefined) {
         throw new Error();
       }
-      if (newFloor.bidders.length >= 3) {
+      if (newFloor.bidders.length >= 3 && newFloor.status !== 'IN_PROGRESS') {
         newFloor.startAuction();
       }
       return { floorJoined: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
     }
 
     if (command.type === 'LeaveAuctionFloor') {
-      this.leaveAuctionFloor(player, command.floor.id);
+      this.leaveAuctionFloor(player, command.floor.id).then();
       this._emitAreaChanged();
       const newFloor = this._auctionFloors.find(f => f.id === command.floor.id);
       if (newFloor === undefined) {
@@ -309,6 +342,20 @@ export default class AuctionHouse extends InteractableArea {
         throw new Error();
       }
       return { floor: newFloor.toModel() } as InteractableCommandReturnType<CommandType>;
+    }
+
+    if (command.type === 'AuctionOurArtwork') {
+      this.createNewAuctionFloorPlayer(player, command.artwork, command.bid).then(() => {
+        this._emitAreaChanged();
+        return undefined as InteractableCommandReturnType<CommandType>;
+      });
+    }
+
+    if (command.type === 'TakeDownOurAuction') {
+      this.leaveAuctionFloor(player, command.floor.id).then(() => {
+        this._emitAreaChanged();
+        return undefined as InteractableCommandReturnType<CommandType>;
+      });
     }
 
     return undefined as InteractableCommandReturnType<CommandType>;
