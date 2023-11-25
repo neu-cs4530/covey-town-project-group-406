@@ -29,14 +29,14 @@ export default function LogoutButton(): JSX.Element {
     townController.once('userLogoutStatus', success => {
       if (success) {
         toast({
-          title: 'log out success',
-          description: `you are no longer logged in as ${email}`,
+          title: 'Log out success!',
+          description: `You are no longer logged in as ${email}.`,
           status: 'info',
         });
       } else {
         toast({
-          title: 'log out failed',
-          description: `not sure tbh`,
+          title: 'Log out failed',
+          description: `There was a server error in logging you out.`,
           status: 'info',
         });
       }
@@ -46,9 +46,10 @@ export default function LogoutButton(): JSX.Element {
         townController.sendLogoutCommand(email);
       })
       .catch(error => {
+        console.log('Log out error: ', error);
         toast({
-          title: 'log out failed',
-          description: `${error}`,
+          title: 'Log out failed',
+          description: 'There was a server error in logging you out.',
           status: 'info',
         });
       });
@@ -60,21 +61,28 @@ export default function LogoutButton(): JSX.Element {
         style={{ marginTop: 10, marginBottom: 10 }}
         onClick={() => {
           if (townController.ourPlayer?.artAuctionAccount) {
-            console.log('logging out');
             logout(townController.ourPlayer.artAuctionAccount.email);
           } else {
             toast({
-              title: 'logout failed',
-              description: `you are not logged in`,
+              title: 'Log out failed',
+              description: `You are not logged in! Please try again.`,
               status: 'info',
             });
           }
         }}>
-        logout
+        Log out
       </Button>
     );
   } else {
-    return <></>;
+    return (
+      <Button
+        style={{ marginTop: 10, marginBottom: 10 }}
+        onClick={() => {
+          // TODO - add SignupSignin modal
+        }}>
+        Log in
+      </Button>
+    );
   }
 
   /**/
