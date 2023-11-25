@@ -3,15 +3,18 @@ import useTownController from '../../hooks/useTownController';
 import {
   Box,
   Button,
-  Heading,
+  Divider,
+  ListItem,
   Modal,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  OrderedList,
 } from '@chakra-ui/react';
 import { Artwork } from '../../types/CoveyTownSocket';
-import UserArtworks from './UserArtworks';
+import { Typography } from '@material-ui/core';
+import UserArtwork from './UserArtwork';
 
 type Props = {
   userEmail: string;
@@ -24,17 +27,45 @@ export default function ArtAuctionAccountInfo({
   userMoney,
   userArtworks,
 }: Props): JSX.Element {
+  const getNetWorth = (): number => {
+    let netWorth = userMoney;
+    for (const userArtwork of userArtworks) {
+      netWorth += userArtwork.purchasePrice;
+    }
+    return netWorth;
+  };
+
   return (
-    <Box>
-      <Heading as='h3' fontSize='m' style={{ marginTop: 10, marginBottom: 10 }}>
-        {' '}
-        email: {userEmail}
-      </Heading>
-      <Heading as='h3' fontSize='m' style={{ marginTop: 10, marginBottom: 10 }}>
-        {' '}
-        money: {userMoney}
-      </Heading>
-      <UserArtworks userArtworks={userArtworks} />
+    <Box style={{ padding: 30, paddingTop: 10 }}>
+      <Typography variant='h6' style={{ marginBottom: 10 }}>
+        <strong>Email</strong>: {userEmail}
+      </Typography>
+      <Typography variant='h6' style={{ marginBottom: 10 }}>
+        <strong>Balance</strong>: ${userMoney.toLocaleString()}
+      </Typography>
+      <Typography variant='h6' style={{ marginBottom: 10 }}>
+        <strong>Net Worth</strong>: ${getNetWorth().toLocaleString()}
+      </Typography>
+      <Typography variant='h5' style={{ marginTop: 20, marginBottom: 10, fontWeight: 600 }}>
+        <strong>Your Art Collection</strong>
+      </Typography>
+      <Divider />
+      <div style={{ marginTop: 10 }}>
+        {userArtworks.length === 0 ? (
+          <Typography variant='subtitle1'>
+            You don not own any artworks right now. Try bidding on some pieces in the Art Auction
+            House!
+          </Typography>
+        ) : (
+          <OrderedList>
+            {userArtworks.map((ua, idx) => (
+              <ListItem style={{ marginBottom: 10 }} key={idx}>
+                <UserArtwork artwork={ua} />
+              </ListItem>
+            ))}
+          </OrderedList>
+        )}
+      </div>
     </Box>
   );
 }
@@ -73,7 +104,7 @@ export function ArtAuctionAccountInfoWrapper(): JSX.Element {
 
   return (
     <Box>
-      {buttonIsShown ? (
+      {buttonIsShown && (
         <Button
           style={{ width: '100%' }}
           onClick={() => {
@@ -82,8 +113,6 @@ export function ArtAuctionAccountInfoWrapper(): JSX.Element {
           }}>
           Account Information
         </Button>
-      ) : (
-        <></>
       )}
       <Modal
         isOpen={modalIsOpen}
@@ -91,10 +120,11 @@ export function ArtAuctionAccountInfoWrapper(): JSX.Element {
           setModalIsOpen(false);
           townController.unPause();
         }}
-        closeOnOverlayClick={false}>
+        closeOnOverlayClick={false}
+        size={'6xl'}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Account Information</ModalHeader>
+          <ModalHeader style={{ fontSize: 42, fontWeight: 700 }}>Account Information</ModalHeader>
           <ModalCloseButton />
           <ArtAuctionAccountInfo
             userEmail={userEmail}
