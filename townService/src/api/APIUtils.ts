@@ -20,19 +20,17 @@ export default class APIUtils {
     if (this._artworkIds.length === 0) {
       await this._getArtworkIDs();
     }
-    await Promise.all(
-      this._artworkIds.slice(startIndex, endIndex).map(async objId => {
-        const artwork = await this.createArtwork(objId);
-        if (this.validArtwork(artwork)) {
-          if (artwork !== undefined) {
-            artworkList.push(artwork);
-          }
-        }
-      }),
+    const rawArtworks = await Promise.all(
+      this._artworkIds.slice(startIndex, endIndex).map(async objId => this.createArtwork(objId)),
     );
 
-    // loop through and add the artworks, keep track of ids added
-    // if id has been added, dont add it
+    for (const artwork of rawArtworks) {
+      if (this.validArtwork(artwork)) {
+        if (artwork !== undefined) {
+          artworkList.push(artwork);
+        }
+      }
+    }
 
     return artworkList;
   }
