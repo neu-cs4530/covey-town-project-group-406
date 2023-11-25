@@ -238,11 +238,20 @@ export default class Town {
       try {
         const dbPlayer = await this._dao.getPlayer(email);
         await this._dao.updatePlayer(email, false, dbPlayer.money);
+
+        // get the auction house area, then call removePlayerOnDisconnect
+        for (const interactable of this.interactables) {
+          if (interactable.occupants.find(o => o.id === playerID)) {
+            (interactable as AuctionHouse).removePlayerOnDisconnect(newPlayer);
+          }
+        }
+
         for (const player of this.players) {
           if (player.id === playerID) {
             player.uninitializeArtAuctionAccount();
           }
         }
+
         socket.emit('auctionHouseLogoutCommandResponse', true);
       } catch (err) {
         socket.emit('auctionHouseLogoutCommandResponse', false);
