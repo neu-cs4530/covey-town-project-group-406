@@ -106,8 +106,11 @@ export default class AuctionHouse extends InteractableArea {
 
   public async addArtworksToAuctionHouse(artworks: Artwork[], endIndex: number) {
     await this._dao.addArtworksToAuctionHouse(artworks, endIndex);
-    const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
-    AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
+    for (const artwork of artworks) {
+      AuctionHouse.artworkToBeAuctioned.push(artwork);
+    }
+    // const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
+    // AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
     // filter the list at all costs
     const descSet: Set<string> = new Set();
     const filteredArtworkToBeAuctioned: Artwork[] = [];
