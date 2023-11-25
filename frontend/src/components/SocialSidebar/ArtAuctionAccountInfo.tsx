@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { Artwork } from '../../types/CoveyTownSocket';
 import { Typography } from '@material-ui/core';
-import UserArtwork from './UserArtworks';
+import UserArtwork from './UserArtwork';
 
 type Props = {
   userEmail: string;
