@@ -52,20 +52,22 @@ function ArtAuctionHouseArea({
             setCanBid(true);
           }
           if (f.timeLeft === 0) {
-            let toastDescription = 'You lost the auction :(';
-            if (
-              f.currentBid &&
-              f.currentBid.player.artAuctionAccount?.email ===
-                townController.ourPlayer.artAuctionAccount?.email
-            ) {
-              toastDescription =
-                'You won the auction! You can view the art in your account information :)';
+            if (f.bidders.find(b => b.userName === townController.ourPlayer.userName)) {
+              let toastDescription = 'You lost the auction :(';
+              if (
+                f.currentBid &&
+                f.currentBid.player.artAuctionAccount?.email ===
+                  townController.ourPlayer.artAuctionAccount?.email
+              ) {
+                toastDescription =
+                  'You won the auction! You can view the art in your account information :)';
+              }
+              toast({
+                title: 'The auction ended!',
+                description: toastDescription,
+                status: 'info',
+              });
             }
-            toast({
-              title: 'The auction ended!',
-              description: toastDescription,
-              status: 'info',
-            });
             setSelectedFloor(undefined);
             setCanBid(false);
           }
