@@ -1,14 +1,10 @@
 import axios, { AxiosInstance } from 'axios';
 import { Artwork, ArtistInfo } from '../types/CoveyTownSocket';
-import ArtworkDAO from '../db/ArtworkDAO';
-import SingletonArtworkDAO from '../db/SingletonArtworkDAO';
 
 export default class APIUtils {
   private _apiInstance: AxiosInstance;
 
   private _artworkIds: number[];
-
-  private _dao: ArtworkDAO;
 
   constructor() {
     this._apiInstance = axios.create({
@@ -17,30 +13,26 @@ export default class APIUtils {
       headers: {},
     });
     this._artworkIds = [];
-    this._dao = SingletonArtworkDAO.instance();
   }
 
   async nextArtworks(startIndex: number, endIndex: number): Promise<Artwork[]> {
     const artworkList: Artwork[] = [];
-    while (artworkList.length === 0) {
-      // eslint-disable-next-line no-await-in-loop
+    if (this._artworkIds.length === 0) {
       await this._getArtworkIDs();
-
-      // eslint-disable-next-line no-await-in-loop
-      const rawArtworks = await Promise.all(
-        this._artworkIds.slice(startIndex, endIndex).map(async objId => this.createArtwork(objId)),
-      );
-
-      for (const artwork of rawArtworks) {
-        if (
-          this.validArtwork(artwork) &&
-          artwork !== undefined &&
-          artworkList.find(a => a.id === artwork.id) === undefined
-        ) {
-          artworkList.push(artwork);
-        }
-      }
     }
+    await Promise.all(
+      this._artworkIds.slice(startIndex, endIndex).map(async objId => {
+        const artwork = await this.createArtwork(objId);
+        if (this.validArtwork(artwork)) {
+          if (artwork !== undefined) {
+            artworkList.push(artwork);
+          }
+        }
+      }),
+    );
+
+    // loop through and add the artworks, keep track of ids added
+    // if id has been added, dont add it
 
     return artworkList;
   }
