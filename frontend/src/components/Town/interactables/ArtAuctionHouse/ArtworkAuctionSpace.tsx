@@ -109,11 +109,12 @@ const ArtworkAuctionSpace = ({
 
         <Divider />
 
+        <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
+          <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
+        </Typography>
+
         {weAreBidder() && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
-            <Typography variant='subtitle1' style={{ fontWeight: 400, marginTop: 5, fontSize: 30 }}>
-              <strong>Time Left: {getSelectedFloor()?.timeLeft}</strong>
-            </Typography>
             <NumberInput
               onChange={valueString => setBidAmount(Number(valueString))}
               value={bidAmount}

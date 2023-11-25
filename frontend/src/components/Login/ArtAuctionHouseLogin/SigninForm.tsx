@@ -18,14 +18,14 @@ export default function SigninForm(): JSX.Element {
           townController.once('loginStatus', success => {
             if (success) {
               toast({
-                title: 'login',
-                description: `you have successfully logged in as ${email}`,
+                title: 'Log in',
+                description: `You have successfully logged in as ${email}.`,
                 status: 'info',
               });
             } else {
               toast({
-                title: 'user already logged in',
-                description: `there is a user already logged in with this information elsewhere`,
+                title: 'User already logged in!',
+                description: `There is a user already logged in with this information elsewhere. Please try a different account.`,
                 status: 'info',
               });
             }
@@ -33,9 +33,10 @@ export default function SigninForm(): JSX.Element {
           townController.sendLoginCommand(email);
         })
         .catch(err => {
+          console.log('Sign in error: ', err);
           toast({
-            title: 'error logging in',
-            description: `${err.message}`,
+            title: 'Error logging in.',
+            description: 'There was a server error in logging you in.',
             status: 'info',
           });
         });
@@ -76,8 +77,8 @@ export default function SigninForm(): JSX.Element {
               sendLoginCommand(email, pass);
             } else {
               toast({
-                title: 'login failed',
-                description: `you are already logged in`,
+                title: 'Log in failed',
+                description: `You are already logged in!`,
                 status: 'info',
               });
             }
