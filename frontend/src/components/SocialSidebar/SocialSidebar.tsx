@@ -3,7 +3,8 @@ import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
 import { ArtAuctionAccountInfoWrapper } from './ArtAuctionAccountInfo';
-import LogoutButton from './LoginLogoutButton';
+import LoginLogoutButton from './LoginLogoutButton';
+import { Typography } from '@material-ui/core';
 
 export default function SocialSidebar(): JSX.Element {
   return (
@@ -22,8 +23,13 @@ export default function SocialSidebar(): JSX.Element {
       </Heading>
       <PlayersList />
       <ConversationAreasList />
-      <ArtAuctionAccountInfoWrapper />
-      <LogoutButton />
+      <div>
+        <Typography variant='subtitle1' style={{ fontWeight: 600 }}>
+          Art Auction Account
+        </Typography>
+        <ArtAuctionAccountInfoWrapper />
+        <LoginLogoutButton />
+      </div>
     </VStack>
   );
 }

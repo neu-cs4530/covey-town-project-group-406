@@ -69,7 +69,7 @@ export default function LoginLogoutButton(): JSX.Element {
   if (isLoggedIn) {
     return (
       <Button
-        style={{ marginTop: 10, marginBottom: 10 }}
+        style={{ marginTop: 10, marginBottom: 10, width: '100%' }}
         onClick={() => {
           if (townController.ourPlayer?.artAuctionAccount) {
             logout(townController.ourPlayer.artAuctionAccount.email);
