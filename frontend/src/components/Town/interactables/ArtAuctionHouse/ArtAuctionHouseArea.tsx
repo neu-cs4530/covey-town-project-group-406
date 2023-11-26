@@ -52,6 +52,22 @@ function ArtAuctionHouseArea({
             setCanBid(true);
           }
           if (f.timeLeft === 0) {
+            if (f.bidders.find(b => b.userName === townController.ourPlayer.userName)) {
+              let toastDescription = 'You lost the auction :(';
+              if (
+                f.currentBid &&
+                f.currentBid.player.artAuctionAccount?.email ===
+                  townController.ourPlayer.artAuctionAccount?.email
+              ) {
+                toastDescription =
+                  'You won the auction! You can view the art in your account information :)';
+              }
+              toast({
+                title: 'The auction ended!',
+                description: toastDescription,
+                status: 'info',
+              });
+            }
             setSelectedFloor(undefined);
             setCanBid(false);
           }
@@ -105,6 +121,8 @@ function ArtAuctionHouseArea({
       controller.removeListener('floorTakenDown', handleFloorTakenDown);
       townController.removeListener('artAccountUpdated', handleArtAccountUpdated);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [controller, townController, selectedFloor?.id]);
 
   const handleAuctionMyArtwork = () => {
@@ -127,14 +145,14 @@ function ArtAuctionHouseArea({
         if (success) {
           toast({
             title: 'Log out success!',
-            description: `You are no longer logged in as ${email}`,
+            description: `You are no longer logged in as ${email}.`,
             status: 'info',
           });
         } else {
           toast({
             title: 'Log out failed.',
             description: `We were not able to log you out. Please try again.`,
-            status: 'error',
+            status: 'info',
           });
         }
       });
@@ -143,10 +161,11 @@ function ArtAuctionHouseArea({
           townController.sendLogoutCommand(email);
         })
         .catch(error => {
+          console.log('Log out error: ', error);
           toast({
             title: 'Log out failed',
-            description: `${error}`,
-            status: 'error',
+            description: 'There was a server error in logging you out.',
+            status: 'info',
           });
         });
     }
@@ -183,13 +202,13 @@ function ArtAuctionHouseArea({
       if (floor.currentBid?.bid !== undefined && floor.currentBid.bid >= bid) {
         toast({
           title: 'Could not make the bid',
-          description: `You must place a bid higher than the current bid.`,
+          description: `You must place a bid higher than the current bid of ${floor.currentBid.bid.toLocaleString()}`,
           status: 'info',
         });
       } else if (floor.minBid >= bid) {
         toast({
           title: 'Could not make the bid',
-          description: `You must place a bid higher than the minimum starting bid.`,
+          description: `You must place a bid higher than the minimum starting bid of ${floor.minBid.toLocaleString()}.`,
           status: 'info',
         });
       }
@@ -199,7 +218,7 @@ function ArtAuctionHouseArea({
     } else {
       toast({
         title: 'Could not make the bid',
-        description: `The auction has not started! Please wait till the auction begins.`,
+        description: 'The auction has not started! Please wait till the auction begins.',
         status: 'info',
       });
     }

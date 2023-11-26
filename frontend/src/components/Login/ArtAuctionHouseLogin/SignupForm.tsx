@@ -18,14 +18,14 @@ export default function SignupForm(): JSX.Element {
         townController.once('loginStatus', success => {
           if (success) {
             toast({
-              title: 'sign up successful',
-              description: `you have successfully signed up and are now logged in as ${email}`,
+              title: 'Sign up successful!',
+              description: `You have successfully signed up and are now logged in as ${email}.`,
               status: 'info',
             });
           } else {
             toast({
-              title: 'user already logged in',
-              description: `there is a user already logged in with this information elsewhere`,
+              title: 'User already logged in',
+              description: `There is a user already logged in with this information elsewhere. Please try a different account.`,
               status: 'info',
             });
           }
@@ -38,9 +38,10 @@ export default function SignupForm(): JSX.Element {
         townController.sendSignupCommand(email);
       })
       .catch(err => {
+        console.log('Sign up error: ', err);
         toast({
-          title: 'user creation not successful',
-          description: `${err.message}`,
+          title: 'User creation not successful.',
+          description: 'There was a server error in signing up.',
           status: 'info',
         });
       });
@@ -50,7 +51,7 @@ export default function SignupForm(): JSX.Element {
     if (p !== cp) {
       toast({
         title: "Your passwords don't match!",
-        description: `please try again with the same passwords.`,
+        description: `Please try again with the same passwords.`,
         status: 'info',
       });
     } else {
@@ -98,8 +99,8 @@ export default function SignupForm(): JSX.Element {
               // sendLoginCommand(email, pass);
             } else {
               toast({
-                title: 'login failed',
-                description: `you are already logged in`,
+                title: 'Log in failed',
+                description: `You are already logged in!`,
                 status: 'info',
               });
             }
