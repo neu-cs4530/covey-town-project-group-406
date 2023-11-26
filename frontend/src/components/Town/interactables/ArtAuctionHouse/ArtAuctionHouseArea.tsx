@@ -86,6 +86,7 @@ function ArtAuctionHouseArea({
 
     const handleFloorJoined = (floor: AuctionFloorArea) => {
       setSelectedFloor(floor);
+      setBidAmount(floor.minBid + 1);
     };
 
     const handleFloorLeft = () => {
@@ -183,6 +184,19 @@ function ArtAuctionHouseArea({
   };
 
   const handleFloorSelect = async (floor: AuctionFloorArea, asBidder: boolean) => {
+    if (asBidder) {
+      if (
+        (floor.currentBid === undefined && userMoney <= floor.minBid) ||
+        (floor.currentBid !== undefined && userMoney <= floor.currentBid.bid)
+      ) {
+        toast({
+          title: 'Could not join the floor as a bidder.',
+          description: 'You do not have enough money!',
+          status: 'info',
+        });
+        return;
+      }
+    }
     await controller.joinFloor(floor, asBidder);
   };
 
@@ -205,16 +219,28 @@ function ArtAuctionHouseArea({
           description: `You must place a bid higher than the current bid of ${floor.currentBid.bid.toLocaleString()}`,
           status: 'info',
         });
+        return;
       } else if (floor.minBid >= bid) {
         toast({
           title: 'Could not make the bid',
           description: `You must place a bid higher than the minimum starting bid of ${floor.minBid.toLocaleString()}.`,
           status: 'info',
         });
+        return;
       }
 
       await controller.makeBid(floor, bid);
-      setBidAmount(0);
+
+      if (
+        townController.ourPlayer.artAuctionAccount &&
+        bid === townController.ourPlayer.artAuctionAccount.wallet.money
+      ) {
+        toast({
+          title: 'Caution!',
+          description: `You are bidding ALL your money.`,
+          status: 'warning',
+        });
+      }
     } else {
       toast({
         title: 'Could not make the bid',

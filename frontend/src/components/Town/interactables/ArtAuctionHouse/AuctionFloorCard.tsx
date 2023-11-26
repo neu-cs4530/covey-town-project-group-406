@@ -30,6 +30,14 @@ const AuctionFloorCard = ({
     }
   };
 
+  const getCurrentBidPrice = () => {
+    if (floor.currentBid !== undefined) {
+      return 'Current bid: $' + floor.currentBid.bid.toLocaleString();
+    } else {
+      return 'Starting bid: $' + floor.minBid.toLocaleString();
+    }
+  };
+
   return (
     <Card style={{ maxWidth: 345, minWidth: 345 }}>
       <CardActionArea
@@ -55,6 +63,13 @@ const AuctionFloorCard = ({
             {artwork.artist.name}
           </Typography>
           <div>{getAuctionStatus()}</div>
+          <Typography
+            gutterBottom
+            variant='body1'
+            component='div'
+            style={{ fontWeight: 400, marginTop: 10 }}>
+            {getCurrentBidPrice()}
+          </Typography>
           <div style={{ display: 'flex', gap: 10, marginTop: 20, flexGrow: 1, alignItems: 'end' }}>
             <Button
               onClick={async () => {
