@@ -3,7 +3,7 @@ import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
 import { ArtAuctionAccountInfoWrapper } from './ArtAuctionAccountInfo';
-import LogoutButton from './LogoutButton';
+import LogoutButton from './LoginLogoutButton';
 
 export default function SocialSidebar(): JSX.Element {
   return (

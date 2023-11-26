@@ -2,26 +2,37 @@ import React, { useState } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { signOut } from 'firebase/auth';
 import auth from '../../classes/FirestoreConfig';
-import { Button, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Modal,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  useToast,
+} from '@chakra-ui/react';
+import SignupSignIn from '../Login/ArtAuctionHouseLogin/SignupSignIn';
 
-export default function LogoutButton(): JSX.Element {
+export default function LoginLogoutButton(): JSX.Element {
   const toast = useToast();
   const townController = useTownController();
-  const [isShown, setIsShown] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
 
   townController.addListener('loginStatus', success => {
     if (success) {
-      setIsShown(true);
+      setIsLoggedIn(true);
     } else {
-      setIsShown(false);
+      setIsLoggedIn(false);
     }
   });
 
   townController.addListener('userLogoutStatus', success => {
     if (success) {
-      setIsShown(false);
+      setIsLoggedIn(false);
     } else {
-      setIsShown(true);
+      setIsLoggedIn(true);
     }
   });
 
@@ -55,7 +66,7 @@ export default function LogoutButton(): JSX.Element {
       });
   };
 
-  if (isShown) {
+  if (isLoggedIn) {
     return (
       <Button
         style={{ marginTop: 10, marginBottom: 10 }}
@@ -75,13 +86,31 @@ export default function LogoutButton(): JSX.Element {
     );
   } else {
     return (
-      <Button
-        style={{ marginTop: 10, marginBottom: 10 }}
-        onClick={() => {
-          // TODO - add SignupSignin modal
-        }}>
-        Log in
-      </Button>
+      <Box style={{ display: 'flex', width: '100%' }}>
+        <Button
+          style={{ marginTop: 10, marginBottom: 10, width: '100%' }}
+          onClick={() => {
+            setLoginModalIsOpen(true);
+            townController.pause();
+          }}>
+          Log in
+        </Button>
+        <Modal
+          isOpen={loginModalIsOpen}
+          onClose={() => {
+            setLoginModalIsOpen(false);
+            townController.unPause();
+          }}
+          closeOnOverlayClick={false}
+          size={'xl'}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader style={{ fontSize: 42, fontWeight: 700 }}>Account Information</ModalHeader>
+            <ModalCloseButton />
+            <SignupSignIn />
+          </ModalContent>
+        </Modal>
+      </Box>
     );
   }
 
