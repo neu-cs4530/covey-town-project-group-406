@@ -81,7 +81,6 @@ export default class ArtworkDAO implements IArtworkDAO {
       // Ensure that the player does not have the artwork being added to their account
       const artworksOfPlayer = await this._getAllOfPlayersArtwork(email);
       if (!this._areArtworksUnique(artworksOfPlayer, [artwork])) {
-        // TODO - Uncomment
         throw new Error('duplicate artwork added');
       }
 
@@ -109,7 +108,6 @@ export default class ArtworkDAO implements IArtworkDAO {
 
       const allArtworks: number[] = allArtworkIDsCollection.data()?.artworkIDs;
       if (this._areAnyOfArtworksAreInCirculation(allArtworks, [artwork])) {
-        // TODO - Uncomment
         throw new Error(
           `duplicate artowrk in circulation when adding artwork with id ${artwork.id}`,
         );
