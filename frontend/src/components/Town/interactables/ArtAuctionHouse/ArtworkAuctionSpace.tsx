@@ -2,12 +2,17 @@ import {
   Badge,
   Button,
   Divider,
+  Flex,
   ListItem,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
   UnorderedList,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
@@ -115,16 +120,34 @@ const ArtworkAuctionSpace = ({
 
         {weAreBidder() && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
-            <NumberInput
-              onChange={valueString => setBidAmount(Number(valueString))}
-              value={bidAmount}
-              max={userMoney}>
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            <Flex gap={12} padding={10} paddingLeft={0} alignItems={'center'}>
+              <div>
+                <NumberInput
+                  onChange={valueString => setBidAmount(Number(valueString))}
+                  value={bidAmount}
+                  width={140}
+                  max={userMoney}>
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </div>
+              <Slider
+                flex='1'
+                focusThumbOnChange={false}
+                value={bidAmount}
+                onChange={valueString => setBidAmount(Number(valueString))}
+                max={userMoney}>
+                <SliderTrack>
+                  <SliderFilledTrack />
+                </SliderTrack>
+                <SliderThumb fontSize='sm' boxSize={'80px'}>
+                  {bidAmount.toLocaleString()}
+                </SliderThumb>
+              </Slider>
+            </Flex>
             <Button
               onClick={async () => {
                 await handleMakeBid(getSelectedFloor() as AuctionFloorArea, bidAmount);
