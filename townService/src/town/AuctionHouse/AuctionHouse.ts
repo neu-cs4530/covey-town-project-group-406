@@ -125,7 +125,7 @@ export default class AuctionHouse extends InteractableArea {
     const floor = this.auctionFloors.find(f => f.id === floorID);
     if (floor) {
       if (
-        ((floor.currentBid === undefined && bid > floor.minBid) ||
+        ((floor.currentBid === undefined && bid >= floor.minBid) ||
           (floor.currentBid !== undefined && bid > floor.currentBid.bid)) &&
         player.wallet.money >= bid
       ) {
