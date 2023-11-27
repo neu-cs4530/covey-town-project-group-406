@@ -86,7 +86,7 @@ function ArtAuctionHouseArea({
 
     const handleFloorJoined = (floor: AuctionFloorArea) => {
       setSelectedFloor(floor);
-      setBidAmount(floor.minBid + 1);
+      setBidAmount(floor.minBid);
     };
 
     const handleFloorLeft = () => {
@@ -220,7 +220,7 @@ function ArtAuctionHouseArea({
           status: 'info',
         });
         return;
-      } else if (floor.minBid >= bid) {
+      } else if (floor.minBid > bid) {
         toast({
           title: 'Could not make the bid',
           description: `You must place a bid higher than the minimum starting bid of ${floor.minBid.toLocaleString()}.`,
