@@ -108,17 +108,6 @@ export default class AuctionHouse extends InteractableArea {
     await this._dao.addArtworksToAuctionHouse(artworks, endIndex);
     const artworksInAuctionHouse = await this._dao.getAllAuctionHouseArtworks();
     AuctionHouse.artworkToBeAuctioned = artworksInAuctionHouse;
-
-    // filter the list at all costs
-    const descSet: Set<string> = new Set();
-    const filteredArtworkToBeAuctioned: Artwork[] = [];
-    for (const art of AuctionHouse.artworkToBeAuctioned) {
-      if (!descSet.has(art.description)) {
-        descSet.add(art.description);
-        filteredArtworkToBeAuctioned.push({ ...art });
-      }
-    }
-    AuctionHouse.artworkToBeAuctioned = filteredArtworkToBeAuctioned;
   }
 
   public makeBid(player: Player, floorID: string, bid: number): void {
