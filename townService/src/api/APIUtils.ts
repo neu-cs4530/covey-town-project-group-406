@@ -24,11 +24,16 @@ export default class APIUtils {
       this._artworkIds.slice(startIndex, endIndex).map(async objId => this.createArtwork(objId)),
     );
 
+    const artworkTitles: Set<string> = new Set();
+
     for (const artwork of rawArtworks) {
-      if (this.validArtwork(artwork)) {
-        if (artwork !== undefined) {
-          artworkList.push(artwork);
-        }
+      if (
+        this.validArtwork(artwork) &&
+        artwork !== undefined &&
+        !artworkTitles.has(artwork?.title)
+      ) {
+        artworkList.push(artwork);
+        artworkTitles.add(artwork.title);
       }
     }
 
