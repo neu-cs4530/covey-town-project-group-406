@@ -423,8 +423,12 @@ export default class Town {
             );
           }
           await Promise.all(results);
+          const artworkTitles: Set<string> = new Set();
           for (const artwork of artworks) {
-            AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
+            if (!artworkTitles.has(artwork.title)) {
+              AuctionHouse.artworkToBeAuctioned.push({ ...artwork, isBeingAuctioned: false });
+              artworkTitles.add(artwork.title);
+            }
           }
         } catch (err) {
           await area.addNewArtworksToAuctionHouse(5);
