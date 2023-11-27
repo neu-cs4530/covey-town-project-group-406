@@ -44,6 +44,7 @@ export default class APIUtils {
     try {
       const response = await this._apiInstance.get(
         'public/collection/v1/search?hasImages=true&artistOrCulture=true&q=*',
+        { timeout: 10000 },
       );
       this._artworkIds = response.data.objectIDs;
     } catch (err) {
@@ -57,7 +58,9 @@ export default class APIUtils {
   async createArtwork(objectId: number): Promise<Artwork | undefined> {
     let responseData = null;
     try {
-      const response = await this._apiInstance.get(`public/collection/v1/objects/${objectId}`);
+      const response = await this._apiInstance.get(`public/collection/v1/objects/${objectId}`, {
+        timeout: 10000,
+      });
       responseData = response.data;
     } catch (error) {
       return undefined;
