@@ -25,6 +25,8 @@ export default class AuctionHouse extends InteractableArea {
 
   private _apiUtils: APIUtils;
 
+  private _topPlayers: { email: string; artValue: number }[];
+
   static artworkToBeAuctioned: Artwork[] = [];
 
   static hasBeenInstantiated = false;

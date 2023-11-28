@@ -178,7 +178,7 @@ function ArtAuctionHouseArea({
 
   const handleViewLeaderboard = () => {
     setIsLeaderboardOpen(true);
-    setLeaderboardInfo()
+    setLeaderboarddInfo()
   };
   const handleCloseLeaderboard = () => setIsLeaderboardOpen(false);
 
