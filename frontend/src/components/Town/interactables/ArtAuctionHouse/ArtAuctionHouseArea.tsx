@@ -42,6 +42,7 @@ function ArtAuctionHouseArea({
   const [isAuctioningArtwork, setIsAuctioningArtwork] = useState(false);
   const [userArtwork, setUserArtwork] = useState<Artwork[]>([]);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [leaderboardInfo, setLeaderboardInfo] = useState<{email: string, artValue: number}[]>([]);
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
@@ -176,9 +177,8 @@ function ArtAuctionHouseArea({
   };
 
   const handleViewLeaderboard = () => {
-    console.log(`is leaderboard1: ${isLeaderboardOpen}`);
     setIsLeaderboardOpen(true);
-    console.log(`is leaderboard2: ${isLeaderboardOpen}`);
+    setLeaderboardInfo()
   };
   const handleCloseLeaderboard = () => setIsLeaderboardOpen(false);
 
@@ -421,6 +421,7 @@ function ArtAuctionHouseArea({
   }
 
   function leaderboardDisplay(): React.ReactNode {
+    const leaderboardInfo = 
     return (
     <div>
 

@@ -109,6 +109,21 @@ describe('when adding a player', () => {
     await expect(dao.addPlayer(player.email)).rejects.toThrowError();
     await dao.removePlayer(player.email);
   });
+  it('should return the email of a player in the db', async () => {
+    await dao.addPlayer(player.email);
+    await expect(await dao.getAllPlayerEmails()).toStrictEqual([player.email]);
+    await dao.removePlayer(player.email);
+  });
+  it('should return all emails of players in the db', async () => {
+    await dao.addPlayer(player.email);
+    await dao.addPlayer(player2.email);
+    await expect(await dao.getAllPlayerEmails()).toStrictEqual([player2.email, player.email]);
+    await dao.removePlayer(player.email);
+    await dao.removePlayer(player2.email);
+  });
+  it('should return an empty list if there are no players in the db', async () => {
+    await expect(await dao.getAllPlayerEmails()).toStrictEqual([]);
+  });
 });
 
 describe('when trying to add artworks to a player', () => {

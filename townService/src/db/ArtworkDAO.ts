@@ -257,6 +257,15 @@ export default class ArtworkDAO implements IArtworkDAO {
     throw new Error('cannot find user data');
   }
 
+  /**
+   * gets a list of all player emails from the database
+   */
+  public async getAllPlayerEmails() {
+    const playerRespose = await this._db.collection(this.userCollection).get();
+    const data = playerRespose.docs.map(doc => doc.id);
+    return data;
+  }
+
   public async logOutAllPlayers(): Promise<void> {
     const playersResponse = await this._db.collection(this.userCollection).get();
     const { docs } = playersResponse;

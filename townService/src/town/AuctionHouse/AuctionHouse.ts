@@ -175,6 +175,38 @@ export default class AuctionHouse extends InteractableArea {
     await this.addArtworksToAuctionHouse(artworks, index + numArtworks);
   }
 
+  public async getTopPlayersLeaderboard(
+    numPlayers: number,
+  ): Promise<{ email: string; artValue: number }[]> {
+    const playerEmails = await this._dao.getAllPlayerEmails();
+    const allPlayers: {
+      email: string;
+      playerInfo: Promise<{ artworks: Artwork[]; money: number; isLoggedIn: boolean }>;
+    }[] = [];
+    await playerEmails.map(async p => {
+      allPlayers.push({ email: p, playerInfo: this._dao.getPlayer(p) });
+    });
+    const playerArtWorth: { email: string; artValue: number }[] = [];
+    allPlayers.map(async p => {
+      let totalArtValue = 0;
+      // eslint-disable-next-line no-return-assign
+      (await p.playerInfo).artworks.map(a => (totalArtValue += a.purchasePrice));
+      playerArtWorth.push({ email: p.email, artValue: totalArtValue });
+    });
+
+    // eslint-disable-next-line prefer-arrow-callback
+    playerArtWorth.sort(function sortValue(a, b) {
+      return a.artValue - b.artValue;
+    });
+
+    let topPlayers = playerArtWorth;
+    if (playerArtWorth.length > numPlayers) {
+      topPlayers = playerArtWorth.slice(0, numPlayers);
+    }
+
+    return topPlayers;
+  }
+
   private async _deleteAuctionFloor(floorID: string): Promise<void> {
     const f = this.auctionFloors.find(floor => floor.id === floorID);
     if (f && !f.currentBid && f.artBeingAuctioned && f.auctioneer) {
