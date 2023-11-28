@@ -15,6 +15,12 @@ export default class APIUtils {
     this._artworkIds = [];
   }
 
+  /**
+   * Returns a list of valid Artworks within the index range given from the MET API response
+   * @param startIndex
+   * @param endIndex
+   * @returns a list of valid Artworks
+   */
   async nextArtworks(startIndex: number, endIndex: number): Promise<Artwork[]> {
     const artworkList: Artwork[] = [];
     if (this._artworkIds.length === 0) {
@@ -39,6 +45,7 @@ export default class APIUtils {
     return artworkList;
   }
 
+  // get all artwork ids that have images and an artist using MET API search endpoint
   private async _getArtworkIDs() {
     try {
       const response = await this._apiInstance.get(
@@ -53,6 +60,11 @@ export default class APIUtils {
     }
   }
 
+  /**
+   * creates an Artwork object with the information of the artwork with the given id
+   * @param objectId the id of the object from API
+   * @returns Artwork if the id exists in the objects enpoint, else returns undefined
+   */
   async createArtwork(objectId: number): Promise<Artwork | undefined> {
     let responseData = null;
     try {
@@ -97,6 +109,11 @@ export default class APIUtils {
     return artwork;
   }
 
+  /**
+   * determines if a given artwork is valid
+   * @param artwork an artowrk or undefined
+   * @returns returns true it is a valid artwork, false otherwise
+   */
   validArtwork(artwork: Artwork | undefined): boolean {
     if (artwork === undefined) {
       return false;

@@ -18,6 +18,9 @@ import { Typography } from '@material-ui/core';
 import React, { useState } from 'react';
 import { Artwork, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
+/**
+ * Information needed for rendering AuctionOurArtworkArea
+ */
 interface AuctionOurArtworkAreaProps {
   artworks: Artwork[];
   auctionFloors: AuctionFloorArea[];
@@ -25,6 +28,9 @@ interface AuctionOurArtworkAreaProps {
   handleTakeDownAuction: (a: Artwork) => Promise<void>;
 }
 
+/**
+ * Renders the floor when user is auctioning their own artwork
+ */
 const AuctionOurArtworkArea = ({
   artworks,
   auctionFloors,
@@ -37,10 +43,12 @@ const AuctionOurArtworkArea = ({
 
   const [startingPrices, setStartingPrices] = useState(initState);
 
+  // puts artwork up for auction
   const handleAdd = async (artwork: Artwork, bid: number) => {
     await handlePutForAuction(artwork, bid);
   };
 
+  // removes auction floor of the given artwork
   const handleRemove = async (artwork: Artwork) => {
     await handleTakeDownAuction(artwork);
   };

@@ -3,6 +3,9 @@ import { Badge, Button } from '@chakra-ui/react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@material-ui/core';
 import { Artwork, AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
+/**
+ * Interface of information AuctionFloorCard needs in order to render
+ */
 interface AuctionFloorCardProps {
   floor: AuctionFloorArea;
   weAreOwner: boolean;
@@ -11,6 +14,12 @@ interface AuctionFloorCardProps {
   handleTakeDownAuction: (artwork: Artwork) => Promise<void>;
 }
 
+/**
+ * Renders the AuctionFloorCard
+ *
+ * Renders: a badge with the bid floor's status, bid price, the image and
+ * buttons that allow users to join as a bidder or observer
+ */
 const AuctionFloorCard = ({
   floor,
   weAreOwner,
@@ -20,6 +29,7 @@ const AuctionFloorCard = ({
 }: AuctionFloorCardProps) => {
   const artwork = floor.artBeingAuctioned;
 
+  // renders a badge with the floor's status
   const getAuctionStatus = () => {
     if (floor.status === 'IN_PROGRESS') {
       return <Badge colorScheme='green'>Auction in progress</Badge>;
@@ -30,6 +40,7 @@ const AuctionFloorCard = ({
     }
   };
 
+  // returns the current or starting bid price depending on if the bidding has started
   const getCurrentBidPrice = () => {
     if (floor.currentBid !== undefined) {
       return 'Current bid: $' + floor.currentBid.bid.toLocaleString();

@@ -23,6 +23,25 @@ import auth from '../../../../classes/FirestoreConfig';
 import ArtworkAuctionSpace from './ArtworkAuctionSpace';
 import AuctionOurArtworkArea from './AuctionOurArtworkArea';
 
+/**
+ * The ArtAuctionHouse Area component renders the Art Auction House
+ *
+ * It renders a login/ signup screen
+ *
+ * Once logged in, displays current user information (email and balance), buttons to auction artwork and logout,
+ * and at least 5 auction floor cards which a user can join using buttons as a bidder or observer
+ *
+ * If joining as an observer, it will render a screen with the artwork and addition information about the artwork
+ * and information about the bidding: current bidder, starting price, current price, list of observers, list of bidders, time left
+ * there is also basic user info at the top with a back button to go back to the auction house
+ *
+ * If joining as an bidder, a dropdown and slider will appear with range min bid price - user's balance which they can
+ * use to make bids and submit those bids using a make bid button which will only work when the bidding is in progress
+ *
+ * If users click the Auction my artwork button, it renders a list of their artworks with a button and a dropdown next to each
+ * of them allowing them to set a price and add the artwork to the auction house
+ * Once added, it renders a new floor card which behaves the same as the others except that the user is able to take down their own artwork from auction
+ */
 function ArtAuctionHouseArea({
   controller,
 }: {
@@ -84,20 +103,24 @@ function ArtAuctionHouseArea({
       }
     };
 
+    // sets the selected floor and bid amount as the floor's min bid price
     const handleFloorJoined = (floor: AuctionFloorArea) => {
       setSelectedFloor(floor);
       setBidAmount(floor.minBid);
     };
 
+    // sets the selected floor to be undefined
     const handleFloorLeft = () => {
       setSelectedFloor(undefined);
     };
 
+    // sets the user's money to their new money amount and adds new artworks to the userArtwork
     const handleArtAccountUpdated = (account: ArtAuctionAccount) => {
       setUserMoney(account.wallet.money);
       setUserArtwork([...account.wallet.artwork]);
     };
 
+    // if the selected floor is taken down, sets it to undefined
     const handleFloorTakenDown = (floorID: string) => {
       if (selectedFloor?.id === floorID) {
         setSelectedFloor(undefined);
@@ -126,14 +149,17 @@ function ArtAuctionHouseArea({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [controller, townController, selectedFloor?.id]);
 
+  // sets isAuctioningArtwork to true
   const handleAuctionMyArtwork = () => {
     setIsAuctioningArtwork(true);
   };
 
+  // puts up artwork for auction
   const handlePutForAuction = async (a: Artwork, bid: number) => {
     await controller.auctionOurArtwork(a, bid);
   };
 
+  // takes down auction floor associated with the given artwork
   const handleTakeDownAuction = async (a: Artwork) => {
     await controller.takeDownAuction(a);
   };
@@ -183,6 +209,7 @@ function ArtAuctionHouseArea({
     }
   };
 
+  // joins floor, if joining as a bidder, checks if user is a valid bidder for this floor
   const handleFloorSelect = async (floor: AuctionFloorArea, asBidder: boolean) => {
     if (asBidder) {
       if (
@@ -200,10 +227,12 @@ function ArtAuctionHouseArea({
     await controller.joinFloor(floor, asBidder);
   };
 
+  // leaves given floor
   const handleFloorUnselect = async (floor: AuctionFloorArea) => {
     await controller.leaveFloor(floor);
   };
 
+  // returns if our player is a bidder
   const weAreBidder = () => {
     if (selectedFloor?.bidders.find(b => b.id === townController.ourPlayer.id) !== undefined) {
       return true;
@@ -211,6 +240,7 @@ function ArtAuctionHouseArea({
     return false;
   };
 
+  // makes bid if user can bid and it is a valid bid, otherwise renders a toast with the issue
   const handleMakeBid = async (floor: AuctionFloorArea, bid: number) => {
     if (canBid) {
       if (floor.currentBid?.bid !== undefined && floor.currentBid.bid >= bid) {
@@ -408,6 +438,11 @@ function ArtAuctionHouseArea({
   );
 }
 
+/**
+ * A wrapper component for the AuctionHouseArea component
+ * Determins if the user is logged in, if they are, renders the ArtAuctionHouse component,
+ * else renders a login/sign up modal
+ */
 export default function AuctionHouseAreaWrapper(): JSX.Element {
   const auctionHouseArea = useInteractable<AuctionHouseAreaInteractable>('auctionHouseArea');
   const townController = useTownController();
@@ -436,8 +471,6 @@ export default function AuctionHouseAreaWrapper(): JSX.Element {
   const closeModal = useCallback(() => {
     if (auctionHouseArea) {
       townController.interactEnd(auctionHouseArea);
-      // const controller = townController.getAuctionHouseAreaController(auctionHouseArea);
-      // controller.leaveGame();
     }
   }, [townController, auctionHouseArea]);
 

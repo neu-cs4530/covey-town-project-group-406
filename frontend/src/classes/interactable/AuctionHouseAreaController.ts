@@ -58,10 +58,18 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     this._auctionFloors = auctionFloors;
   }
 
+  /**
+   * Returns list of Auction Floor Areas
+   */
   get auctionFloors(): AuctionFloorArea[] {
     return this._auctionFloors;
   }
 
+  /**
+   *  Sends an interactable command to joing floor emits a floorJoined event
+   * @param floor Floor being joined
+   * @param asBidder true if player joining is joining as bidder, false if joining as observer
+   */
   public async joinFloor(floor: AuctionFloorArea, asBidder: boolean) {
     const { floorJoined } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinAuctionFloor',
@@ -71,6 +79,10 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     this.emit('floorJoined', floorJoined);
   }
 
+  /**
+   * Sends command to leave floor and emits a 'floorLeft' event
+   * @param floor floor being left
+   */
   public async leaveFloor(floor: AuctionFloorArea) {
     const { floorLeft } = await this._townController.sendInteractableCommand(this.id, {
       type: 'LeaveAuctionFloor',
@@ -79,6 +91,11 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     this.emit('floorLeft', floorLeft);
   }
 
+  /**
+   * Sends a command to make a bid
+   * @param floor the AuctionFloorArea where bid is made
+   * @param bid the bid amount
+   */
   public async makeBid(floor: AuctionFloorArea, bid: number) {
     await this._townController.sendInteractableCommand(this.id, {
       type: 'MakeBid',
@@ -87,6 +104,11 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     });
   }
 
+  /**
+   * Sends a command to auction our artwork
+   * @param artwork the chosen artwork to be put up for auction
+   * @param bid the starting bid amount
+   */
   public async auctionOurArtwork(artwork: Artwork, bid: number) {
     await this._townController.sendInteractableCommand(this.id, {
       type: 'AuctionOurArtwork',
@@ -95,6 +117,10 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
     });
   }
 
+  /**
+   * Sends a command to take down our auction floor and emits a 'floorTakenDown' event
+   * @param artwork the artwork associated with the floor being taken down
+   */
   public async takeDownAuction(artwork: Artwork) {
     const floor = this._auctionFloors.find(af => af.artBeingAuctioned.id === artwork.id);
     if (floor !== undefined) {
@@ -119,8 +145,6 @@ export default class AuctionHouseAreaController extends InteractableAreaControll
         this._townController.ourPlayer.artAuctionAccount as ArtAuctionAccount,
       );
     }
-    // check if the ourPlayer's artworks differ. If they do, assign nedw artworks
-    //if (this._townController.ourPlayer.artAuctionAccount?.wallet.artwork.length !=
   }
 
   /**
