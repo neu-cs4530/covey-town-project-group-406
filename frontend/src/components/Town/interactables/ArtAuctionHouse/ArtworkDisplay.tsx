@@ -3,10 +3,16 @@ import { Typography } from '@material-ui/core';
 import { Image } from '@chakra-ui/react';
 import { Artwork } from '../../../../types/CoveyTownSocket';
 
+/**
+ * Interface for information ArtworkDisplay needs to render
+ */
 interface ArtworkDisplayProps {
   artwork: Artwork;
 }
 
+/**
+ * Renders the Artwork's image with information about the artwork under
+ */
 const ArtworkDisplay = ({ artwork }: ArtworkDisplayProps) => {
   const getArtistName = () => {
     if (artwork.artist.wikiUrl !== undefined) {

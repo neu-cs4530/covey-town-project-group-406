@@ -19,6 +19,9 @@ import { Typography } from '@material-ui/core';
 import React from 'react';
 import { AuctionFloorArea } from '../../../../types/CoveyTownSocket';
 
+/**
+ * Interface for information that the ArtworkAuctionSpace rendering needs
+ */
 interface ArtworkAuctionSpaceProps {
   selectedFloor: AuctionFloorArea;
   bidAmount: number;
@@ -28,7 +31,9 @@ interface ArtworkAuctionSpaceProps {
   setBidAmount: (bidAmount: number) => void;
   weAreBidder: () => boolean;
 }
-
+/**
+ * Renders the Auction Space of the Auction Floor
+ */
 const ArtworkAuctionSpace = ({
   selectedFloor,
   bidAmount,
@@ -48,6 +53,7 @@ const ArtworkAuctionSpace = ({
     }
   };
 
+  // renders current information about the status of the bidding floor, current bid price and currently bidding user
   const getCurrentBid = () => {
     const floor = getSelectedFloor();
     if (floor?.status === 'WAITING_TO_START') {

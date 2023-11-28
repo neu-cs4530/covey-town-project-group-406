@@ -463,7 +463,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           if (activeBefore !== activeNow) {
             this.emit('interactableAreasChanged');
           }
-          // controller.emit('interactableAreaChanged', interactable);
         }
       } catch (err) {
         console.error('Error updating interactable', interactable);
@@ -695,6 +694,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
   }
 
+  /**
+   * Retrieve the action house area controller that corresponds with the area given
+   *
+   * @param auctionHouseArea
+   * @returns the controller if it exists, else throws an error
+   */
   public getAuctionHouseAreaController(
     auctionHouseArea: AuctionHouseArea,
   ): AuctionHouseAreaController {
