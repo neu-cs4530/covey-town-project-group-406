@@ -3,9 +3,11 @@ import {
   Modal,
   ModalCloseButton,
   ModalContent,
+  ModalFocusScope,
   ModalHeader,
   ModalOverlay,
   Spinner,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import { Typography } from '@material-ui/core';
@@ -39,6 +41,7 @@ function ArtAuctionHouseArea({
   );
   const [isAuctioningArtwork, setIsAuctioningArtwork] = useState(false);
   const [userArtwork, setUserArtwork] = useState<Artwork[]>([]);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
 
   useEffect(() => {
     const handleFloorsChanged = (newFloors: AuctionFloorArea[]) => {
@@ -172,6 +175,13 @@ function ArtAuctionHouseArea({
     }
   };
 
+  const handleViewLeaderboard = () => {
+    console.log(`is leaderboard1: ${isLeaderboardOpen}`);
+    setIsLeaderboardOpen(true);
+    console.log(`is leaderboard2: ${isLeaderboardOpen}`);
+  };
+  const handleCloseLeaderboard = () => setIsLeaderboardOpen(false);
+
   // gets the selected floor from all the floors
   // USE THIS method when using updateFrom and handleCommand
   const getSelectedFloor = (): AuctionFloorArea | undefined => {
@@ -250,6 +260,173 @@ function ArtAuctionHouseArea({
     }
   };
 
+  function homePage(): React.ReactNode {
+    return (
+      <div style={{ paddingLeft: 30, paddingRight: 30 }}>
+        <Typography variant='subtitle1'>
+          Welcome to the art auction house! You can view an artwork by clicking on the art and join
+          the auction for the art too. All auctions require a minimum of 3 bidders to start.
+        </Typography>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'left',
+            marginTop: 30,
+            gap: 10,
+          }}>
+          <Button colorScheme='teal' size='md' onClick={handleAuctionMyArtwork}>
+            Auction my artwork
+          </Button>
+          <Button colorScheme='teal' variant='outline' size='md' onClick={handleLogout}>
+            Logout
+          </Button>
+          <Button colorScheme='teal' variant='outline' size='md' onClick={handleViewLeaderboard}>
+            View Leaderboard
+          </Button>
+        </div>
+        <div>
+          {floors.length === 0 ? (
+            <div
+              style={{
+                display: 'flex',
+                alignContent: 'center',
+                gap: 20,
+                justifyContent: 'center',
+                padding: 30,
+              }}>
+              <Typography variant='h6'>Loading</Typography>
+              <Spinner
+                thickness='4px'
+                speed='0.65s'
+                emptyColor='gray.200'
+                color='blue.500'
+                size='xl'
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                paddingTop: 30,
+                paddingBottom: 30,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 20,
+              }}>
+              {floors.map((floor, idx) => (
+                <AuctionFloorCard
+                  key={idx}
+                  floor={floor}
+                  weAreOwner={
+                    userArtwork.find(a => a.id === floor.artBeingAuctioned.id) !== undefined
+                  }
+                  handleClickJoinObserver={async () => {
+                    await handleFloorSelect(floor, false);
+                  }}
+                  handleClickJoinFloorBidder={async () => {
+                    await handleFloorSelect(floor, true);
+                  }}
+                  handleTakeDownAuction={handleTakeDownAuction}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function pickAuctionFloorPage(): React.ReactNode {
+    return (
+      <div
+        style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <Typography variant='h5' style={{ fontWeight: 700 }}>
+          Choose your artwork to auction
+        </Typography>
+
+        <Button
+          colorScheme='teal'
+          size='md'
+          width={200}
+          onClick={() => setIsAuctioningArtwork(false)}>
+          Back to Auction House
+        </Button>
+
+        {townController.ourPlayer.artAuctionAccount?.wallet.artwork.length === 0 ? (
+          <div>
+            <Typography>
+              You do not own any artwork. Try bidding for an artwork in the Art Auction house!
+            </Typography>
+          </div>
+        ) : (
+          townController.ourPlayer.artAuctionAccount && (
+            <div>
+              <AuctionOurArtworkArea
+                artworks={userArtwork}
+                auctionFloors={floors}
+                handlePutForAuction={handlePutForAuction}
+                handleTakeDownAuction={handleTakeDownAuction}
+              />
+            </div>
+          )
+        )}
+      </div>
+    );
+  }
+
+  function selectedFloorDisplay(floor: AuctionFloorArea): React.ReactNode {
+    return (
+      <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>
+        <Button
+          colorScheme='teal'
+          size='md'
+          style={{ width: 100 }}
+          onClick={async () => {
+            await handleFloorUnselect(floor);
+          }}>
+          Back
+        </Button>
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            paddingTop: 40,
+            gap: 20,
+          }}>
+          <div
+            style={{
+              width: '50%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'left',
+            }}>
+            <ArtworkDisplay artwork={floor.artBeingAuctioned} />
+          </div>
+
+          <div style={{ width: '50%' }}>
+            <ArtworkAuctionSpace
+              selectedFloor={floor}
+              bidAmount={bidAmount}
+              userMoney={userMoney}
+              getSelectedFloor={getSelectedFloor}
+              handleMakeBid={handleMakeBid}
+              setBidAmount={setBidAmount}
+              weAreBidder={weAreBidder}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function leaderboardDisplay(): React.ReactNode {
+    return (
+    <div>
+
+    </div>);
+  }
+
   return (
     <div>
       <Typography variant='subtitle1' style={{ padding: 30, paddingTop: 15, fontWeight: 300 }}>
@@ -259,150 +436,13 @@ function ArtAuctionHouseArea({
       </Typography>
 
       {isAuctioningArtwork ? (
-        <div
-          style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <Typography variant='h5' style={{ fontWeight: 700 }}>
-            Choose your artwork to auction
-          </Typography>
-
-          <Button
-            colorScheme='teal'
-            size='md'
-            width={200}
-            onClick={() => setIsAuctioningArtwork(false)}>
-            Back to Auction House
-          </Button>
-
-          {townController.ourPlayer.artAuctionAccount?.wallet.artwork.length === 0 ? (
-            <div>
-              <Typography>
-                You do not own any artwork. Try bidding for an artwork in the Art Auction house!
-              </Typography>
-            </div>
-          ) : (
-            townController.ourPlayer.artAuctionAccount && (
-              <div>
-                <AuctionOurArtworkArea
-                  artworks={userArtwork}
-                  auctionFloors={floors}
-                  handlePutForAuction={handlePutForAuction}
-                  handleTakeDownAuction={handleTakeDownAuction}
-                />
-              </div>
-            )
-          )}
-        </div>
+        <div>{pickAuctionFloorPage()}</div>
       ) : selectedFloor !== undefined ? (
-        <div style={{ padding: 30, paddingTop: 5, display: 'flex', flexDirection: 'column' }}>
-          <Button
-            colorScheme='teal'
-            size='md'
-            style={{ width: 100 }}
-            onClick={async () => {
-              await handleFloorUnselect(selectedFloor);
-            }}>
-            Back
-          </Button>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              paddingTop: 40,
-              gap: 20,
-            }}>
-            <div
-              style={{
-                width: '50%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'left',
-              }}>
-              <ArtworkDisplay artwork={selectedFloor.artBeingAuctioned} />
-            </div>
-
-            <div style={{ width: '50%' }}>
-              <ArtworkAuctionSpace
-                selectedFloor={selectedFloor}
-                bidAmount={bidAmount}
-                userMoney={userMoney}
-                getSelectedFloor={getSelectedFloor}
-                handleMakeBid={handleMakeBid}
-                setBidAmount={setBidAmount}
-                weAreBidder={weAreBidder}
-              />
-            </div>
-          </div>
-        </div>
+        <div>{selectedFloorDisplay(selectedFloor)}</div>
+      ) : isLeaderboardOpen ? (
+        <div>{leaderboardDisplay()}</div>
       ) : (
-        <div style={{ paddingLeft: 30, paddingRight: 30 }}>
-          <Typography variant='subtitle1'>
-            Welcome to the art auction house! You can view an artwork by clicking on the art and
-            join the auction for the art too. All auctions require a minimum of 3 bidders to start.
-          </Typography>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'left',
-              marginTop: 30,
-              gap: 10,
-            }}>
-            <Button colorScheme='teal' size='md' onClick={handleAuctionMyArtwork}>
-              Auction my artwork
-            </Button>
-            <Button colorScheme='teal' variant='outline' size='md' onClick={handleLogout}>
-              Logout
-            </Button>
-          </div>
-          <div>
-            {floors.length === 0 ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignContent: 'center',
-                  gap: 20,
-                  justifyContent: 'center',
-                  padding: 30,
-                }}>
-                <Typography variant='h6'>Loading</Typography>
-                <Spinner
-                  thickness='4px'
-                  speed='0.65s'
-                  emptyColor='gray.200'
-                  color='blue.500'
-                  size='xl'
-                />
-              </div>
-            ) : (
-              <div
-                style={{
-                  paddingTop: 30,
-                  paddingBottom: 30,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 20,
-                }}>
-                {floors.map((floor, idx) => (
-                  <AuctionFloorCard
-                    key={idx}
-                    floor={floor}
-                    weAreOwner={
-                      userArtwork.find(a => a.id === floor.artBeingAuctioned.id) !== undefined
-                    }
-                    handleClickJoinObserver={async () => {
-                      await handleFloorSelect(floor, false);
-                    }}
-                    handleClickJoinFloorBidder={async () => {
-                      await handleFloorSelect(floor, true);
-                    }}
-                    handleTakeDownAuction={handleTakeDownAuction}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        <div>{homePage()}</div>
       )}
     </div>
   );
