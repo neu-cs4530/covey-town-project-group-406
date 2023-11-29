@@ -18,19 +18,7 @@ Running the application locally entails running both the backend service and a f
 
 ### Setting up the backend
 
-To run the backend, you will need a Twilio account. Twilio provides new accounts with $15 of credit, which is more than enough to get started.
-To create an account and configure your local environment:
-
-1. Go to [Twilio](https://www.twilio.com/) and create an account. You do not need to provide a credit card to create a trial account.
-2. Create an API key and secret (select "API Keys" on the left under "Settings")
-3. Create a `.env` file in the `townService` directory, setting the values as follows:
-
-| Config Value            | Description                               |
-| ----------------------- | ----------------------------------------- |
-| `TWILIO_ACCOUNT_SID`    | Visible on your twilio account dashboard. |
-| `TWILIO_API_KEY_SID`    | The SID of the new API key you created.   |
-| `TWILIO_API_KEY_SECRET` | The secret for the API key you created.   |
-| `TWILIO_API_AUTH_TOKEN` | Visible on your twilio account dashboard. |
+You will need to add a .env file in each of the frontend/ and townService/ folders which connect to Twilio and Firebase. Please email gupta.ridd@northeastern.edu for these environment files.
 
 ### Starting the backend
 
